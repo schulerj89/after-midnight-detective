@@ -12,13 +12,15 @@ export interface ExplorationPlayerSnapshot {
   lean: number;
 }
 
+export const EXPLORATION_CHARACTER_SCALE = 0.72;
+
 export class ExplorationPlayer {
   private readonly root: Phaser.GameObjects.Container;
   private readonly shadow: Phaser.GameObjects.Ellipse;
   private readonly body: Phaser.GameObjects.Image;
   private bobPhase = 0;
   private moving = false;
-  private readonly collisionBody = { halfWidth: 30, halfHeight: 20 };
+  private readonly collisionBody = { halfWidth: 22, halfHeight: 15 };
 
   constructor(
     scene: Phaser.Scene,
@@ -26,8 +28,8 @@ export class ExplorationPlayer {
     y: number,
     textureKey: string,
   ) {
-    this.shadow = scene.add.ellipse(0, 0, 108, 25, 0x000000, 0.5);
-    this.body = scene.add.image(0, 0, textureKey).setOrigin(0.5, 1);
+    this.shadow = scene.add.ellipse(0, 0, 78, 18, 0x000000, 0.5);
+    this.body = scene.add.image(0, 0, textureKey).setOrigin(0.5, 1).setScale(EXPLORATION_CHARACTER_SCALE);
     this.root = scene.add.container(x, y, [this.shadow, this.body]);
     this.updateDepth();
   }
@@ -58,7 +60,7 @@ export class ExplorationPlayer {
 
     if (this.moving) {
       this.bobPhase += distance * 0.08;
-      const bob = Math.abs(Math.sin(this.bobPhase)) * 7;
+      const bob = Math.abs(Math.sin(this.bobPhase)) * 5;
       this.body.setY(-bob);
       this.body.setRotation(vector.x * 0.055);
       this.shadow.setScale(1 - bob * 0.012, 1 - bob * 0.02);

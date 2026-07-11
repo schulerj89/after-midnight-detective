@@ -28,9 +28,13 @@ export interface LevelDoorLink {
   fromRoomId: string;
   fromX: number;
   fromY: number;
+  fromEnterX: number;
+  fromEnterY: number;
   toRoomId: string;
   toX: number;
   toY: number;
+  toEnterX: number;
+  toEnterY: number;
 }
 
 export interface LevelDefinition {

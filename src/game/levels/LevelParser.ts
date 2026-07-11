@@ -28,6 +28,16 @@ function walkable(room: LevelRoom, x: number, y: number): boolean {
   return x >= 0 && y >= 0 && x < room.width && y < room.height && room.map[y]?.[x] !== '#';
 }
 
+function onPerimeter(room: LevelRoom, x: number, y: number): boolean {
+  return x === 0 || y === 0 || x === room.width - 1 || y === room.height - 1;
+}
+
+function occupiedByPlacement(room: LevelRoom, x: number, y: number): boolean {
+  return room.placements.some((placement) =>
+    x >= placement.x && x < placement.x + placement.width &&
+    y >= placement.y && y < placement.y + placement.height);
+}
+
 export function parseLevel(source: string): LevelParseResult {
   const lines = source.replace(/\r/g, '').split('\n');
   const errors: LevelParseError[] = [];
@@ -123,12 +133,21 @@ export function parseLevel(source: string): LevelParseResult {
       case 'LINK': {
         const fromX = integer(parts[2]);
         const fromY = integer(parts[3]);
-        const toX = integer(parts[6]);
-        const toY = integer(parts[7]);
-        if (parts.length !== 10 || parts[4] !== '<->' || parts[8] !== 'ID' || fromX === undefined || fromY === undefined || toX === undefined || toY === undefined) {
-          fail(lineNumber, 'LINK requires room x y <-> room x y ID id');
+        const fromEnterX = integer(parts[5]);
+        const fromEnterY = integer(parts[6]);
+        const toX = integer(parts[9]);
+        const toY = integer(parts[10]);
+        const toEnterX = integer(parts[12]);
+        const toEnterY = integer(parts[13]);
+        if (parts.length !== 16 || parts[4] !== 'ENTER' || parts[7] !== '<->' || parts[11] !== 'ENTER' || parts[14] !== 'ID' ||
+          fromX === undefined || fromY === undefined || fromEnterX === undefined || fromEnterY === undefined ||
+          toX === undefined || toY === undefined || toEnterX === undefined || toEnterY === undefined) {
+          fail(lineNumber, 'LINK requires room x y ENTER x y <-> room x y ENTER x y ID id');
         } else {
-          links.push({ id: parts[9], fromRoomId: parts[1], fromX, fromY, toRoomId: parts[5], toX, toY });
+          links.push({
+            id: parts[15], fromRoomId: parts[1], fromX, fromY, fromEnterX, fromEnterY,
+            toRoomId: parts[8], toX, toY, toEnterX, toEnterY,
+          });
         }
         break;
       }
@@ -191,7 +210,9 @@ export function parseLevel(source: string): LevelParseResult {
   const roomsById = new Map(rooms.map((room) => [room.id, room]));
   if (start) {
     const room = roomsById.get(start.roomId);
-    if (!room || !walkable(room, start.x, start.y)) fail(0, 'START must reference a walkable room tile');
+    if (!room || !walkable(room, start.x, start.y) || onPerimeter(room, start.x, start.y) || room.map[start.y]?.[start.x] === '+' || occupiedByPlacement(room, start.x, start.y)) {
+      fail(0, 'START must reference an unoccupied interior floor tile');
+    }
   }
 
   const linkIds = new Set<string>();
@@ -203,13 +224,17 @@ export function parseLevel(source: string): LevelParseResult {
     const to = roomsById.get(link.toRoomId);
     if (!from || !to) { fail(0, `Link ${link.id} references an unknown room`); return; }
     if (from.map[link.fromY]?.[link.fromX] !== '+' || to.map[link.toY]?.[link.toX] !== '+') fail(0, `Link ${link.id} endpoints must use + tiles`);
+    if (!onPerimeter(from, link.fromX, link.fromY) || !onPerimeter(to, link.toX, link.toY)) fail(0, `Link ${link.id} door endpoints must be on room perimeters`);
+    if (!walkable(from, link.fromEnterX, link.fromEnterY) || from.map[link.fromEnterY]?.[link.fromEnterX] === '+') fail(0, `Link ${link.id} from ENTER must use an interior walkable tile`);
+    if (!walkable(to, link.toEnterX, link.toEnterY) || to.map[link.toEnterY]?.[link.toEnterX] === '+') fail(0, `Link ${link.id} to ENTER must use an interior walkable tile`);
+    if (onPerimeter(from, link.fromEnterX, link.fromEnterY) || onPerimeter(to, link.toEnterX, link.toEnterY)) fail(0, `Link ${link.id} ENTER tiles must be inside the room perimeter`);
+    if (occupiedByPlacement(from, link.fromEnterX, link.fromEnterY) || occupiedByPlacement(to, link.toEnterX, link.toEnterY)) fail(0, `Link ${link.id} ENTER tiles cannot overlap placements`);
+    if (Math.abs(link.fromX - link.fromEnterX) + Math.abs(link.fromY - link.fromEnterY) !== 1) fail(0, `Link ${link.id} from ENTER must be adjacent to its door`);
+    if (Math.abs(link.toX - link.toEnterX) + Math.abs(link.toY - link.toEnterY) !== 1) fail(0, `Link ${link.id} to ENTER must be adjacent to its door`);
     const fromKey = `${from.id}:${link.fromX}:${link.fromY}`;
     const toKey = `${to.id}:${link.toX}:${link.toY}`;
     linkedDoorCounts.set(fromKey, (linkedDoorCounts.get(fromKey) ?? 0) + 1);
     linkedDoorCounts.set(toKey, (linkedDoorCounts.get(toKey) ?? 0) + 1);
-    const fromWorld = { x: from.originX + link.fromX, y: from.originY + link.fromY };
-    const toWorld = { x: to.originX + link.toX, y: to.originY + link.toY };
-    if (Math.abs(fromWorld.x - toWorld.x) + Math.abs(fromWorld.y - toWorld.y) !== 1) fail(0, `Link ${link.id} endpoints must be adjacent`);
   });
   rooms.forEach((room) => room.map.forEach((row, y) => row.forEach((tile, x) => {
     if (tile === '+' && linkedDoorCounts.get(`${room.id}:${x}:${y}`) !== 1) {

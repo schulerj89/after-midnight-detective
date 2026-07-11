@@ -140,6 +140,9 @@ a general decoration color.
 
 - Build scenes from layered planes: distant exterior, room, actors, foreground
   occluders, weather/effects, and UI.
+- Present connected interiors as isolated room stages. A doorway cuts briefly to
+  black before revealing the destination; neighboring rooms do not remain visible
+  beyond the active set.
 - Favor strong silhouettes, pools of light, negative space, and graphic shadow
   shapes over realistic rendering.
 - Present characters as full-body transparent cutouts with a consistent camera
@@ -217,6 +220,10 @@ timeline, and one explainable accusation.
 Keep Level 1 to a small connected room set and do not add another floor or a large
 cast until that slice is readable, replayable, and satisfying on desktop and
 landscape mobile.
+
+The Level 1 lounge is the 30x30 travel and observation hub. Its kitchen, Room 317
+bedroom, and manager office remain compact clue-focused stages connected by quick
+black doorway transitions.
 
 ## Technical implications
 

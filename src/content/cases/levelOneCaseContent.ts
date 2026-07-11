@@ -18,6 +18,7 @@ function script(id: string, speaker: string, portraitKey: string, pages: readonl
 const DETECTIVE = 'portrait-detective';
 const VERA = 'portrait-vera';
 const MILES = 'portrait-miles';
+const OFFICER = 'portrait-officer';
 
 export const LEVEL_ONE_CASE_TRUTH = {
   victim: 'Elias Wren',
@@ -26,6 +27,20 @@ export const LEVEL_ONE_CASE_TRUTH = {
 } as const;
 
 export const LEVEL_ONE_INTERACTIONS: readonly LevelOneInteractionVariant[] = [
+  {
+    id: 'dlg.officer.first-question', targetId: 'npc.officer', prompt: 'QUESTION OFFICER HALE',
+    excludesAny: ['reviewed.officer.first-question'],
+    script: script('dlg.officer.first-question', 'OFFICER HALE', OFFICER, [
+      'I sealed the hotel exits when the alarm sounded.',
+      'Nobody passed me after that. The guests stayed inside.',
+      'Move where you need, detective. I will hold the doors.',
+    ]),
+    effects: ['statement.officer.exits-sealed', 'reviewed.officer.first-question'],
+  },
+  {
+    id: 'dlg.officer.repeat', targetId: 'npc.officer', prompt: 'QUESTION OFFICER HALE AGAIN',
+    script: script('dlg.officer.repeat', 'OFFICER HALE', OFFICER, ['The exits are still sealed. Nobody leaves without my seeing them.']), effects: [],
+  },
   {
     id: 'dlg.vera.followup.torn-ledger', targetId: 'npc.vera', prompt: 'ASK VERA ABOUT THE TORN LEDGER',
     requiresAll: ['topic.vera.torn-ledger', 'confrontation.miles.torn-ledger'], excludesAny: ['reviewed.vera.torn-ledger'],

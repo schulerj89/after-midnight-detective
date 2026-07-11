@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "lounge-office-destination-mobile", "file": "lounge-office-destination-mobile.png", "pose": "transition-auto-lounge-office" },
+  "viewport": { "deviceScaleFactor": 1, "width": 1000, "height": 560 },
+  "elements": [
+    { "id": "office-stage", "role": "room-grid", "x": 3, "y": 0, "width": 560, "height": 449 },
+    { "id": "player", "role": "character", "x": 450, "y": 51, "width": 58, "height": 151 },
+    { "id": "joystick", "role": "touch-control", "x": 16, "y": 384, "width": 160, "height": 160 },
+    { "id": "action-b", "role": "touch-control", "x": 846, "y": 448, "width": 62, "height": 62 },
+    { "id": "action-a", "role": "touch-control", "x": 922, "y": 466, "width": 62, "height": 62 }
+  ],
+  "containmentZones": [ { "id": "safe-area", "x": 8, "y": 8, "width": 984, "height": 544, "contains": ["player", "joystick", "action-b", "action-a"] } ],
+  "forbiddenOverlaps": [],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [ { "id": "isolated-office", "x": 3, "y": 0, "width": 560, "height": 449, "minLuminance": 3, "maxLuminance": 115, "minVariance": 8, "maxVariance": 9000 } ]
+}

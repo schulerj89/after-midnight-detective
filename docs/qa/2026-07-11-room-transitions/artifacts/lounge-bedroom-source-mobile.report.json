@@ -1,0 +1,20 @@
+{
+  "status": "pass",
+  "screenshot": "C:\\Users\\joshs\\Projects\\after-midnight-detective\\docs\\screenshots\\level-1-transitions\\lounge-bedroom-source-mobile.png",
+  "layout": "C:\\Users\\joshs\\Projects\\after-midnight-detective\\docs\\screenshots\\level-1-transitions\\lounge-bedroom-source-mobile.layout.json",
+  "annotated": "C:\\Users\\joshs\\Projects\\after-midnight-detective\\docs\\qa\\2026-07-11-room-transitions\\artifacts\\lounge-bedroom-source-mobile.annotated.png",
+  "imageSize": {
+    "width": 1000,
+    "height": 560
+  },
+  "findings": [],
+  "summary": {
+    "failures": 0,
+    "checksRun": 19
+  },
+  "limitations": [
+    "Pixel activity is a heuristic and does not establish readability or composition quality.",
+    "Geometry is trustworthy only when the manifest is exported from authoritative runtime bounds.",
+    "Human review of the original and annotated screenshot remains mandatory."
+  ]
+}

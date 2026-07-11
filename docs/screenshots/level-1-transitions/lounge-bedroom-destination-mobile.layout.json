@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "lounge-bedroom-destination-mobile", "file": "lounge-bedroom-destination-mobile.png", "pose": "transition-auto-lounge-bedroom" },
+  "viewport": { "deviceScaleFactor": 1, "width": 1000, "height": 560 },
+  "elements": [
+    { "id": "bedroom-stage", "role": "room-grid", "x": 3, "y": 0, "width": 449, "height": 449 },
+    { "id": "player", "role": "character", "x": 177, "y": 212, "width": 46, "height": 154 },
+    { "id": "joystick", "role": "touch-control", "x": 16, "y": 384, "width": 160, "height": 160 },
+    { "id": "action-b", "role": "touch-control", "x": 846, "y": 448, "width": 62, "height": 62 },
+    { "id": "action-a", "role": "touch-control", "x": 922, "y": 466, "width": 62, "height": 62 }
+  ],
+  "containmentZones": [ { "id": "safe-area", "x": 8, "y": 8, "width": 984, "height": 544, "contains": ["player", "joystick", "action-b", "action-a"] } ],
+  "forbiddenOverlaps": [],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [ { "id": "isolated-bedroom", "x": 3, "y": 0, "width": 449, "height": 449, "minLuminance": 3, "maxLuminance": 115, "minVariance": 8, "maxVariance": 9000 } ]
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "lounge-kitchen-source-mobile", "file": "lounge-kitchen-source-mobile.png", "pose": "transition-lounge-kitchen-source" },
+  "viewport": { "deviceScaleFactor": 1, "width": 1000, "height": 560 },
+  "elements": [
+    { "id": "lounge-stage", "role": "room-grid", "x": 3, "y": 84, "width": 940, "height": 476 },
+    { "id": "player", "role": "character", "x": 831, "y": 134, "width": 60, "height": 153 },
+    { "id": "east-door", "role": "door", "x": 943, "y": 252, "width": 57, "height": 72 },
+    { "id": "joystick", "role": "touch-control", "x": 16, "y": 384, "width": 160, "height": 160 },
+    { "id": "action-b", "role": "touch-control", "x": 846, "y": 448, "width": 62, "height": 62 },
+    { "id": "action-a", "role": "touch-control", "x": 922, "y": 466, "width": 62, "height": 62 }
+  ],
+  "containmentZones": [
+    { "id": "viewport", "x": 0, "y": 0, "width": 1000, "height": 560, "contains": ["lounge-stage", "east-door"] },
+    { "id": "safe-area", "x": 8, "y": 8, "width": 984, "height": 544, "contains": ["player", "joystick", "action-b", "action-a"] }
+  ],
+  "forbiddenOverlaps": [ { "a": "player", "b": "east-door" } ],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "lounge-floor", "x": 3, "y": 84, "width": 800, "height": 476, "minLuminance": 10, "maxLuminance": 50, "minVariance": 1, "maxVariance": 9000 },
+    { "id": "player-art", "x": 831, "y": 134, "width": 60, "height": 153, "minLuminance": 3, "maxLuminance": 150, "minVariance": 8, "maxVariance": 9000 }
+  ]
+}

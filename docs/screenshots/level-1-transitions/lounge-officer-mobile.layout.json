@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "lounge-officer-mobile", "file": "lounge-officer-mobile.png", "pose": "level-room-lounge-officer" },
+  "viewport": { "deviceScaleFactor": 1, "width": 1000, "height": 560 },
+  "elements": [
+    { "id": "officer", "role": "character", "x": 605, "y": 134, "width": 60, "height": 151 },
+    { "id": "dialogue", "role": "dialogue", "x": 42, "y": 376, "width": 918, "height": 166 },
+    { "id": "portrait", "role": "portrait", "x": 57, "y": 391, "width": 138, "height": 137 },
+    { "id": "copy", "role": "text", "x": 213, "y": 423, "width": 535, "height": 52 },
+    { "id": "action-b", "role": "touch-control", "x": 846, "y": 448, "width": 62, "height": 62 },
+    { "id": "action-a", "role": "touch-control", "x": 922, "y": 466, "width": 62, "height": 62 }
+  ],
+  "containmentZones": [
+    { "id": "safe-area", "x": 8, "y": 8, "width": 984, "height": 544, "contains": ["officer", "dialogue", "portrait", "copy", "action-b", "action-a"] }
+  ],
+  "forbiddenOverlaps": [ { "a": "portrait", "b": "copy" }, { "a": "copy", "b": "action-b" }, { "a": "copy", "b": "action-a" } ],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [ { "id": "officer-art", "x": 605, "y": 134, "width": 60, "height": 151, "minLuminance": 3, "maxLuminance": 150, "minVariance": 8, "maxVariance": 9000 } ]
+}

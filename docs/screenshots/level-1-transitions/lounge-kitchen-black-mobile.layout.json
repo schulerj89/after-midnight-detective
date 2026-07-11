@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "lounge-kitchen-black-mobile", "file": "lounge-kitchen-black-mobile.png", "pose": "transition-lounge-kitchen-black" },
+  "viewport": { "deviceScaleFactor": 1, "width": 1000, "height": 560 },
+  "elements": [ { "id": "black-frame", "role": "transition", "x": 0, "y": 0, "width": 1000, "height": 560 } ],
+  "containmentZones": [ { "id": "viewport", "x": 0, "y": 0, "width": 1000, "height": 560, "contains": ["black-frame"] } ],
+  "forbiddenOverlaps": [],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [ { "id": "opaque-black", "x": 0, "y": 0, "width": 1000, "height": 560, "minLuminance": 0, "maxLuminance": 5, "minVariance": 0, "maxVariance": 5 } ]
+}

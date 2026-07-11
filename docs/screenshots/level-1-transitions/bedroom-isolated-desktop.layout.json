@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "bedroom-isolated-desktop", "file": "bedroom-isolated-desktop.png", "pose": "level-room-bedroom" },
+  "viewport": { "deviceScaleFactor": 1, "width": 1280, "height": 720 },
+  "elements": [
+    { "id": "bedroom-stage", "role": "room-grid", "x": 0, "y": 0, "width": 576, "height": 576 },
+    { "id": "player", "role": "character", "x": 292, "y": 137, "width": 63, "height": 196 },
+    { "id": "black-gutter", "role": "offstage", "x": 576, "y": 92, "width": 704, "height": 628 }
+  ],
+  "containmentZones": [
+    { "id": "viewport", "x": 0, "y": 0, "width": 1280, "height": 720, "contains": ["bedroom-stage", "player", "black-gutter"] },
+    { "id": "bedroom", "x": 0, "y": 0, "width": 576, "height": 576, "contains": ["player"] }
+  ],
+  "forbiddenOverlaps": [ { "a": "player", "b": "black-gutter" } ],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "bedroom-art", "x": 0, "y": 0, "width": 576, "height": 576, "minLuminance": 3, "maxLuminance": 110, "minVariance": 8, "maxVariance": 9000 },
+    { "id": "offstage-black", "x": 700, "y": 120, "width": 500, "height": 500, "minLuminance": 0, "maxLuminance": 15, "minVariance": 0, "maxVariance": 50 }
+  ]
+}

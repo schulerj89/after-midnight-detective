@@ -2,46 +2,57 @@
 LEVEL hotel-marlowe-floor-1 "Hotel Marlowe - Level One"
 VERSION 1
 TILE_SIZE 72
-START lounge 10 17
+START lounge 15 26
 
-ROOM lounge "Main Lounge" 20 20 AT 0 0
+ROOM lounge "Main Lounge" 30 30 AT 0 0
 MAP
-#########+##########
-#..................#
-#..................#
-#..................#
-#..................#
-#..................#
-#..................#
-#..................#
-#..................#
-#..................+
-+..................#
-#..................#
-#..................#
-#..................#
-#..................#
-#..................#
-#..................#
-#..................#
-#..................#
-####################
+##############+###############
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................+
++............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+#............................#
+##############################
 ENDMAP
-PLACE prop.front-desk prop front-desk 2 2 w=5 h=2 solid=true
-PLACE prop.piano prop piano 13 2 w=4 h=2 solid=true
-PLACE prop.west-sofa prop sofa 3 6 w=4 h=2 solid=true
-PLACE prop.lounge-table prop low-table 4 12 w=2 h=1 solid=true
-PLACE prop.east-sofa prop sofa 13 13 w=4 h=2 solid=true
-PLACE prop.grand-clock prop grand-clock 17 5 w=1 h=2 solid=true
-PLACE prop.coat-rack prop coat-rack 2 15 w=1 h=2 solid=true
-PLACE prop.foreground-screen prop folding-screen 16 16 w=2 h=2 solid=true
-PLACE npc.vera actor vera 5 3
-PLACE npc.miles actor miles 15 3
-PLACE clue.wet-footprints clue wet-footprints 9 2
-PLACE clue.torn-ledger clue torn-ledger 7 4
+PLACE prop.front-desk prop front-desk 3 3 w=5 h=2 solid=true
+PLACE prop.piano prop piano 21 3 w=4 h=2 solid=true
+PLACE prop.west-sofa prop sofa 5 9 w=4 h=2 solid=true
+PLACE prop.lounge-table prop low-table 7 18 w=2 h=1 solid=true
+PLACE prop.east-sofa prop sofa 21 20 w=4 h=2 solid=true
+PLACE prop.grand-clock prop grand-clock 27 8 w=1 h=2 solid=true
+PLACE prop.coat-rack prop coat-rack 3 23 w=1 h=2 solid=true
+PLACE prop.foreground-screen prop folding-screen 25 25 w=2 h=2 solid=true
+PLACE npc.vera actor vera 8 4
+PLACE npc.miles actor miles 23 4
+PLACE npc.officer actor officer 23 17
+PLACE clue.wet-footprints clue wet-footprints 14 3
+PLACE clue.torn-ledger clue torn-ledger 11 6
 ENDROOM
 
-ROOM kitchen "Service Kitchen" 12 10 AT 20 5
+ROOM kitchen "Service Kitchen" 12 10 AT 30 10
 MAP
 ############
 #..........#
@@ -63,7 +74,7 @@ PLACE prop.kitchen-bin prop bin 10 7 w=1 h=1 solid=true
 PLACE clue.damp-matchbook clue damp-matchbook 8 3
 ENDROOM
 
-ROOM bedroom "Room 317 Bedroom" 8 8 AT 6 -8
+ROOM bedroom "Room 317 Bedroom" 8 8 AT 11 -8
 MAP
 ########
 #......#
@@ -82,7 +93,7 @@ PLACE prop.bedroom-chair prop chair 6 5 w=1 h=1 solid=true
 PLACE clue.stopped-watch clue stopped-watch 4 4
 ENDROOM
 
-ROOM office "Manager Office" 10 8 AT -10 7
+ROOM office "Manager Office" 10 8 AT -10 12
 MAP
 ##########
 #........#
@@ -103,7 +114,7 @@ PLACE prop.office-coat-stand prop coat-stand 8 5 w=1 h=1 solid=true
 PLACE clue.switchboard-log clue switchboard-log 7 2
 ENDROOM
 
-LINK lounge 19 9 <-> kitchen 0 4 ID door.lounge-kitchen
-LINK lounge 9 0 <-> bedroom 3 7 ID door.lounge-317
-LINK lounge 0 10 <-> office 9 3 ID door.lounge-office
+LINK lounge 29 14 ENTER 28 14 <-> kitchen 0 4 ENTER 1 4 ID door.lounge-kitchen
+LINK lounge 14 0 ENTER 14 1 <-> bedroom 3 7 ENTER 3 6 ID door.lounge-317
+LINK lounge 0 15 ENTER 1 15 <-> office 9 3 ENTER 8 3 ID door.lounge-office
 ENDLEVEL

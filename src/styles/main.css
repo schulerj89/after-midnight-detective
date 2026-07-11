@@ -56,6 +56,17 @@ body {
     pointer-events: none;
     font-family: 'Press Start 2P', monospace;
     user-select: none;
+    transition: opacity 100ms linear;
+  }
+
+  #mobile-controls.is-room-transitioning {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #mobile-controls.is-room-transitioning button,
+  #mobile-controls.is-room-transitioning .mobile-controls__dpad {
+    pointer-events: none;
   }
 
   #mobile-controls button {

@@ -21,7 +21,7 @@ ENDMAP
 PLACE stable-id actor|prop|clue archetype local-x local-y w=1 h=1 solid=false
 ENDROOM
 
-LINK room-a x y <-> room-b x y ID stable-door-id
+LINK room-a door-x door-y ENTER arrival-x arrival-y <-> room-b door-x door-y ENTER arrival-x arrival-y ID stable-door-id
 ENDLEVEL
 ```
 
@@ -39,9 +39,13 @@ Placements use stable IDs so later mystery, notebook, timeline, and dialogue dat
 can refer to spatial objects without depending on coordinates. Multi-tile props
 use `w` and `h`; `solid=true` adds their footprint to collision geometry.
 
+Each `LINK` endpoint names its walkable `+` door tile and an adjacent interior
+`ENTER` tile. A room transition fades to black and places the player on the
+destination endpoint's `ENTER` tile, preventing immediate door bounce.
+
 ## Level 1
 
-- `lounge`: 20x20 main observation hub
+- `lounge`: 30x30 main observation hub
 - `kitchen`: 12x10 service room
 - `bedroom`: 8x8 Room 317
 - `office`: 10x8 manager office
@@ -53,4 +57,5 @@ and furniture are placeholders for spatial and interaction testing.
 
 Run `npm run validate`. The parser rejects malformed row sizes, invalid glyphs,
 duplicate stable IDs, overlapping rooms, invalid placements, disconnected room
-graphs, non-adjacent links, and door endpoints that are not `+` tiles.
+graphs, door endpoints that are not `+` tiles, and invalid
+or non-adjacent `ENTER` arrivals.

@@ -62,4 +62,12 @@ describe('LevelOneCaseState', () => {
   it('does not manufacture repeat text for unknown clues', () => {
     expect(resolveLevelOneInteraction('clue.unknown-placeholder', new LevelOneCaseState())).toBeUndefined();
   });
+
+  it('records Officer Hale testimony and then serves repeat text', () => {
+    const state = new LevelOneCaseState();
+    expect(resolveLevelOneInteraction('npc.officer', state)?.id).toBe('dlg.officer.first-question');
+    completeTarget(state, 'npc.officer');
+    expect(state.has('statement.officer.exits-sealed')).toBe(true);
+    expect(resolveLevelOneInteraction('npc.officer', state)?.id).toBe('dlg.officer.repeat');
+  });
 });

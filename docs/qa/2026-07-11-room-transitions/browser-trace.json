@@ -1,0 +1,19 @@
+{
+  "pose": "transition-auto-lounge-kitchen",
+  "viewport": { "width": 1000, "height": 560 },
+  "observed": {
+    "roomId": "kitchen",
+    "activeRoomCount": 1,
+    "lastTransitionLinkId": "door.lounge-kitchen",
+    "lastTransitionFromRoom": "lounge",
+    "lastTransitionToRoom": "kitchen",
+    "playerLocalX": 1,
+    "playerLocalY": 4,
+    "transitionState": "idle",
+    "inputLocked": false,
+    "timelinePaused": false,
+    "caseEvidenceCount": 0,
+    "caseStatementCount": 0,
+    "characterScale": 0.72
+  }
+}
