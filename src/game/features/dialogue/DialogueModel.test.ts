@@ -38,4 +38,13 @@ describe('DialogueModel', () => {
     const dialogue = new DialogueModel();
     expect(() => dialogue.open({ ...script, pages: [] })).toThrow(/at least one page/);
   });
+
+  it('dismisses an open script without advancing it', () => {
+    const dialogue = new DialogueModel();
+    dialogue.open(script);
+
+    expect(dialogue.dismiss()).toBe('closed');
+    expect(dialogue.snapshot()).toMatchObject({ isOpen: false, pageCount: 0 });
+    expect(dialogue.dismiss()).toBe('idle');
+  });
 });

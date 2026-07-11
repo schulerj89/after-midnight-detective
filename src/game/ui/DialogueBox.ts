@@ -70,15 +70,18 @@ export class DialogueBox {
     const result = this.model.advance();
 
     if (result === 'closed') {
-      this.root.setVisible(false);
-      const onClosed = this.onClosed;
-      this.onClosed = undefined;
-      onClosed?.();
+      this.finishClosing();
       return;
     }
 
     if (result === 'advanced') {
       this.render();
+    }
+  }
+
+  dismiss(): void {
+    if (this.model.dismiss() === 'closed') {
+      this.finishClosing();
     }
   }
 
@@ -100,5 +103,12 @@ export class DialogueBox {
     this.speaker.setText(snapshot.speaker ?? '');
     this.body.setText(snapshot.text ?? '');
     this.prompt.setText(snapshot.pageIndex < snapshot.pageCount - 1 ? '▼' : '■');
+  }
+
+  private finishClosing(): void {
+    this.root.setVisible(false);
+    const onClosed = this.onClosed;
+    this.onClosed = undefined;
+    onClosed?.();
   }
 }

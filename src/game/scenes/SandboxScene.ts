@@ -2,15 +2,21 @@ import Phaser from 'phaser';
 import { CharacterPawn, type CharacterPose } from '../actors/CharacterPawn';
 import { GAME_HEIGHT, GAME_WIDTH, SCENE_KEYS } from '../constants';
 import type { DialogueScript } from '../features/dialogue/DialogueModel';
+import { FocusNavigator } from '../features/interaction/FocusNavigator';
 import {
   SandboxTimeline,
   type TimelineEvent,
 } from '../features/timeline/SandboxTimeline';
+import {
+  onMobileControl,
+  type MobileControl,
+} from '../input/mobileControls';
 import { DialogueBox } from '../ui/DialogueBox';
 
 const FONT = '"Press Start 2P", monospace';
 const FLOOR_Y = 480;
 const STAGE_MARKS = { left: 280, center: 635, right: 970 } as const;
+type FocusTarget = 'vera' | 'matchbook' | 'miles';
 
 const TIMELINE_EVENTS: readonly TimelineEvent[] = [
   { id: 'vera-center', atMs: 1_500 },
@@ -52,6 +58,7 @@ const DIALOGUE: Record<'vera' | 'miles' | 'matchbook', DialogueScript> = {
 
 export class SandboxScene extends Phaser.Scene {
   private readonly timeline = new SandboxTimeline(18_000, TIMELINE_EVENTS);
+  private readonly focus = new FocusNavigator<FocusTarget>(['vera', 'matchbook', 'miles']);
   private dialogue!: DialogueBox;
   private vera!: CharacterPawn;
   private miles!: CharacterPawn;
@@ -59,6 +66,9 @@ export class SandboxScene extends Phaser.Scene {
   private statusText!: Phaser.GameObjects.Text;
   private pauseText!: Phaser.GameObjects.Text;
   private headlight!: Phaser.GameObjects.Rectangle;
+  private focusReticle!: Phaser.GameObjects.Container;
+  private focusVisible = false;
+  private removeMobileControls?: () => void;
   private lastInteraction = 'sandbox-ready';
   private lastLoop = 1;
 
@@ -74,7 +84,15 @@ export class SandboxScene extends Phaser.Scene {
     this.createActors();
     this.createForegroundAndClue();
     this.dialogue = new DialogueBox(this);
+    this.createFocusReticle();
     this.createHelpText();
+    this.removeMobileControls = onMobileControl((control) =>
+      this.handleMobileControl(control),
+    );
+    this.setMobileActionLabels('ACT', 'PAUSE');
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () =>
+      this.removeMobileControls?.(),
+    );
     this.publishDebugSnapshot();
   }
 
@@ -89,6 +107,7 @@ export class SandboxScene extends Phaser.Scene {
     }
 
     events.forEach((event) => this.runTimelineEvent(event));
+    this.updateFocusReticle();
     this.renderTimelineHud();
     this.publishDebugSnapshot();
   }
@@ -260,6 +279,31 @@ export class SandboxScene extends Phaser.Scene {
       .setDepth(12);
   }
 
+  private createFocusReticle(): void {
+    const halo = this.add
+      .ellipse(0, 0, 126, 34, 0xc7a85b, 0.1)
+      .setStrokeStyle(3, 0xc7a85b, 0.72);
+    const pointer = this.add
+      .text(0, -34, '▼', {
+        color: '#c7a85b',
+        fontFamily: FONT,
+        fontSize: '13px',
+      })
+      .setOrigin(0.5);
+    this.focusReticle = this.add
+      .container(0, 0, [halo, pointer])
+      .setDepth(14)
+      .setVisible(false);
+    this.tweens.add({
+      targets: this.focusReticle,
+      alpha: { from: 0.58, to: 1 },
+      duration: 650,
+      ease: 'Sine.easeInOut',
+      yoyo: true,
+      repeat: -1,
+    });
+  }
+
   private createButton(
     x: number,
     y: number,
@@ -290,6 +334,7 @@ export class SandboxScene extends Phaser.Scene {
       return;
     }
 
+    this.focus.select(id);
     const wasRunning = this.timeline.snapshot().running;
     this.setTimelineRunning(false);
     this.pauseText.setText('[ TALKING ]');
@@ -297,9 +342,11 @@ export class SandboxScene extends Phaser.Scene {
     this.lastInteraction = `questioned-${id}`;
     this.dialogue.open(DIALOGUE[id], () => {
       pawn.setPose(id === 'vera' ? 'suspicious' : 'neutral');
+      this.setMobileActionLabels('ACT', wasRunning ? 'PAUSE' : 'PLAY');
       this.setTimelineRunning(wasRunning);
       this.lastInteraction = `dialogue-${id}-closed`;
     });
+    this.setMobileActionLabels('NEXT', 'BACK');
   }
 
   private openClueDialogue(): void {
@@ -307,14 +354,83 @@ export class SandboxScene extends Phaser.Scene {
       return;
     }
 
+    this.focus.select('matchbook');
     const wasRunning = this.timeline.snapshot().running;
     this.setTimelineRunning(false);
     this.pauseText.setText('[ INSPECT ]');
     this.lastInteraction = 'inspected-matchbook';
     this.dialogue.open(DIALOGUE.matchbook, () => {
+      this.setMobileActionLabels('ACT', wasRunning ? 'PAUSE' : 'PLAY');
       this.setTimelineRunning(wasRunning);
       this.lastInteraction = 'dialogue-matchbook-closed';
     });
+    this.setMobileActionLabels('NEXT', 'BACK');
+  }
+
+  private handleMobileControl(control: MobileControl): void {
+    switch (control) {
+      case 'focus-left':
+      case 'focus-up':
+        this.focus.previous();
+        this.showFocusReticle();
+        break;
+      case 'focus-right':
+      case 'focus-down':
+        this.focus.next();
+        this.showFocusReticle();
+        break;
+      case 'action-a':
+        if (this.dialogue.isOpen()) {
+          this.dialogue.advance();
+        } else {
+          this.activateFocusedTarget();
+        }
+        break;
+      case 'action-b':
+        if (this.dialogue.isOpen()) {
+          this.dialogue.dismiss();
+        } else {
+          this.setTimelineRunning(!this.timeline.snapshot().running);
+          this.lastInteraction = this.timeline.snapshot().running
+            ? 'mobile-timeline-resumed'
+            : 'mobile-timeline-paused';
+        }
+        break;
+    }
+  }
+
+  private activateFocusedTarget(): void {
+    const target = this.focus.selected();
+    if (target === 'vera') {
+      this.openCharacterDialogue('vera', this.vera);
+    } else if (target === 'miles') {
+      this.openCharacterDialogue('miles', this.miles);
+    } else {
+      this.openClueDialogue();
+    }
+    this.showFocusReticle();
+  }
+
+  private showFocusReticle(): void {
+    this.focusVisible = true;
+    this.focusReticle.setVisible(true);
+    this.lastInteraction = `focused-${this.focus.selected()}`;
+    this.updateFocusReticle();
+  }
+
+  private updateFocusReticle(): void {
+    if (!this.focusVisible) {
+      return;
+    }
+
+    const selected = this.focus.selected();
+    if (selected === 'vera') {
+      this.focusReticle.setPosition(this.vera.snapshot().x, FLOOR_Y + 20);
+    } else if (selected === 'miles') {
+      this.focusReticle.setPosition(this.miles.snapshot().x, FLOOR_Y + 20);
+    } else {
+      this.focusReticle.setPosition(860, 405);
+    }
   }
 
   private setTimelineRunning(running: boolean): void {
@@ -328,6 +444,20 @@ export class SandboxScene extends Phaser.Scene {
     }
     if (this.pauseText) {
       this.pauseText.setText(running ? '[ PAUSE ]' : '[ RESUME ]');
+    }
+    if (!this.dialogue?.isOpen()) {
+      this.setMobileActionLabels('ACT', running ? 'PAUSE' : 'PLAY');
+    }
+  }
+
+  private setMobileActionLabels(actionA: string, actionB: string): void {
+    const aLabel = document.querySelector<HTMLElement>('.action-a span');
+    const bLabel = document.querySelector<HTMLElement>('.action-b span');
+    if (aLabel) {
+      aLabel.textContent = actionA;
+    }
+    if (bLabel) {
+      bLabel.textContent = actionB;
     }
   }
 
@@ -497,6 +627,8 @@ export class SandboxScene extends Phaser.Scene {
     canvas.dataset.dialogue = snapshot.dialogue?.scriptId ?? 'closed';
     canvas.dataset.timelineRunning = String(snapshot.timeline.running);
     canvas.dataset.lastInteraction = snapshot.lastInteraction;
+    canvas.dataset.focusTarget = this.focus.selected();
+    canvas.dataset.focusVisible = String(this.focusVisible);
     canvas.dataset.timelineElapsed = Math.round(snapshot.timeline.elapsedMs).toString();
     snapshot.characters.forEach((character) => {
       const prefix = character.id;

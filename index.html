@@ -14,6 +14,23 @@
       <strong>ROTATE DEVICE</strong>
       <span>The night reads better in landscape.</span>
     </aside>
+    <nav id="mobile-controls" aria-label="Mobile game controls">
+      <div class="mobile-controls__dpad" aria-label="Focus navigation">
+        <button class="dpad-up" data-game-control="focus-up" aria-label="Previous focus">▲</button>
+        <button class="dpad-left" data-game-control="focus-left" aria-label="Previous focus">◀</button>
+        <span class="dpad-center" aria-hidden="true"></span>
+        <button class="dpad-right" data-game-control="focus-right" aria-label="Next focus">▶</button>
+        <button class="dpad-down" data-game-control="focus-down" aria-label="Next focus">▼</button>
+      </div>
+      <div class="mobile-controls__actions">
+        <button class="action-b" data-game-control="action-b" aria-label="Back or pause">
+          <strong>B</strong><span>PAUSE</span>
+        </button>
+        <button class="action-a" data-game-control="action-a" aria-label="Interact or continue">
+          <strong>A</strong><span>ACT</span>
+        </button>
+      </div>
+    </nav>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

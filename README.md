@@ -29,6 +29,10 @@ Click either placeholder character to test portrait dialogue, inspect the red
 matchbook on the counter, or use the pause and replay controls to exercise the
 authored movement timeline.
 
+On landscape mobile, the translucent D-pad moves focus between authored people
+and clues. A interacts or continues dialogue; B pauses, resumes, or dismisses
+the current dialogue. Direct touch remains available.
+
 ## Technology
 
 - Phaser 4 for scenes, rendering, input, animation, and audio

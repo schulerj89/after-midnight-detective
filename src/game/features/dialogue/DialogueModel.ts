@@ -16,6 +16,7 @@ export interface DialogueSnapshot {
 }
 
 export type DialogueAdvanceResult = 'advanced' | 'closed' | 'idle';
+export type DialogueDismissResult = 'closed' | 'idle';
 
 export class DialogueModel {
   private script: DialogueScript | null = null;
@@ -47,6 +48,14 @@ export class DialogueModel {
   close(): void {
     this.script = null;
     this.pageIndex = 0;
+  }
+
+  dismiss(): DialogueDismissResult {
+    if (!this.script) {
+      return 'idle';
+    }
+    this.close();
+    return 'closed';
   }
 
   snapshot(): DialogueSnapshot {
