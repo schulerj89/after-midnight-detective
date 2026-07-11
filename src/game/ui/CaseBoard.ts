@@ -138,6 +138,13 @@ export class CaseBoard {
     const timeline = this.options.timeline.snapshot();
     const flags = this.options.state.snapshot().flags;
     content.append(this.element('p', 'case-board__lede', `LOOP ${timeline.loop} // ${Math.floor(timeline.elapsedMs / 1_000)}s OF ${timeline.durationMs / 1_000}s`));
+    content.append(this.element(
+      'p',
+      'case-board__loop-note',
+      this.options.state.has('variant.miles.checks-office-next-loop')
+        ? 'LIVE OBSERVATION: return to the lounge and watch Miles at 12:11. The solved cinematic unlocks after a correct accusation.'
+        : 'LIVE OBSERVATION: this restages character behavior; it is not the post-solve reconstruction.',
+    ));
     const list = this.element('ol', 'case-board__timeline');
     const entries = [
       ['12:06', 'CLAIMED', 'Vera at the desk; Room 317 receives a call.'],
@@ -153,7 +160,10 @@ export class CaseBoard {
       list.append(item);
     });
     content.append(list);
-    const replay = this.button('REPLAY THE NIGHT', 'case-board__replay', () => {
+    const replayLabel = this.options.state.has('variant.miles.checks-office-next-loop')
+      ? 'RESTAGE ALTERED LOOP'
+      : 'START NEXT OBSERVATION LOOP';
+    const replay = this.button(replayLabel, 'case-board__replay', () => {
       this.options.onReplay();
       this.close();
     });
@@ -180,6 +190,8 @@ export class CaseBoard {
     }
 
     content.append(this.element('p', 'case-board__lede', 'Name the suspect, then support the accusation with one clue, one contradiction, and one witnessed timeline fact.'));
+    const selectedCount = Object.values(this.draft).filter(Boolean).length;
+    content.append(this.element('p', 'case-board__theory-progress', `THEORY LINKS SELECTED: ${selectedCount}/4`));
     const theory = this.element('div', 'case-board__theory');
     theory.append(
       this.choiceGroup('SUSPECT', 'suspectId', [['npc.vera', 'VERA VALE'], ['npc.miles', 'MILES PIKE']]),
@@ -200,6 +212,7 @@ export class CaseBoard {
     choices: readonly (readonly [string, string])[],
   ): HTMLElement {
     const group = this.element('fieldset', 'case-board__choice-group');
+    if (this.result?.missing.includes(key)) group.classList.add('is-missing');
     group.append(this.element('legend', '', label));
     choices.forEach(([id, copy]) => {
       const selected = this.draft[key] === id;
@@ -210,6 +223,10 @@ export class CaseBoard {
       });
       button.dataset.caseChoice = key;
       button.dataset.caseValue = id;
+      if (key !== 'suspectId' && !this.options.state.has(id)) {
+        button.disabled = true;
+        button.title = 'Not yet recorded in the notebook';
+      }
       group.append(button);
     });
     return group;

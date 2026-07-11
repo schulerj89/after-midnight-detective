@@ -16,7 +16,12 @@ describe('LevelOneTimeline', () => {
     const timeline = new LevelOneTimeline();
     expect(timeline.update(8_000, true).some((beat) => beat.variant)).toBe(false);
     timeline.replay();
-    expect(timeline.update(8_000, true).map((beat) => beat.id)).toContain('variant.miles-office-check');
+    expect(timeline.update(12_000, true).map((beat) => beat.id)).toEqual([
+      'baseline.vera-desk',
+      'baseline.miles-windows',
+      'variant.miles-office-check',
+      'variant.miles-office-return',
+    ]);
   });
 
   it('can pause without advancing', () => {

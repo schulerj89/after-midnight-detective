@@ -18,7 +18,16 @@ describe('evaluateLevelOneAccusation', () => {
   });
 
   it('rejects Miles without the correct reasoning links', () => {
-    expect(evaluateLevelOneAccusation({ ...LEVEL_ONE_CORRECT_DRAFT, evidenceId: 'evidence.wet-footprints' }, readyState()).status).toBe('unsupported');
+    const result = evaluateLevelOneAccusation({ ...LEVEL_ONE_CORRECT_DRAFT, evidenceId: 'evidence.wet-footprints' }, readyState());
+    expect(result.status).toBe('unsupported');
+    expect(result.message).not.toContain('evidenceId');
+  });
+
+  it('describes a missing timeline choice in player-facing language', () => {
+    const result = evaluateLevelOneAccusation({ ...LEVEL_ONE_CORRECT_DRAFT, timelineFactId: null }, readyState());
+    expect(result.status).toBe('unsupported');
+    expect(result.message).toContain('witnessed timeline fact');
+    expect(result.message).not.toContain('timelineFactId');
   });
 
   it('solves only the complete explanation', () => {

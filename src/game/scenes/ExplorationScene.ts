@@ -527,11 +527,20 @@ export class ExplorationScene extends Phaser.Scene {
     }[mark];
     const point = levelPoint(this.level, this.levelGeometry, lounge, local.x, local.y);
     const interactable = this.interactables.find((target) => target.id === actorId);
+    const travelDistance = Phaser.Math.Distance.Between(root.x, root.y, point.x, point.y);
+    const travelDuration = Phaser.Math.Clamp((travelDistance / 480) * 1_000, 700, 3_400);
     this.tweens.killTweensOf(root);
     if (body) {
       this.tweens.killTweensOf(body);
       body.setY(0);
-      this.tweens.add({ targets: body, y: -4, duration: 210, ease: 'Sine.easeInOut', yoyo: true, repeat: 3 });
+      this.tweens.add({
+        targets: body,
+        y: -4,
+        duration: 210,
+        ease: 'Sine.easeInOut',
+        yoyo: true,
+        repeat: Math.max(1, Math.floor(travelDuration / 420) - 1),
+      });
     }
     const direction = Math.sign(point.x - root.x) || 1;
     this.tweens.add({
@@ -539,7 +548,7 @@ export class ExplorationScene extends Phaser.Scene {
       x: point.x,
       y: point.y,
       angle: direction * 3,
-      duration: 1_600,
+      duration: travelDuration,
       ease: 'Sine.easeInOut',
       yoyo: false,
       onUpdate: () => {
@@ -557,6 +566,12 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private replayNight(): void {
+    const lounge = this.room('lounge');
+    this.activateRoom(lounge.id);
+    const observationMark = levelPoint(this.level, this.levelGeometry, lounge, 15, 14);
+    this.player.setPosition(observationMark.x, observationMark.y);
+    this.setCameraForRoom(lounge);
+    this.cameras.main.centerOn(observationMark.x, observationMark.y);
     this.timeline.replay();
     this.lastTimelineBeat = 'loop-replayed';
     this.lastInteraction = `replayed-loop-${this.timeline.snapshot().loop}`;

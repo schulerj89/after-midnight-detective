@@ -73,6 +73,11 @@ The game evaluates the reasoning, not only the selected name.
 No step should require fast reflexes. Important events must be replayable and
 must have more than one perceivable signal where practical.
 
+Case-board loop controls restage the live, interactive observation timeline;
+they are not cinematic playback. Reserve `Detective's Reconstruction` for the
+evidence-bounded cutscene that follows a correct accusation, and label both
+flows explicitly so the player cannot confuse them.
+
 ## Information model
 
 The mystery is built from distinct information types:

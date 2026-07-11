@@ -47,12 +47,33 @@ export function evaluateLevelOneAccusation(
       missing: ['suspect'],
     };
   }
+  const missingSelections = (['evidenceId', 'contradictionId', 'timelineFactId'] as const)
+    .filter((key) => draft[key] === null);
+  if (missingSelections.length > 0) {
+    const labels: Record<(typeof missingSelections)[number], string> = {
+      evidenceId: 'decisive evidence',
+      contradictionId: 'broken claim',
+      timelineFactId: 'witnessed timeline fact',
+    };
+    return {
+      status: 'unsupported',
+      message: missingSelections.length === 1
+        ? `The theory is incomplete. Choose a ${labels[missingSelections[0]]} before presenting it.`
+        : `The theory is incomplete. Choose these links: ${missingSelections.map((key) => labels[key]).join(', ')}.`,
+      missing: missingSelections,
+    };
+  }
   const weak = (['evidenceId', 'contradictionId', 'timelineFactId'] as const)
     .filter((key) => draft[key] !== LEVEL_ONE_CORRECT_DRAFT[key]);
   if (weak.length > 0) {
+    const feedback: Record<(typeof weak)[number], string> = {
+      evidenceId: 'The selected evidence does not connect Miles to the Room 317 key.',
+      contradictionId: 'The selected claim does not break Miles’s Room 317 denial.',
+      timelineFactId: 'The selected timeline fact does not explain why Miles abandoned his alibi.',
+    };
     return {
       status: 'unsupported',
-      message: `Miles is plausible, but the explanation is unsupported: ${weak.join(', ')}.`,
+      message: feedback[weak[0]],
       missing: weak,
     };
   }

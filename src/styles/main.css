@@ -159,6 +159,18 @@ body {
   line-height: 1.8;
 }
 
+.case-board__loop-note,
+.case-board__theory-progress {
+  margin: 10px 0 0;
+  color: #817967;
+  font-size: 8px;
+  line-height: 1.6;
+}
+
+.case-board__theory-progress {
+  color: #c7a85b;
+}
+
 .case-board__columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -243,6 +255,18 @@ body {
 
 .case-board__choice-group legend {
   padding: 0 8px;
+}
+
+.case-board__choice-group.is-missing {
+  border-color: #8f2432;
+  box-shadow: inset 0 0 0 1px rgb(143 36 50 / 32%);
+}
+
+#case-board button:disabled {
+  border-color: #303139;
+  color: #5f5b52;
+  background: #111319;
+  cursor: not-allowed;
 }
 
 .case-board__feedback {
@@ -485,6 +509,13 @@ body {
   .case-board__timeline {
     gap: 4px;
     margin: 7px 0;
+  }
+
+  .case-board__loop-note,
+  .case-board__theory-progress {
+    margin-top: 5px;
+    font-size: 7px;
+    line-height: 1.4;
   }
 
   .case-board__ending {

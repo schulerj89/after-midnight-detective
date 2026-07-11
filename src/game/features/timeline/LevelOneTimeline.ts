@@ -72,7 +72,11 @@ export class LevelOneTimeline {
   }
 
   private eventsBetween(previous: number, current: number, variantArmed: boolean): readonly LevelOneTimelineBeat[] {
-    const beats = variantArmed && this.loop >= 2 ? [...BASE_BEATS, ...VARIANT_BEATS] : BASE_BEATS;
+    const alteredLoop = variantArmed && this.loop >= 2;
+    const baseline = alteredLoop
+      ? BASE_BEATS.filter((beat) => beat.id !== 'baseline.miles-piano')
+      : BASE_BEATS;
+    const beats = alteredLoop ? [...baseline, ...VARIANT_BEATS] : baseline;
     return beats
       .filter((beat) => beat.atMs > previous && beat.atMs <= current && !this.emitted.has(beat.id))
       .sort((a, b) => a.atMs - b.atMs)
