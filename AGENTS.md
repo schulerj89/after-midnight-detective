@@ -14,6 +14,9 @@ Consult the matching project skill before material decisions:
   gates, notebook behavior, deductions, and accusations.
 - `.agents/skills/direct-noir-game/` for player experience, pacing, scope,
   feature priority, accessibility, and cross-discipline tradeoffs.
+- `.agents/skills/validate-game-screenshots/` for named-pose screenshot capture,
+  layout manifests, programmatic geometry checks, annotated grids, and visual
+  regression review.
 
 Use more than one specialist when a change crosses disciplines. Reconcile
 conflicts in favor of player comprehension and the game bible rather than
@@ -47,4 +50,3 @@ Every specialist recommendation must explain:
 - Keep scenes and systems data-driven so timelines and cases can be tested.
 - Update the game bible when an approved decision changes the source of truth.
 - Build and smoke-test relevant flows before declaring implementation complete.
-

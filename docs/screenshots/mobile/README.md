@@ -11,13 +11,15 @@ Renderer: Phaser 4.2.1 WebGL
 ![Landscape mobile controls](sandbox-mobile-landscape-controls.png)
 
 - Viewport: 844x390
-- Timeline: loop 1, paused at approximately 133 ms
+- Named pose: `mobile-controls`
+- Timeline: loop 1, paused at 0 ms
 - Focus: matchbook
 - Expected labels: A / ACT and B / PLAY
 - Result: Pass
 
-The D-pad and action buttons remain inside the viewport, preserve the lightly
-transparent treatment, and do not cover either character or the focused clue.
+The 160px circular D-pad and 62px circular action buttons remain inside the
+viewport, preserve the lightly transparent treatment, and do not cover either
+character or the focused clue. Each directional hit region remains 48x48px.
 The dim-yellow reticle is visible beneath the matchbook and does not rely on
 color alone because it adds a distinct oval and pointer shape.
 
@@ -26,7 +28,8 @@ color alone because it adds a distinct oval and pointer shape.
 ![Landscape mobile dialogue](sandbox-mobile-landscape-dialogue.png)
 
 - Viewport: 844x390
-- Timeline: loop 1, paused at approximately 133 ms
+- Named pose: `mobile-dialogue`
+- Timeline: loop 1, paused at 0 ms
 - Dialogue: `sandbox-matchbook`, page 1
 - Expected labels: A / NEXT and B / BACK
 - Result: Pass
@@ -58,7 +61,10 @@ the presentation.
 - Browser errors: None during final capture route.
 - Blocking defects: None.
 
+Each PNG has a companion `.layout.json` exported from runtime DOM and canvas
+coordinates. Machine reports and annotated 10% grid images are stored under
+[`docs/qa/2026-07-11-circular-mobile-controls/`](../../qa/2026-07-11-circular-mobile-controls/).
+
 The top sandbox timeline labels are intentionally small debug UI and are not a
 production HUD approval. Reassess their size when the player-facing timeline is
 designed.
-

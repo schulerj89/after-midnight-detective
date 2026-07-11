@@ -1,0 +1,4 @@
+interface:
+  display_name: "Game Screenshot QA"
+  short_description: "Validate game screenshots and layout geometry"
+  default_prompt: "Use $validate-game-screenshots to capture, analyze, and document visual regression evidence."

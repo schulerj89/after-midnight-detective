@@ -84,37 +84,70 @@ body {
     position: absolute;
     left: max(8px, env(safe-area-inset-left));
     top: 50%;
-    display: grid;
-    grid-template: repeat(3, 48px) / repeat(3, 48px);
+    width: 160px;
+    height: 160px;
+    overflow: hidden;
+    border: 2px solid rgb(217 207 182 / 38%);
+    border-radius: 50%;
+    background:
+      linear-gradient(45deg, transparent 49.4%, rgb(217 207 182 / 12%) 49.5% 50.5%, transparent 50.6%),
+      linear-gradient(-45deg, transparent 49.4%, rgb(217 207 182 / 12%) 49.5% 50.5%, transparent 50.6%),
+      radial-gradient(circle, rgb(199 168 91 / 18%) 0 18px, transparent 19px),
+      rgb(9 10 13 / 28%);
+    box-shadow:
+      inset 0 0 28px rgb(199 168 91 / 5%),
+      0 6px 18px rgb(0 0 0 / 24%);
     transform: translateY(-45%);
   }
 
   .mobile-controls__dpad button {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    border: 0;
     border-radius: 7px;
+    background: transparent;
+    box-shadow: none;
     font-size: 15px;
   }
 
+  .mobile-controls__dpad button:active {
+    border: 0;
+    background: radial-gradient(circle, rgb(143 36 50 / 58%), transparent 72%);
+  }
+
   .dpad-up {
-    grid-area: 1 / 2;
+    top: 4px;
+    left: 54px;
   }
 
   .dpad-left {
-    grid-area: 2 / 1;
+    top: 54px;
+    left: 4px;
   }
 
   .dpad-center {
-    grid-area: 2 / 2;
-    margin: 10px;
+    position: absolute;
+    top: 64px;
+    left: 64px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    background: rgb(199 168 91 / 20%);
+    border: 1px solid rgb(217 207 182 / 18%);
+    background: rgb(199 168 91 / 18%);
+    box-shadow: inset 0 0 12px rgb(0 0 0 / 28%);
   }
 
   .dpad-right {
-    grid-area: 2 / 3;
+    top: 54px;
+    right: 4px;
   }
 
   .dpad-down {
-    grid-area: 3 / 2;
+    bottom: 4px;
+    left: 54px;
   }
 
   .mobile-controls__actions {
@@ -127,7 +160,7 @@ body {
     transform: translateY(-35%) rotate(-10deg);
   }
 
-  .mobile-controls__actions button {
+  #mobile-controls .mobile-controls__actions button {
     display: grid;
     width: 62px;
     height: 62px;
@@ -137,7 +170,7 @@ body {
     transform: rotate(10deg);
   }
 
-  .mobile-controls__actions button:active {
+  #mobile-controls .mobile-controls__actions button:active {
     transform: rotate(10deg) scale(0.94);
   }
 

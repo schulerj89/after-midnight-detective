@@ -93,6 +93,7 @@ export class SandboxScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () =>
       this.removeMobileControls?.(),
     );
+    this.applyQaPose();
     this.publishDebugSnapshot();
   }
 
@@ -277,6 +278,21 @@ export class SandboxScene extends Phaser.Scene {
       )
       .setOrigin(0.5)
       .setDepth(12);
+  }
+
+  private applyQaPose(): void {
+    const pose = new URLSearchParams(window.location.search).get('qaPose');
+    if (pose !== 'mobile-controls' && pose !== 'mobile-dialogue') {
+      return;
+    }
+
+    this.setTimelineRunning(false);
+    this.focus.select('matchbook');
+    this.showFocusReticle();
+    if (pose === 'mobile-dialogue') {
+      this.openClueDialogue();
+    }
+    this.lastInteraction = `qa-pose-${pose}`;
   }
 
   private createFocusReticle(): void {
@@ -629,6 +645,8 @@ export class SandboxScene extends Phaser.Scene {
     canvas.dataset.lastInteraction = snapshot.lastInteraction;
     canvas.dataset.focusTarget = this.focus.selected();
     canvas.dataset.focusVisible = String(this.focusVisible);
+    canvas.dataset.qaPose =
+      new URLSearchParams(window.location.search).get('qaPose') ?? 'none';
     canvas.dataset.timelineElapsed = Math.round(snapshot.timeline.elapsedMs).toString();
     snapshot.characters.forEach((character) => {
       const prefix = character.id;

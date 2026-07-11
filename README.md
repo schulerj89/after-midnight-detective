@@ -24,6 +24,12 @@ Run the complete regression check with:
 npm run validate
 ```
 
+Run the geometry-backed screenshot regression checks with Python and Pillow:
+
+```bash
+npm run validate:visual
+```
+
 The current development build opens directly into the Lantern Room sandbox.
 Click either placeholder character to test portrait dialogue, inspect the red
 matchbook on the counter, or use the pause and replay controls to exercise the

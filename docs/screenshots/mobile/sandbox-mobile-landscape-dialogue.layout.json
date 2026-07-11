@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "screenshot": {
+    "name": "sandbox-mobile-landscape-dialogue",
+    "file": "sandbox-mobile-landscape-dialogue.png",
+    "pose": "mobile-dialogue"
+  },
+  "viewport": {
+    "deviceScaleFactor": 1.5,
+    "height": 390,
+    "width": 844
+  },
+  "elements": [
+    {
+      "id": "dpad",
+      "role": "control-group",
+      "height": 160,
+      "width": 160,
+      "x": 8,
+      "y": 123,
+      "minWidth": 160,
+      "minHeight": 160
+    },
+    {
+      "id": "dpad-up",
+      "role": "touch-control",
+      "height": 48,
+      "width": 48,
+      "x": 64,
+      "y": 129,
+      "minWidth": 48,
+      "minHeight": 48
+    },
+    {
+      "id": "dpad-left",
+      "role": "touch-control",
+      "height": 48,
+      "width": 48,
+      "x": 14,
+      "y": 179,
+      "minWidth": 48,
+      "minHeight": 48
+    },
+    {
+      "id": "dpad-right",
+      "role": "touch-control",
+      "height": 48,
+      "width": 48,
+      "x": 114,
+      "y": 179,
+      "minWidth": 48,
+      "minHeight": 48
+    },
+    {
+      "id": "dpad-down",
+      "role": "touch-control",
+      "height": 48,
+      "width": 48,
+      "x": 64,
+      "y": 229,
+      "minWidth": 48,
+      "minHeight": 48
+    },
+    {
+      "id": "action-a",
+      "role": "touch-control",
+      "height": 62,
+      "width": 62,
+      "x": 769.4379272460938,
+      "y": 166.87503051757812,
+      "minWidth": 62,
+      "minHeight": 62
+    },
+    {
+      "id": "action-b",
+      "role": "touch-control",
+      "height": 62,
+      "width": 62,
+      "x": 696.5621337890625,
+      "y": 179.7249755859375,
+      "minWidth": 62,
+      "minHeight": 62
+    },
+    {
+      "id": "dialogue-panel",
+      "role": "panel",
+      "x": 141.000004196167,
+      "y": 263.25,
+      "width": 637.0000373840331,
+      "height": 113.74999999999999
+    },
+    {
+      "id": "dialogue-portrait",
+      "role": "portrait",
+      "x": 155.08333835601806,
+      "y": 277.3333333333333,
+      "width": 85.58333835601806,
+      "height": 85.58333333333333
+    },
+    {
+      "id": "dialogue-speaker",
+      "role": "text",
+      "x": 260.1666778564453,
+      "y": 276.25,
+      "width": 227.5000133514404,
+      "height": 15.166666666666666
+    },
+    {
+      "id": "dialogue-copy",
+      "role": "text",
+      "x": 260.1666778564453,
+      "y": 297.375,
+      "width": 492.91669559478754,
+      "height": 43.33333333333333
+    }
+  ],
+  "containmentZones": [
+    {
+      "id": "viewport-safe-area",
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390,
+      "contains": [
+        "dpad",
+        "dpad-up",
+        "dpad-left",
+        "dpad-right",
+        "dpad-down",
+        "action-a",
+        "action-b",
+        "dialogue-panel",
+        "dialogue-portrait",
+        "dialogue-speaker",
+        "dialogue-copy"
+      ]
+    },
+    {
+      "id": "dpad-housing",
+      "height": 160,
+      "width": 160,
+      "x": 8,
+      "y": 123,
+      "contains": [
+        "dpad-up",
+        "dpad-left",
+        "dpad-right",
+        "dpad-down"
+      ]
+    },
+    {
+      "id": "dialogue-panel-zone",
+      "x": 141.000004196167,
+      "y": 263.25,
+      "width": 637.0000373840331,
+      "height": 113.74999999999999,
+      "contains": [
+        "dialogue-portrait",
+        "dialogue-speaker",
+        "dialogue-copy"
+      ]
+    }
+  ],
+  "forbiddenOverlaps": [
+    {
+      "a": "dpad-up",
+      "b": "dialogue-portrait"
+    },
+    {
+      "a": "dpad-up",
+      "b": "dialogue-copy"
+    },
+    {
+      "a": "dpad-left",
+      "b": "dialogue-portrait"
+    },
+    {
+      "a": "dpad-left",
+      "b": "dialogue-copy"
+    },
+    {
+      "a": "dpad-right",
+      "b": "dialogue-portrait"
+    },
+    {
+      "a": "dpad-right",
+      "b": "dialogue-copy"
+    },
+    {
+      "a": "dpad-down",
+      "b": "dialogue-portrait"
+    },
+    {
+      "a": "dpad-down",
+      "b": "dialogue-copy"
+    },
+    {
+      "a": "action-a",
+      "b": "dialogue-portrait"
+    },
+    {
+      "a": "action-a",
+      "b": "dialogue-copy"
+    },
+    {
+      "a": "action-b",
+      "b": "dialogue-portrait"
+    },
+    {
+      "a": "action-b",
+      "b": "dialogue-copy"
+    }
+  ],
+  "alignmentPairs": [
+    {
+      "a": "dpad-up",
+      "b": "dpad-down",
+      "axis": "centerX",
+      "tolerance": 1
+    },
+    {
+      "a": "dpad-left",
+      "b": "dpad-right",
+      "axis": "centerY",
+      "tolerance": 1
+    }
+  ],
+  "expectedPixelActivity": [
+    {
+      "id": "dialogue-portrait-art",
+      "x": 155.08333835601806,
+      "y": 277.3333333333333,
+      "width": 85.58333835601806,
+      "height": 85.58333333333333,
+      "minLuminance": 4,
+      "maxLuminance": 180,
+      "minVariance": 20,
+      "maxVariance": 9000
+    },
+    {
+      "id": "dialogue-copy-art",
+      "x": 260.1666778564453,
+      "y": 297.375,
+      "width": 492.91669559478754,
+      "height": 43.33333333333333,
+      "minLuminance": 4,
+      "maxLuminance": 180,
+      "minVariance": 20,
+      "maxVariance": 9000
+    }
+  ]
+}

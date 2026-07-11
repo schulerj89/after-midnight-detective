@@ -10,23 +10,23 @@
   <body>
     <main id="game" aria-label="After Midnight, Detective"></main>
     <aside id="rotate-device" role="status" aria-live="polite">
-      <span class="rotate-device__icon" aria-hidden="true">▰</span>
-      <strong>ROTATE DEVICE</strong>
-      <span>The night reads better in landscape.</span>
+      <span class="rotate-device__icon" data-qa-id="rotate-icon" aria-hidden="true">▰</span>
+      <strong data-qa-id="rotate-title">ROTATE DEVICE</strong>
+      <span data-qa-id="rotate-copy">The night reads better in landscape.</span>
     </aside>
     <nav id="mobile-controls" aria-label="Mobile game controls">
-      <div class="mobile-controls__dpad" aria-label="Focus navigation">
-        <button class="dpad-up" data-game-control="focus-up" aria-label="Previous focus">▲</button>
-        <button class="dpad-left" data-game-control="focus-left" aria-label="Previous focus">◀</button>
+      <div class="mobile-controls__dpad" data-qa-id="dpad" aria-label="Focus navigation">
+        <button class="dpad-up" data-game-control="focus-up" data-qa-id="dpad-up" aria-label="Previous focus">▲</button>
+        <button class="dpad-left" data-game-control="focus-left" data-qa-id="dpad-left" aria-label="Previous focus">◀</button>
         <span class="dpad-center" aria-hidden="true"></span>
-        <button class="dpad-right" data-game-control="focus-right" aria-label="Next focus">▶</button>
-        <button class="dpad-down" data-game-control="focus-down" aria-label="Next focus">▼</button>
+        <button class="dpad-right" data-game-control="focus-right" data-qa-id="dpad-right" aria-label="Next focus">▶</button>
+        <button class="dpad-down" data-game-control="focus-down" data-qa-id="dpad-down" aria-label="Next focus">▼</button>
       </div>
       <div class="mobile-controls__actions">
-        <button class="action-b" data-game-control="action-b" aria-label="Back or pause">
+        <button class="action-b" data-game-control="action-b" data-qa-id="action-b" aria-label="Back or pause">
           <strong>B</strong><span>PAUSE</span>
         </button>
-        <button class="action-a" data-game-control="action-a" aria-label="Interact or continue">
+        <button class="action-a" data-game-control="action-a" data-qa-id="action-a" aria-label="Interact or continue">
           <strong>A</strong><span>ACT</span>
         </button>
       </div>

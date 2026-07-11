@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "validate": "npm run test && npm run build"
+    "validate": "npm run test && npm run build",
+    "validate:visual": "python .agents/skills/validate-game-screenshots/scripts/analyze_layout.py docs/screenshots/mobile/sandbox-mobile-landscape-controls.png docs/screenshots/mobile/sandbox-mobile-landscape-controls.layout.json --output-dir docs/qa/2026-07-11-circular-mobile-controls/artifacts && python .agents/skills/validate-game-screenshots/scripts/analyze_layout.py docs/screenshots/mobile/sandbox-mobile-landscape-dialogue.png docs/screenshots/mobile/sandbox-mobile-landscape-dialogue.layout.json --output-dir docs/qa/2026-07-11-circular-mobile-controls/artifacts && python .agents/skills/validate-game-screenshots/scripts/analyze_layout.py docs/screenshots/mobile/sandbox-mobile-portrait-rotate.png docs/screenshots/mobile/sandbox-mobile-portrait-rotate.layout.json --output-dir docs/qa/2026-07-11-circular-mobile-controls/artifacts"
   },
   "dependencies": {
     "@fontsource/press-start-2p": "^5.2.7",

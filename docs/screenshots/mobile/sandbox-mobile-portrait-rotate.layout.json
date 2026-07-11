@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "screenshot": {
+    "name": "sandbox-mobile-portrait-rotate",
+    "file": "sandbox-mobile-portrait-rotate.png",
+    "pose": "portrait-orientation-gate"
+  },
+  "viewport": {
+    "deviceScaleFactor": 1.0000000298023224,
+    "height": 844,
+    "width": 390
+  },
+  "elements": [
+    {
+      "id": "rotate-panel",
+      "role": "orientation-gate",
+      "height": 844,
+      "width": 390,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "rotate-icon",
+      "role": "icon",
+      "height": 52.48948287963867,
+      "width": 69.49324035644531,
+      "x": 160.25338745117188,
+      "y": 337.0990295410156
+    },
+    {
+      "id": "rotate-title",
+      "role": "text",
+      "height": 31.197917938232422,
+      "width": 253.5,
+      "x": 68.25,
+      "y": 419.34375
+    },
+    {
+      "id": "rotate-copy",
+      "role": "text",
+      "height": 42.10416793823242,
+      "width": 318,
+      "x": 36,
+      "y": 472.54168701171875
+    }
+  ],
+  "containmentZones": [
+    {
+      "id": "orientation-gate",
+      "height": 844,
+      "width": 390,
+      "x": 0,
+      "y": 0,
+      "contains": [
+        "rotate-icon",
+        "rotate-title",
+        "rotate-copy"
+      ]
+    }
+  ],
+  "forbiddenOverlaps": [],
+  "alignmentPairs": [
+    {
+      "a": "rotate-title",
+      "b": "rotate-copy",
+      "axis": "centerX",
+      "tolerance": 1
+    }
+  ],
+  "expectedPixelActivity": [
+    {
+      "id": "rotate-title-art",
+      "height": 31.197917938232422,
+      "width": 253.5,
+      "x": 68.25,
+      "y": 419.34375,
+      "minLuminance": 20,
+      "maxLuminance": 240,
+      "minVariance": 20,
+      "maxVariance": 9000
+    },
+    {
+      "id": "rotate-copy-art",
+      "height": 42.10416793823242,
+      "width": 318,
+      "x": 36,
+      "y": 472.54168701171875,
+      "minLuminance": 8,
+      "maxLuminance": 200,
+      "minVariance": 10,
+      "maxVariance": 9000
+    }
+  ]
+}
