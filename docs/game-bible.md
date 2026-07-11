@@ -199,6 +199,9 @@ music, ambience, dialogue, and SFX buses.
   or extended dialogue interfaces cover the scene.
 - Design gameplay for landscape mobile. Show a styled rotate-device presentation
   in portrait rather than shrinking essential text into illegibility.
+- In landscape mobile, expand the scene to the full available viewport and layer
+  the translucent joystick and action buttons over the lower corners. Controls
+  must not reserve black side gutters or reduce the visible play area.
 
 ## Difficulty and fairness
 

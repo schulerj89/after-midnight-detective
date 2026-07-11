@@ -47,8 +47,6 @@ function bindAnalogJoystick(): void {
   pad.dataset.analogBound = 'true';
 
   let activePointer: number | null = null;
-  const knobTravel = 44;
-
   const emit = (x: number, y: number) => {
     document.dispatchEvent(
       new CustomEvent<MobileMoveVector>(MOBILE_MOVE_EVENT, {
@@ -60,6 +58,7 @@ function bindAnalogJoystick(): void {
   const update = (event: PointerEvent) => {
     const bounds = pad.getBoundingClientRect();
     const radius = bounds.width / 2;
+    const knobTravel = bounds.width * 0.275;
     let x = (event.clientX - (bounds.left + radius)) / radius;
     let y = (event.clientY - (bounds.top + radius)) / radius;
     const magnitude = Math.hypot(x, y);

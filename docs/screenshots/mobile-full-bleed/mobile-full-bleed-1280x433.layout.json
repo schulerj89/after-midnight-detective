@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "screenshot": {
+    "name": "mobile-full-bleed-1280x433",
+    "file": "mobile-full-bleed-1280x433.png",
+    "pose": "level-room-lounge"
+  },
+  "viewport": { "width": 1280, "height": 433, "deviceScaleFactor": 1 },
+  "elements": [
+    { "id": "joystick", "role": "touch-control", "x": 16, "y": 305.3333, "width": 112, "height": 112, "minWidth": 112, "minHeight": 112 },
+    { "id": "joystick-knob", "role": "control-art", "x": 53, "y": 342.3333, "width": 39, "height": 39, "minWidth": 39, "minHeight": 39 },
+    { "id": "action-b", "role": "touch-control", "x": 1126, "y": 321.3333, "width": 62, "height": 62, "minWidth": 62, "minHeight": 62 },
+    { "id": "action-a", "role": "touch-control", "x": 1202, "y": 339.3333, "width": 62, "height": 62, "minWidth": 62, "minHeight": 62 }
+  ],
+  "containmentZones": [
+    { "id": "viewport", "x": 0, "y": 0, "width": 1280, "height": 433, "contains": ["joystick", "joystick-knob", "action-b", "action-a"] },
+    { "id": "joystick-housing", "x": 16, "y": 305.3333, "width": 112, "height": 112, "contains": ["joystick-knob"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "joystick", "b": "action-a" },
+    { "a": "joystick", "b": "action-b" },
+    { "a": "action-a", "b": "action-b" }
+  ],
+  "expectedPixelActivity": [
+    { "id": "left-scene-edge", "x": 0, "y": 0, "width": 160, "height": 260, "minLuminance": 1, "minVariance": 2 },
+    { "id": "right-scene-edge", "x": 1120, "y": 0, "width": 160, "height": 260, "minLuminance": 1, "minVariance": 2 }
+  ]
+}

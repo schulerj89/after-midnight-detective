@@ -14,7 +14,7 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
   backgroundColor: '#090a0d',
   scene: [BootScene, PreloadScene, ExplorationScene, SandboxScene, TitleScene],
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.EXPAND,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   input: {
