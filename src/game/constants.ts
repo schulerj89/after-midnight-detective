@@ -6,5 +6,6 @@ export const SCENE_KEYS = {
   preload: 'preload',
   title: 'title',
   sandbox: 'sandbox',
+  exploration: 'exploration',
   investigation: 'investigation',
 } as const;

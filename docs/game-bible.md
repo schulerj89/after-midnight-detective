@@ -30,8 +30,8 @@ The primary pleasures are:
 
 ### Observe a living scene
 
-Characters follow readable routes between fixed stage positions during a
-repeating timeline. Important information is expressed through entrances,
+NPCs follow readable routes between authored positions during a repeating
+timeline while the detective may explore the venue directly. Important information is expressed through entrances,
 exits, pauses, lines of sight, prop use, lighting, and sound—not through twitch
 challenges.
 
@@ -160,7 +160,7 @@ not obscure faces, clues, subtitles, or interactive silhouettes.
 Do not use traditional frame-by-frame walk cycles. Movement must look like an
 intentional theatrical convention:
 
-1. Slide the cutout horizontally between authored stage marks.
+1. Slide the cutout across authored positions or the exploration floor plane.
 2. Ease into and out of the move.
 3. Lean slightly toward the destination, returning upright on arrival.
 4. Add a restrained vertical bob only while moving.
@@ -168,7 +168,8 @@ intentional theatrical convention:
 6. Swap static poses at motivated beats rather than continuously animating limbs.
 7. Use foreground occlusion to sell depth and soften foot sliding.
 
-Movement timing should communicate character: hurried, hesitant, controlled,
+Player-directed movement may travel on both X and Y while retaining the same
+lean, bob, shadow, and pose language. Movement timing should communicate character: hurried, hesitant, controlled,
 or furtive. The shadow remains grounded even while the cutout bobs.
 
 ## Audio direction
@@ -228,7 +229,7 @@ replayable, and satisfying on desktop and landscape mobile.
 ## Explicit non-goals
 
 - Combat, platforming, chase sequences, or reflex-based quick-time events.
-- Free-roaming movement with collision-heavy navigation.
+- Large seamless worlds or collision-heavy navigation beyond authored venues.
 - Walk-cycle animation or animation added merely to imitate conventional games.
 - Procedurally generated mysteries for the initial game.
 - Photorealism, large inventories, or exhaustive dialogue trees.
@@ -240,4 +241,3 @@ A scene succeeds when the player can tell where to look without being told,
 understands that movement is theatrical by design, remembers characters by
 silhouette and behavior, can revisit every important fact, and feels clever for
 explaining the solution rather than lucky for selecting it.
-

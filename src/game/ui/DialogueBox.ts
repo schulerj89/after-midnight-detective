@@ -52,7 +52,8 @@ export class DialogueBox {
 
     this.root = scene.add
       .container(52, 486, [panel, this.portrait, this.speaker, this.body, this.prompt])
-      .setDepth(100)
+      .setDepth(10_000)
+      .setScrollFactor(0)
       .setVisible(false);
 
     scene.input.keyboard?.on('keydown-SPACE', () => this.advance());

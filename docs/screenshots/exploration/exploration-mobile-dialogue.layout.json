@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "exploration-mobile-dialogue", "file": "exploration-mobile-dialogue.png", "pose": "exploration-dialogue" },
+  "viewport": { "deviceScaleFactor": 1, "width": 1000, "height": 560 },
+  "elements": [
+    { "id": "dpad", "role": "control-group", "x": 8, "y": 208, "width": 160, "height": 160 },
+    { "id": "action-a", "role": "touch-control", "x": 925.438, "y": 251.875, "width": 62, "height": 62 },
+    { "id": "action-b", "role": "touch-control", "x": 852.562, "y": 264.725, "width": 62, "height": 62 },
+    { "id": "dialogue-panel", "role": "dialogue", "x": 43.66, "y": 378, "width": 914.67, "height": 163.33 },
+    { "id": "portrait", "role": "portrait", "x": 63.89, "y": 398.22, "width": 122.89, "height": 122.89 },
+    { "id": "dialogue-copy", "role": "text", "x": 214.78, "y": 421, "width": 700, "height": 70 }
+  ],
+  "containmentZones": [
+    { "id": "viewport", "x": 0, "y": 0, "width": 1000, "height": 560, "contains": ["dpad", "action-a", "action-b", "dialogue-panel", "portrait", "dialogue-copy"] },
+    { "id": "dialogue-content", "x": 43.66, "y": 378, "width": 914.67, "height": 163.33, "contains": ["portrait", "dialogue-copy"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "dpad", "b": "dialogue-panel" }, { "a": "action-a", "b": "dialogue-panel" }, { "a": "action-b", "b": "dialogue-panel" },
+    { "a": "portrait", "b": "dialogue-copy" }
+  ],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "portrait-art", "x": 63.89, "y": 398.22, "width": 122.89, "height": 122.89, "minLuminance": 5, "maxLuminance": 170, "minVariance": 10, "maxVariance": 9000 },
+    { "id": "dialogue-copy-art", "x": 214.78, "y": 421, "width": 700, "height": 70, "minLuminance": 5, "maxLuminance": 160, "minVariance": 10, "maxVariance": 9000 }
+  ]
+}

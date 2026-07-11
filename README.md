@@ -30,14 +30,16 @@ Run the geometry-backed screenshot regression checks with Python and Pillow:
 npm run validate:visual
 ```
 
-The current development build opens directly into the Lantern Room sandbox.
-Click either placeholder character to test portrait dialogue, inspect the red
-matchbook on the counter, or use the pause and replay controls to exercise the
-authored movement timeline.
+The current development build opens into a larger Hotel Marlowe exploration
+sandbox. Move through the 2D venue with WASD, the arrow keys, or the mobile
+analog stick. Approach or click placeholder characters to question them and
+inspect the red ledger to test clue dialogue. The original authored Lantern
+Room blocking sandbox remains available at `/?scene=blocking`.
 
-On landscape mobile, the translucent D-pad moves focus between authored people
-and clues. A interacts or continues dialogue; B pauses, resumes, or dismisses
-the current dialogue. Direct touch remains available.
+On landscape mobile, drag the little inner knob anywhere inside the translucent
+circular pad for analog movement. A interacts or continues dialogue; B dismisses
+dialogue. The four directional sectors remain as accessible discrete fallbacks,
+and direct touch remains available.
 
 ## Technology
 
