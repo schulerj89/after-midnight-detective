@@ -1,0 +1,20 @@
+{
+  "status": "pass",
+  "screenshot": "docs\\screenshots\\level-1-solution\\level-1-case-closed-mobile.png",
+  "layout": "docs\\screenshots\\level-1-solution\\level-1-case-closed-mobile.layout.json",
+  "annotated": "docs\\qa\\2026-07-11-level-one-solution\\artifacts\\level-1-case-closed-mobile.annotated.png",
+  "imageSize": {
+    "width": 844,
+    "height": 390
+  },
+  "findings": [],
+  "summary": {
+    "failures": 0,
+    "checksRun": 35
+  },
+  "limitations": [
+    "Pixel activity is a heuristic and does not establish readability or composition quality.",
+    "Geometry is trustworthy only when the manifest is exported from authoritative runtime bounds.",
+    "Human review of the original and annotated screenshot remains mandatory."
+  ]
+}

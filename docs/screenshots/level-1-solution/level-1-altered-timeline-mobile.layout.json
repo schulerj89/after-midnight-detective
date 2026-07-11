@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "level-1-altered-timeline-mobile", "file": "level-1-altered-timeline-mobile.png", "pose": "case-altered-timeline" },
+  "viewport": { "width": 844, "height": 390, "deviceScaleFactor": 1 },
+  "elements": [
+    { "id": "case-board", "role": "modal", "x": 6, "y": 6.19, "width": 832, "height": 377.63 },
+    { "id": "close", "role": "touch-control", "x": 781.33, "y": 14.85, "width": 48, "height": 48 },
+    { "id": "tab-notebook", "role": "touch-control", "x": 16.67, "y": 73.15, "width": 266.89, "height": 48 },
+    { "id": "tab-timeline", "role": "touch-control", "x": 288.55, "y": 73.15, "width": 266.89, "height": 48 },
+    { "id": "tab-accuse", "role": "touch-control", "x": 560.44, "y": 73.15, "width": 266.90, "height": 48 },
+    { "id": "timeline-list", "role": "timeline", "x": 18.67, "y": 156.15, "width": 806.67, "height": 164 },
+    { "id": "observed-deviation", "role": "timeline-fact", "x": 18.67, "y": 240.15, "width": 806.67, "height": 38 },
+    { "id": "replay", "role": "touch-control", "x": 18.67, "y": 327.15, "width": 806.67, "height": 48 }
+  ],
+  "containmentZones": [
+    { "id": "viewport", "x": 0, "y": 0, "width": 844, "height": 390, "contains": ["case-board", "close", "tab-notebook", "tab-timeline", "tab-accuse", "timeline-list", "observed-deviation", "replay"] },
+    { "id": "board-panel", "x": 6, "y": 6.19, "width": 832, "height": 377.63, "contains": ["close", "tab-notebook", "tab-timeline", "tab-accuse", "timeline-list", "observed-deviation", "replay"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "close", "b": "tab-accuse" },
+    { "a": "tab-notebook", "b": "tab-timeline" },
+    { "a": "tab-timeline", "b": "tab-accuse" },
+    { "a": "timeline-list", "b": "replay" }
+  ],
+  "alignmentPairs": [
+    { "a": "tab-notebook", "b": "tab-timeline", "axis": "centerY", "tolerance": 1 },
+    { "a": "tab-timeline", "b": "tab-accuse", "axis": "centerY", "tolerance": 1 }
+  ],
+  "expectedPixelActivity": [
+    { "id": "observed-copy", "x": 18.67, "y": 240.15, "width": 806.67, "height": 38, "minLuminance": 5, "minVariance": 8 },
+    { "id": "replay-copy", "x": 18.67, "y": 327.15, "width": 806.67, "height": 48, "minLuminance": 5, "minVariance": 8 }
+  ]
+}

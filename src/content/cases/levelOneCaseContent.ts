@@ -92,7 +92,7 @@ export const LEVEL_ONE_INTERACTIONS: readonly LevelOneInteractionVariant[] = [
       'She told me to leave it on her desk.',
       'Ask why she tore the page.',
     ]),
-    effects: ['confrontation.miles.torn-ledger', 'statement.miles.key-was-errand', 'statement.miles.vale-gave-key', 'topic.vera.torn-ledger'],
+    effects: ['confrontation.miles.torn-ledger', 'contradiction.miles-denied-317', 'statement.miles.key-was-errand', 'statement.miles.vale-gave-key', 'topic.vera.torn-ledger'],
   },
   {
     id: 'dlg.miles.after-switchboard-log', targetId: 'npc.miles', prompt: 'ASK MILES ABOUT THE SWITCHBOARD LOG',

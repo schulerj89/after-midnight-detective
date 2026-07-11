@@ -46,6 +46,17 @@ export class LevelOneCaseState {
     flags.forEach((flag) => this.flags.add(flag));
   }
 
+  record(source: string, effects: readonly string[]): readonly string[] {
+    const added = effects.filter((flag) => {
+      if (this.flags.has(flag)) return false;
+      this.flags.add(flag);
+      return true;
+    });
+    if (added.length > 0) this.lastUnlock = added.at(-1) ?? null;
+    this.eventLog.push(`recorded:${source}`, ...added.map((flag) => `unlocked:${flag}`));
+    return added;
+  }
+
   snapshot(): LevelOneCaseSnapshot {
     const flags = [...this.flags].sort();
     return {

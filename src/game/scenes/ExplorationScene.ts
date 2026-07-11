@@ -6,6 +6,8 @@ import { GAME_WIDTH, SCENE_KEYS } from '../constants';
 import type { DialogueScript } from '../features/dialogue/DialogueModel';
 import { LevelOneCaseState } from '../features/case/LevelOneCaseState';
 import { applyLevelOneInteractionClose } from '../features/case/LevelOneInteractionController';
+import type { LevelOneAccusationResult } from '../features/case/LevelOneAccusation';
+import { solveLevelOneCase } from '../features/case/LevelOneSolutionPath';
 import { gateTransitionInput } from '../features/navigation/TransitionInputGate';
 import type { Rect } from '../features/movement/CollisionResolver';
 import { normalizeMovementVector, type MovementVector } from '../features/movement/MovementVector';
@@ -19,6 +21,8 @@ import type { LevelDefinition, LevelPlacement, LevelRoom } from '../levels/Level
 import { buildLevelGeometry, levelPoint, placementRect, type LevelGeometry } from '../levels/LevelGeometry';
 import { parseLevel } from '../levels/LevelParser';
 import { resolveRoomTransition, type RoomTransitionDestination } from '../levels/RoomTransitionModel';
+import { LevelOneTimeline, type LevelOneTimelineBeat } from '../features/timeline/LevelOneTimeline';
+import { CaseBoard } from '../ui/CaseBoard';
 import { DialogueBox } from '../ui/DialogueBox';
 
 const FONT = '"Press Start 2P", monospace';
@@ -36,16 +40,20 @@ type RoomTransitionState = 'idle' | 'fading-out' | 'relocating' | 'fading-in';
 
 export class ExplorationScene extends Phaser.Scene {
   private readonly caseState = new LevelOneCaseState();
+  private readonly timeline = new LevelOneTimeline();
   private level!: LevelDefinition;
   private levelGeometry!: LevelGeometry;
   private player!: ExplorationPlayer;
   private dialogue!: DialogueBox;
+  private caseBoard!: CaseBoard;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<'up' | 'down' | 'left' | 'right', Phaser.Input.Keyboard.Key>;
   private mobileVector: MobileMoveVector = { x: 0, y: 0 };
   private obstacles: Rect[] = [];
   private readonly roomObjects = new Map<string, Phaser.GameObjects.GameObject[]>();
   private readonly roomObstacles = new Map<string, Rect[]>();
+  private readonly npcRoots = new Map<string, Phaser.GameObjects.Container>();
+  private readonly npcBodies = new Map<string, Phaser.GameObjects.Image>();
   private interactables: Interactable[] = [];
   private promptText!: Phaser.GameObjects.Text;
   private locationText!: Phaser.GameObjects.Text;
@@ -58,6 +66,9 @@ export class ExplorationScene extends Phaser.Scene {
   private transition?: RoomTransitionDestination;
   private lastTransition?: RoomTransitionDestination;
   private requiresNeutralInput = false;
+  private lastTimelineBeat = 'none';
+  private lastHudSecond = -1;
+  private debugSolveSteps: readonly string[] = [];
 
   constructor() {
     super(SCENE_KEYS.exploration);
@@ -83,6 +94,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.setCameraForRoom(startRoom);
     this.dialogue = new DialogueBox(this);
     this.createHud();
+    this.createCaseBoard();
     this.createInput();
     this.applyQaPose();
     this.publishDebugSnapshot({ x: 0, y: 0 });
@@ -90,11 +102,13 @@ export class ExplorationScene extends Phaser.Scene {
 
   update(_time: number, delta: number): void {
     const physicalVector = this.readMovement();
-    const gated = gateTransitionInput(physicalVector, this.transitionState !== 'idle', this.dialogue.isOpen(), this.requiresNeutralInput);
+    const interfaceOpen = this.dialogue.isOpen() || this.caseBoard.isOpen();
+    const gated = gateTransitionInput(physicalVector, this.transitionState !== 'idle', interfaceOpen, this.requiresNeutralInput);
     this.requiresNeutralInput = gated.requiresNeutral;
     const vector = gated.vector;
     this.player.update(vector, delta, this.roomBounds(this.room(this.currentRoomId)), this.obstacles);
     this.checkDoorTransition();
+    this.updateTimeline(delta);
     this.updatePrompt();
     this.publishDebugSnapshot(vector);
   }
@@ -106,6 +120,12 @@ export class ExplorationScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-E', () => {
       if (this.transitionState === 'idle') this.activateNearest();
     });
+    this.input.keyboard.on('keydown-N', () => {
+      if (!this.dialogue.isOpen() && this.transitionState === 'idle') this.caseBoard.toggle();
+    });
+    this.input.keyboard.on('keydown-T', () => {
+      if (!this.dialogue.isOpen() && this.transitionState === 'idle') this.caseBoard.open('timeline');
+    });
     this.removeMobileMove = onMobileMove((vector) => { this.mobileVector = vector; });
     this.removeMobileControl = onMobileControl((control) => this.handleMobileControl(control));
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -115,6 +135,7 @@ export class ExplorationScene extends Phaser.Scene {
       this.cameras.main.removeAllListeners(Phaser.Cameras.Scene2D.Events.FADE_IN_COMPLETE);
       this.cameras.main.resetFX();
       document.querySelector<HTMLElement>('#mobile-controls')?.classList.remove('is-room-transitioning');
+      this.caseBoard.destroy();
     });
   }
 
@@ -126,10 +147,16 @@ export class ExplorationScene extends Phaser.Scene {
 
   private handleMobileControl(control: MobileControl): void {
     if (this.transitionState !== 'idle') return;
+    if (this.caseBoard.isOpen()) {
+      if (control === 'action-b') this.caseBoard.close();
+      return;
+    }
     if (control === 'action-a') {
       this.dialogue.isOpen() ? this.dialogue.advance() : this.activateNearest();
     } else if (control === 'action-b' && this.dialogue.isOpen()) {
       this.dialogue.dismiss();
+    } else if (control === 'action-b') {
+      this.caseBoard.open();
     }
   }
 
@@ -207,6 +234,8 @@ export class ExplorationScene extends Phaser.Scene {
     const body = this.add.image(0, 0, texture).setOrigin(0.5, 1).setScale(EXPLORATION_CHARACTER_SCALE);
     const hitTarget = this.add.rectangle(0, -100, 96, 210, 0xffffff, 0.001).setInteractive({ useHandCursor: true });
     root.add([shadow, body, hitTarget]);
+    this.npcRoots.set(placement.id, root);
+    this.npcBodies.set(placement.id, body);
     hitTarget.on('pointerdown', () => {
       if (this.currentRoomId === room.id && this.transitionState === 'idle') this.openDialogue(placement.id);
     });
@@ -235,11 +264,107 @@ export class ExplorationScene extends Phaser.Scene {
     hud.fillStyle(0x090a0d, 0.86).fillRoundedRect(844, 20, 414, 70, 5);
     hud.lineStyle(2, 0x817967, 0.8).strokeRoundedRect(844, 20, 414, 70, 5);
     this.locationText = this.add.text(42, 36, 'AFTER MIDNIGHT // HOTEL MARLOWE', { color: '#d9cfb6', fontFamily: FONT, fontSize: '12px' }).setScrollFactor(0).setDepth(9001);
-    this.add.text(42, 61, 'MOVE: WASD / ARROWS / JOYSTICK', { color: '#817967', fontFamily: FONT, fontSize: '9px' }).setScrollFactor(0).setDepth(9001);
+    this.add.text(42, 61, 'MOVE: WASD / ARROWS  //  CASE: N / B', { color: '#817967', fontFamily: FONT, fontSize: '9px' }).setScrollFactor(0).setDepth(9001);
     this.caseText = this.add.text(864, 34, '', { color: '#c7a85b', fontFamily: FONT, fontSize: '9px', lineSpacing: 8 }).setScrollFactor(0).setDepth(9001);
     this.promptText = this.add.text(GAME_WIDTH / 2, 452, '', { color: '#c7a85b', backgroundColor: '#090a0ddd', fontFamily: FONT, fontSize: '12px', padding: { x: 14, y: 9 } }).setOrigin(0.5).setScrollFactor(0).setDepth(9001);
     this.updateCaseHud();
     this.setMobileLabels('ACT', 'BACK');
+  }
+
+  private createCaseBoard(): void {
+    this.caseBoard = new CaseBoard({
+      state: this.caseState,
+      timeline: this.timeline,
+      onReplay: () => this.replayNight(),
+      onSolved: (result) => this.completeLevelOne(result),
+      onVisibilityChange: () => {
+        this.mobileVector = { x: 0, y: 0 };
+        this.updateCaseHud();
+      },
+    });
+  }
+
+  private updateTimeline(delta: number): void {
+    const paused = this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen();
+    this.timeline.setRunning(!paused);
+    const events = this.timeline.update(delta, this.caseState.has('variant.miles.checks-office-next-loop'));
+    events.forEach((beat) => this.applyTimelineBeat(beat));
+    const second = Math.floor(this.timeline.snapshot().elapsedMs / 1_000);
+    if (second !== this.lastHudSecond) {
+      this.lastHudSecond = second;
+      this.updateCaseHud();
+    }
+  }
+
+  private applyTimelineBeat(beat: LevelOneTimelineBeat): void {
+    this.lastTimelineBeat = beat.id;
+    this.lastInteraction = `timeline-${beat.id}`;
+    if (beat.actorId && beat.mark) this.moveNpcToMark(beat.actorId, beat.mark);
+    if (beat.id === 'variant.miles-office-check' && this.currentRoomId === 'lounge') {
+      this.caseState.record(beat.id, [
+        'observation.miles-office-check',
+        'timeline.miles-office-deviation',
+      ]);
+    }
+    this.updateCaseHud();
+  }
+
+  private moveNpcToMark(actorId: string, mark: NonNullable<LevelOneTimelineBeat['mark']>): void {
+    const root = this.npcRoots.get(actorId);
+    const body = this.npcBodies.get(actorId);
+    const lounge = this.room('lounge');
+    if (!root) return;
+    const local = {
+      windows: { x: 23, y: 4 },
+      'office-door': { x: 2, y: 15 },
+      piano: { x: 20, y: 6 },
+      desk: { x: 8, y: 4 },
+    }[mark];
+    const point = levelPoint(this.level, this.levelGeometry, lounge, local.x, local.y);
+    const interactable = this.interactables.find((target) => target.id === actorId);
+    this.tweens.killTweensOf(root);
+    if (body) {
+      this.tweens.killTweensOf(body);
+      body.setY(0);
+      this.tweens.add({ targets: body, y: -4, duration: 210, ease: 'Sine.easeInOut', yoyo: true, repeat: 3 });
+    }
+    const direction = Math.sign(point.x - root.x) || 1;
+    this.tweens.add({
+      targets: root,
+      x: point.x,
+      y: point.y,
+      angle: direction * 3,
+      duration: 1_600,
+      ease: 'Sine.easeInOut',
+      yoyo: false,
+      onUpdate: () => {
+        root.setDepth(100 + root.y);
+        if (interactable) {
+          interactable.x = root.x;
+          interactable.y = root.y;
+        }
+      },
+      onComplete: () => {
+        root.setAngle(0);
+        body?.setY(0);
+      },
+    });
+  }
+
+  private replayNight(): void {
+    this.timeline.replay();
+    this.lastTimelineBeat = 'loop-replayed';
+    this.lastInteraction = `replayed-loop-${this.timeline.snapshot().loop}`;
+    this.moveNpcToMark('npc.miles', 'windows');
+    this.moveNpcToMark('npc.vera', 'desk');
+    this.updateCaseHud();
+  }
+
+  private completeLevelOne(result: LevelOneAccusationResult): void {
+    if (result.status !== 'solved') return;
+    this.caseState.record('accusation', ['outcome.level-one-solved']);
+    this.lastInteraction = 'level-one-solved';
+    this.updateCaseHud();
   }
 
   private updatePrompt(): void {
@@ -253,12 +378,17 @@ export class ExplorationScene extends Phaser.Scene {
       this.setMobileLabels('NEXT', 'CLOSE');
       return;
     }
+    if (this.caseBoard.isOpen()) {
+      this.promptText.setText('').setVisible(false);
+      this.setMobileLabels('SELECT', 'CLOSE');
+      return;
+    }
     const nearest = this.nearestInteractable();
     const variant = nearest ? this.interactionFor(nearest.id) : undefined;
     this.promptText
       .setText(variant ? `A / E: ${variant.prompt}` : '')
       .setVisible(Boolean(variant));
-    this.setMobileLabels('ACT', 'BACK');
+    this.setMobileLabels('ACT', 'CASE');
   }
 
   private nearestInteractable(): Interactable | undefined {
@@ -319,7 +449,9 @@ export class ExplorationScene extends Phaser.Scene {
     const last = snapshot.lastUnlock === 'variant.miles.checks-office-next-loop'
       ? 'MILES CHECKS OFFICE NEXT LOOP'
       : snapshot.lastUnlock?.replaceAll('.', ' ').toUpperCase() ?? 'NONE';
-    this.caseText.setText(`CASE NOTES // EVIDENCE ${snapshot.evidenceCount}/5\nLAST: ${last.slice(0, 34)}`);
+    const loop = this.timeline.snapshot();
+    const outcome = snapshot.flags.includes('outcome.level-one-solved') ? ' // CASE CLOSED' : '';
+    this.caseText.setText(`CASE NOTES // EVIDENCE ${snapshot.evidenceCount}/5${outcome}\nLOOP ${loop.loop} // ${Math.floor(loop.elapsedMs / 1_000)}S  LAST: ${last.slice(0, 22)}`);
   }
 
   private setMobileLabels(a: string, b: string): void {
@@ -403,7 +535,7 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private checkDoorTransition(): void {
-    if (this.transitionState !== 'idle' || this.dialogue.isOpen()) return;
+    if (this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen()) return;
     const room = this.room(this.currentRoomId);
     const position = this.player.position();
     const localX = Math.floor((position.x - this.levelGeometry.offsetX) / this.level.tileSize) - room.originX;
@@ -444,7 +576,36 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private applyQaPose(): void {
-    const pose = new URLSearchParams(window.location.search).get('qaPose');
+    const query = new URLSearchParams(window.location.search);
+    const pose = query.get('qaPose');
+    const debugSolve = query.get('debugSolve');
+    if (pose === 'case-altered-timeline') {
+      const proof = solveLevelOneCase();
+      this.caseState.seed(proof.state.snapshot().flags.filter((flag) => !flag.startsWith('outcome.')));
+      this.debugSolveSteps = proof.steps.slice(0, -1);
+      this.timeline.replay();
+      this.lastTimelineBeat = 'variant.miles-office-check';
+      this.lastInteraction = 'qa-pose-case-altered-timeline';
+      this.caseBoard.open('timeline');
+      this.updateCaseHud();
+    }
+    if (pose === 'case-accusation-ready') {
+      const proof = solveLevelOneCase();
+      this.caseState.seed(proof.state.snapshot().flags.filter((flag) => !flag.startsWith('outcome.')));
+      this.debugSolveSteps = proof.steps.slice(0, -1);
+      this.caseBoard.open('accuse');
+      this.lastInteraction = 'qa-pose-case-accusation-ready';
+      this.updateCaseHud();
+    }
+    if (pose === 'case-solved' || debugSolve === 'level-one') {
+      const proof = solveLevelOneCase();
+      this.caseState.seed(proof.state.snapshot().flags);
+      this.debugSolveSteps = proof.steps;
+      this.lastTimelineBeat = 'variant.miles-office-check';
+      this.lastInteraction = 'debug-solve-level-one-complete';
+      this.caseBoard.showSolved(proof.result);
+      this.updateCaseHud();
+    }
     if (pose === 'exploration-joystick') {
       const knob = document.querySelector<HTMLElement>('.dpad-center');
       if (knob) {
@@ -611,7 +772,7 @@ export class ExplorationScene extends Phaser.Scene {
     canvas.dataset.playerLocalX = (Math.floor((position.x - this.levelGeometry.offsetX) / this.level.tileSize) - activeRoom.originX).toString();
     canvas.dataset.playerLocalY = (Math.floor((position.y - this.levelGeometry.offsetY) / this.level.tileSize) - activeRoom.originY).toString();
     canvas.dataset.inputLocked = (this.transitionState !== 'idle' || this.requiresNeutralInput).toString();
-    canvas.dataset.timelinePaused = (this.transitionState !== 'idle').toString();
+    canvas.dataset.timelinePaused = (this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen()).toString();
     canvas.dataset.doorReentryLocked = this.requiresNeutralInput.toString();
     canvas.dataset.characterScale = EXPLORATION_CHARACTER_SCALE.toFixed(2);
     canvas.dataset.playerX = position.x.toFixed(1);
@@ -629,5 +790,14 @@ export class ExplorationScene extends Phaser.Scene {
     canvas.dataset.caseStatementCount = caseSnapshot.statementCount.toString();
     canvas.dataset.caseLastUnlock = caseSnapshot.lastUnlock ?? 'none';
     canvas.dataset.caseCompletedScripts = caseSnapshot.completedScripts.join('|');
+    const timeline = this.timeline.snapshot();
+    canvas.dataset.timelineLoop = timeline.loop.toString();
+    canvas.dataset.timelineElapsedMs = Math.round(timeline.elapsedMs).toString();
+    canvas.dataset.timelineRunning = timeline.running.toString();
+    canvas.dataset.timelineLastBeat = this.lastTimelineBeat;
+    canvas.dataset.caseBoardOpen = this.caseBoard.isOpen().toString();
+    canvas.dataset.caseOutcome = this.caseState.has('outcome.level-one-solved') ? 'solved' : 'investigating';
+    canvas.dataset.debugSolveStatus = this.debugSolveSteps.at(-1) === 'accusation.solved' ? 'solved' : this.debugSolveSteps.length ? 'running' : 'idle';
+    canvas.dataset.debugSolveSteps = this.debugSolveSteps.join('|');
   }
 }

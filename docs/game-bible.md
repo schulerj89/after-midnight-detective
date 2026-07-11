@@ -228,6 +228,11 @@ The Level 1 lounge is the 30x30 travel and observation hub. Its kitchen, Room 31
 bedroom, and manager office remain compact clue-focused stages connected by quick
 black doorway transitions.
 
+Level 1 is solvable when the player connects Miles to the torn Room 317 ledger,
+identifies the contradiction in his denial, witnesses his manager-office check
+in the altered loop, and submits those links through the case board. Collecting
+all five clues is helpful but is not required to finish the case.
+
 ## Technical implications
 
 - Author cases and schedules as data rather than embedding them in scene code.

@@ -1,0 +1,28 @@
+{
+  "status": "solved",
+  "debugRoute": "/?debugSolve=level-one",
+  "steps": [
+    "dlg.miles.first-question",
+    "inspect.torn-ledger.first",
+    "confront.miles.torn-ledger",
+    "dlg.vera.followup.torn-ledger",
+    "dlg.miles.followup.missing-key",
+    "witness.variant.miles-office-check",
+    "accusation.solved"
+  ],
+  "requiredKnowledge": [
+    "evidence.torn-ledger",
+    "contradiction.miles-denied-317",
+    "timeline.miles-office-deviation"
+  ],
+  "browserAssertions": {
+    "caseOutcome": "solved",
+    "caseBoardHeading": "CASE CLOSED",
+    "timelinePaused": true
+  },
+  "screenshotReports": [
+    "docs/qa/2026-07-11-level-one-solution/artifacts/level-1-case-closed-desktop.report.json",
+    "docs/qa/2026-07-11-level-one-solution/artifacts/level-1-case-closed-mobile.report.json",
+    "docs/qa/2026-07-11-level-one-solution/artifacts/level-1-altered-timeline-mobile.report.json"
+  ]
+}
