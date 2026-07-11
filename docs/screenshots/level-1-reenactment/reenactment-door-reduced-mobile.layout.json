@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "reenactment-door-reduced-mobile", "file": "reenactment-door-reduced-mobile.png", "pose": "reenactment-door-reduced-motion" },
+  "viewport": { "width": 844, "height": 390, "deviceScaleFactor": 1 },
+  "elements": [
+    { "id": "pause", "role": "touch-control", "x": 655, "y": 8, "width": 88, "height": 48 },
+    { "id": "skip", "role": "touch-control", "x": 748, "y": 8, "width": 88, "height": 48 },
+    { "id": "caption-card", "role": "caption", "x": 8, "y": 307.48, "width": 828, "height": 74.52 },
+    { "id": "provenance", "role": "provenance", "x": 20, "y": 319.15, "width": 804, "height": 9.79 },
+    { "id": "heading", "role": "text", "x": 20, "y": 334.94, "width": 804, "height": 18.90 },
+    { "id": "caption", "role": "text", "x": 20, "y": 358.83, "width": 804, "height": 10.50 }
+  ],
+  "containmentZones": [
+    { "id": "viewport", "x": 0, "y": 0, "width": 844, "height": 390, "contains": ["pause", "skip", "caption-card", "provenance", "heading", "caption"] },
+    { "id": "caption-card", "x": 8, "y": 307.48, "width": 828, "height": 74.52, "contains": ["provenance", "heading", "caption"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "pause", "b": "skip" }, { "a": "skip", "b": "caption-card" }
+  ],
+  "alignmentPairs": [
+    { "a": "pause", "b": "skip", "axis": "centerY", "tolerance": 1 }
+  ],
+  "expectedPixelActivity": [
+    { "id": "reduced-door-stage", "x": 20, "y": 60, "width": 500, "height": 230, "minLuminance": 2, "minVariance": 8 },
+    { "id": "caption-art", "x": 20, "y": 319.15, "width": 804, "height": 50.18, "minLuminance": 3, "minVariance": 8 }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "reenactment-door-desktop", "file": "reenactment-door-desktop.png", "pose": "reenactment-door" },
+  "viewport": { "width": 1280, "height": 720, "deviceScaleFactor": 1 },
+  "elements": [
+    { "id": "pause", "role": "touch-control", "x": 1048, "y": 16, "width": 104, "height": 48 },
+    { "id": "skip", "role": "touch-control", "x": 1160, "y": 16, "width": 104, "height": 48 },
+    { "id": "caption-card", "role": "caption", "x": 150, "y": 577.53, "width": 980, "height": 118.47 },
+    { "id": "provenance", "role": "provenance", "x": 170, "y": 596.20, "width": 940, "height": 11.20 },
+    { "id": "heading", "role": "text", "x": 170, "y": 617.40, "width": 940, "height": 35.09 },
+    { "id": "caption", "role": "text", "x": 170, "y": 660.49, "width": 940, "height": 14.84 }
+  ],
+  "containmentZones": [
+    { "id": "viewport", "x": 0, "y": 0, "width": 1280, "height": 720, "contains": ["pause", "skip", "caption-card", "provenance", "heading", "caption"] },
+    { "id": "caption-card", "x": 150, "y": 577.53, "width": 980, "height": 118.47, "contains": ["provenance", "heading", "caption"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "pause", "b": "skip" }, { "a": "skip", "b": "caption-card" }
+  ],
+  "alignmentPairs": [
+    { "a": "pause", "b": "skip", "axis": "centerY", "tolerance": 1 }
+  ],
+  "expectedPixelActivity": [
+    { "id": "door-stage", "x": 50, "y": 90, "width": 500, "height": 420, "minLuminance": 2, "minVariance": 8 },
+    { "id": "caption-art", "x": 170, "y": 596.20, "width": 940, "height": 79.13, "minLuminance": 3, "minVariance": 8 }
+  ]
+}

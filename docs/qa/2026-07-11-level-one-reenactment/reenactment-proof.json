@@ -1,0 +1,29 @@
+{
+  "status": "completed",
+  "durationMs": 28000,
+  "debugRoute": "/?debugReenactment=level-one",
+  "beats": [
+    { "id": "reconstruction.title", "provenance": "INFERRED", "basisIds": ["outcome.level-one-solved"] },
+    { "id": "reconstruction.window-alibi", "provenance": "TESTIMONY", "basisIds": ["statement.miles.window-alibi", "statement.miles.denies-317"] },
+    { "id": "reconstruction.key-ledger", "provenance": "RECORDED", "basisIds": ["evidence.torn-ledger", "observation.ledger-317-key-line"] },
+    { "id": "reconstruction.room-317-door", "provenance": "INFERRED", "basisIds": ["evidence.torn-ledger", "statement.miles.key-was-errand", "contradiction.miles-denied-317"] },
+    { "id": "reconstruction.office-deviation", "provenance": "OBSERVED", "basisIds": ["observation.miles-office-check", "timeline.miles-office-deviation"] },
+    { "id": "reconstruction.finale", "provenance": "INFERRED", "basisIds": ["evidence.torn-ledger", "contradiction.miles-denied-317", "timeline.miles-office-deviation"] }
+  ],
+  "browserAssertions": {
+    "pauseStatus": "paused",
+    "skipRequiresConfirmation": true,
+    "skipReturnsToCaseClosed": true,
+    "replayCountAfterReplay": 1,
+    "fullRunReturnsToCaseClosed": true,
+    "reducedMotionPose": true
+  },
+  "screenshotReports": [
+    "docs/qa/2026-07-11-level-one-reenactment/artifacts/reenactment-door-desktop.report.json",
+    "docs/qa/2026-07-11-level-one-reenactment/artifacts/reenactment-door-reduced-mobile.report.json",
+    "docs/qa/2026-07-11-level-one-reenactment/artifacts/reenactment-finale-desktop.report.json",
+    "docs/qa/2026-07-11-level-one-reenactment/artifacts/reenactment-key-mobile.report.json",
+    "docs/qa/2026-07-11-level-one-reenactment/artifacts/reenactment-office-tell-mobile.report.json",
+    "docs/qa/2026-07-11-level-one-reenactment/artifacts/reenactment-replay-board-mobile.report.json"
+  ]
+}

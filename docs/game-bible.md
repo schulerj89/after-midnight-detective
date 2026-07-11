@@ -233,6 +233,12 @@ identifies the contradiction in his denial, witnesses his manager-office check
 in the altered loop, and submits those links through the case board. Collecting
 all five clues is helpful but is not required to finish the case.
 
+After a correct accusation, Level 1 presents a short, skippable detective
+reconstruction using the same room stages and cutout movement. It visualizes only
+the evidence-supported chain, labels recorded information, testimony,
+observation, and inference explicitly, and never invents an unproven murder act.
+The solved board remains available afterward with a replay control.
+
 ## Technical implications
 
 - Author cases and schedules as data rather than embedding them in scene code.

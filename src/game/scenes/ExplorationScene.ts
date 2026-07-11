@@ -8,6 +8,7 @@ import { LevelOneCaseState } from '../features/case/LevelOneCaseState';
 import { applyLevelOneInteractionClose } from '../features/case/LevelOneInteractionController';
 import type { LevelOneAccusationResult } from '../features/case/LevelOneAccusation';
 import { solveLevelOneCase } from '../features/case/LevelOneSolutionPath';
+import { LevelOneReenactment } from '../features/case/LevelOneReenactment';
 import { gateTransitionInput } from '../features/navigation/TransitionInputGate';
 import type { Rect } from '../features/movement/CollisionResolver';
 import { normalizeMovementVector, type MovementVector } from '../features/movement/MovementVector';
@@ -24,6 +25,8 @@ import { resolveRoomTransition, type RoomTransitionDestination } from '../levels
 import { LevelOneTimeline, type LevelOneTimelineBeat } from '../features/timeline/LevelOneTimeline';
 import { CaseBoard } from '../ui/CaseBoard';
 import { DialogueBox } from '../ui/DialogueBox';
+import { ReenactmentHud } from '../ui/ReenactmentHud';
+import { LEVEL_ONE_REENACTMENT_BEATS, type LevelOneReenactmentBeat, type ReenactmentStageAction } from '../../content/cases/levelOneReenactmentContent';
 
 const FONT = '"Press Start 2P", monospace';
 
@@ -41,11 +44,16 @@ type RoomTransitionState = 'idle' | 'fading-out' | 'relocating' | 'fading-in';
 export class ExplorationScene extends Phaser.Scene {
   private readonly caseState = new LevelOneCaseState();
   private readonly timeline = new LevelOneTimeline();
+  private readonly reenactment = new LevelOneReenactment(this.caseState);
   private level!: LevelDefinition;
   private levelGeometry!: LevelGeometry;
   private player!: ExplorationPlayer;
   private dialogue!: DialogueBox;
   private caseBoard!: CaseBoard;
+  private reenactmentHud!: ReenactmentHud;
+  private reenactmentActor!: Phaser.GameObjects.Container;
+  private reenactmentActorBody!: Phaser.GameObjects.Image;
+  private reenactmentOfficer!: Phaser.GameObjects.Container;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<'up' | 'down' | 'left' | 'right', Phaser.Input.Keyboard.Key>;
   private mobileVector: MobileMoveVector = { x: 0, y: 0 };
@@ -69,6 +77,8 @@ export class ExplorationScene extends Phaser.Scene {
   private lastTimelineBeat = 'none';
   private lastHudSecond = -1;
   private debugSolveSteps: readonly string[] = [];
+  private lastReenactmentBeat = 'none';
+  private readonly reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches || new URLSearchParams(window.location.search).get('reducedMotion') === '1';
 
   constructor() {
     super(SCENE_KEYS.exploration);
@@ -91,18 +101,21 @@ export class ExplorationScene extends Phaser.Scene {
     this.activateRoom(startRoom.id);
     const start = levelPoint(this.level, this.levelGeometry, startRoom, this.level.start.x, this.level.start.y);
     this.player = new ExplorationPlayer(this, start.x, start.y, 'exploration-detective');
+    this.createReenactmentActors();
     this.setCameraForRoom(startRoom);
     this.dialogue = new DialogueBox(this);
     this.createHud();
     this.createCaseBoard();
+    this.createReenactmentHud();
     this.createInput();
     this.applyQaPose();
     this.publishDebugSnapshot({ x: 0, y: 0 });
   }
 
   update(_time: number, delta: number): void {
+    this.updateReenactment(delta);
     const physicalVector = this.readMovement();
-    const interfaceOpen = this.dialogue.isOpen() || this.caseBoard.isOpen();
+    const interfaceOpen = this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive();
     const gated = gateTransitionInput(physicalVector, this.transitionState !== 'idle', interfaceOpen, this.requiresNeutralInput);
     this.requiresNeutralInput = gated.requiresNeutral;
     const vector = gated.vector;
@@ -126,6 +139,12 @@ export class ExplorationScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-T', () => {
       if (!this.dialogue.isOpen() && this.transitionState === 'idle') this.caseBoard.open('timeline');
     });
+    this.input.keyboard.on('keydown-SPACE', () => {
+      if (this.isReenactmentActive()) this.toggleReenactmentPause();
+    });
+    this.input.keyboard.on('keydown-ESC', () => {
+      if (this.isReenactmentActive()) this.reenactmentHud.requestSkip();
+    });
     this.removeMobileMove = onMobileMove((vector) => { this.mobileVector = vector; });
     this.removeMobileControl = onMobileControl((control) => this.handleMobileControl(control));
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -136,6 +155,8 @@ export class ExplorationScene extends Phaser.Scene {
       this.cameras.main.resetFX();
       document.querySelector<HTMLElement>('#mobile-controls')?.classList.remove('is-room-transitioning');
       this.caseBoard.destroy();
+      this.reenactmentHud.destroy();
+      document.querySelector<HTMLElement>('#mobile-controls')?.removeAttribute('aria-hidden');
     });
   }
 
@@ -147,6 +168,7 @@ export class ExplorationScene extends Phaser.Scene {
 
   private handleMobileControl(control: MobileControl): void {
     if (this.transitionState !== 'idle') return;
+    if (this.isReenactmentActive()) return;
     if (this.caseBoard.isOpen()) {
       if (control === 'action-b') this.caseBoard.close();
       return;
@@ -277,6 +299,7 @@ export class ExplorationScene extends Phaser.Scene {
       timeline: this.timeline,
       onReplay: () => this.replayNight(),
       onSolved: (result) => this.completeLevelOne(result),
+      onReplayReenactment: () => this.startReenactment(),
       onVisibilityChange: () => {
         this.mobileVector = { x: 0, y: 0 };
         this.updateCaseHud();
@@ -284,8 +307,190 @@ export class ExplorationScene extends Phaser.Scene {
     });
   }
 
+  private createReenactmentActors(): void {
+    const actor = (texture: string) => {
+      const shadow = this.add.ellipse(0, 0, 80, 19, 0x000000, 0.58);
+      const body = this.add.image(0, 0, texture).setOrigin(0.5, 1).setScale(EXPLORATION_CHARACTER_SCALE);
+      const root = this.add.container(0, 0, [shadow, body]).setVisible(false);
+      return { root, body };
+    };
+    const miles = actor('exploration-miles');
+    this.reenactmentActor = miles.root;
+    this.reenactmentActorBody = miles.body;
+    this.reenactmentOfficer = actor('exploration-officer').root;
+  }
+
+  private createReenactmentHud(): void {
+    this.reenactmentHud = new ReenactmentHud({
+      onTogglePause: () => this.toggleReenactmentPause(),
+      onSkip: () => this.finishReenactment('skipped'),
+    });
+  }
+
+  private isReenactmentActive(): boolean {
+    const status = this.reenactment.snapshot().status;
+    return status === 'playing' || status === 'paused';
+  }
+
+  private startReenactment(beatId?: string, freeze = false): void {
+    const beat = this.reenactment.start(beatId);
+    if (!beat) return;
+    this.caseBoard.close();
+    document.querySelector<HTMLElement>('#mobile-controls')?.setAttribute('aria-hidden', 'true');
+    this.player.gameObject().setVisible(false);
+    this.reenactmentActor.setVisible(true);
+    this.reenactmentOfficer.setVisible(false);
+    this.mobileVector = { x: 0, y: 0 };
+    this.stageReenactmentBeat(beat);
+    if (freeze) {
+      this.settleReenactmentPose(beat);
+      this.toggleReenactmentPause();
+    }
+    this.lastInteraction = `reenactment-started-${beat.id}`;
+  }
+
+  private updateReenactment(delta: number): void {
+    const update = this.reenactment.update(delta);
+    update.entered.forEach((beat) => this.stageReenactmentBeat(beat));
+    if (update.finished) this.finishReenactment('completed');
+  }
+
+  private toggleReenactmentPause(): boolean {
+    const status = this.reenactment.togglePause();
+    const paused = status === 'paused';
+    if (paused) this.tweens.pauseAll();
+    else if (status === 'playing') this.tweens.resumeAll();
+    this.reenactmentHud.setPaused(paused);
+    this.lastInteraction = paused ? 'reenactment-paused' : 'reenactment-resumed';
+    return paused;
+  }
+
+  private finishReenactment(reason: 'completed' | 'skipped'): void {
+    if (reason === 'skipped') this.reenactment.skip();
+    this.tweens.resumeAll();
+    this.tweens.killTweensOf(this.reenactmentActor);
+    this.tweens.killTweensOf(this.reenactmentActorBody);
+    this.reenactmentActor.setVisible(false);
+    this.reenactmentOfficer.setVisible(false);
+    this.reenactmentHud.hide();
+    document.querySelector<HTMLElement>('#mobile-controls')?.removeAttribute('aria-hidden');
+    this.player.gameObject().setVisible(true);
+    this.activateRoom('lounge');
+    this.setCameraForRoom(this.room('lounge'));
+    this.caseBoard.open('accuse');
+    this.lastInteraction = `reenactment-${reason}`;
+  }
+
+  private stageReenactmentBeat(beat: LevelOneReenactmentBeat): void {
+    this.lastReenactmentBeat = beat.id;
+    this.reenactmentHud.show(beat, this.reducedMotion);
+    this.reenactmentActor.setAlpha(beat.provenance === 'INFERRED' ? 0.56 : 1).setAngle(0);
+    this.reenactmentOfficer.setVisible(false);
+    this.tweens.killTweensOf(this.reenactmentActor);
+    this.tweens.killTweensOf(this.reenactmentActorBody);
+    this.reenactmentActorBody.setY(0);
+    this.stageReenactmentAction(beat.stageAction, beat.roomId);
+    this.npcRoots.forEach((root) => root.setVisible(false));
+    this.lastInteraction = `reenactment-beat-${beat.id}`;
+  }
+
+  private stageReenactmentAction(action: ReenactmentStageAction, roomId: LevelOneReenactmentBeat['roomId']): void {
+    const room = this.room(roomId);
+    this.activateRoom(room.id);
+    const place = (target: Phaser.GameObjects.Container, x: number, y: number) => {
+      const point = levelPoint(this.level, this.levelGeometry, room, x, y);
+      target.setPosition(point.x, point.y).setDepth(100 + point.y);
+      return point;
+    };
+    if (action === 'title') {
+      this.reenactmentActor.setVisible(false);
+      this.setReenactmentCamera(room, 15, 14, 0.58);
+      return;
+    }
+    this.reenactmentActor.setVisible(true);
+    if (action === 'miles-window-alibi') {
+      place(this.reenactmentActor, 23, 4);
+      this.setReenactmentCamera(room, 23, 6, 0.8);
+      return;
+    }
+    if (action === 'key-ledger') {
+      place(this.reenactmentActor, 18, 6);
+      this.setReenactmentCamera(room, 12, 6, 0.72);
+      this.slideReenactmentActor(levelPoint(this.level, this.levelGeometry, room, 11, 6), 3_100);
+      return;
+    }
+    if (action === 'room-317-door') {
+      place(this.reenactmentActor, 3, 5);
+      this.setReenactmentCamera(room, 3, 4, 0.9);
+      return;
+    }
+    if (action === 'office-deviation') {
+      place(this.reenactmentActor, 23, 4);
+      this.setReenactmentCamera(room, 23, 6, 0.72);
+      this.cameras.main.startFollow(this.reenactmentActor, true, 0.045, 0.045);
+      this.slideReenactmentActor(levelPoint(this.level, this.levelGeometry, room, 2, 15), 4_800);
+      return;
+    }
+    place(this.reenactmentActor, 14, 14);
+    place(this.reenactmentOfficer, 17, 14);
+    this.reenactmentOfficer.setVisible(true).setAlpha(0.84);
+    this.reenactmentActor.setAlpha(1);
+    this.setReenactmentCamera(room, 15, 14, 0.72);
+  }
+
+  private settleReenactmentPose(beat: LevelOneReenactmentBeat): void {
+    this.tweens.killTweensOf(this.reenactmentActor);
+    this.tweens.killTweensOf(this.reenactmentActorBody);
+    this.reenactmentActor.setAngle(0);
+    this.reenactmentActorBody.setY(0);
+    const room = this.room(beat.roomId);
+    const destination = beat.stageAction === 'key-ledger'
+      ? { x: 11, y: 6 }
+      : beat.stageAction === 'office-deviation'
+        ? { x: 2, y: 15 }
+        : null;
+    if (!destination) return;
+    const point = levelPoint(this.level, this.levelGeometry, room, destination.x, destination.y);
+    this.reenactmentActor.setPosition(point.x, point.y).setDepth(100 + point.y);
+    if (beat.stageAction === 'office-deviation') {
+      this.cameras.main.stopFollow();
+      this.cameras.main.centerOn(point.x, point.y);
+    }
+  }
+
+  private slideReenactmentActor(destination: { x: number; y: number }, duration: number): void {
+    if (this.reducedMotion) {
+      this.reenactmentActor.setPosition(destination.x, destination.y).setDepth(100 + destination.y);
+      return;
+    }
+    const direction = Math.sign(destination.x - this.reenactmentActor.x) || 1;
+    this.tweens.add({ targets: this.reenactmentActorBody, y: -4, duration: 220, ease: 'Sine.easeInOut', yoyo: true, repeat: 8 });
+    this.tweens.add({
+      targets: this.reenactmentActor,
+      x: destination.x,
+      y: destination.y,
+      angle: direction * 3,
+      duration,
+      ease: 'Sine.easeInOut',
+      onUpdate: () => this.reenactmentActor.setDepth(100 + this.reenactmentActor.y),
+      onComplete: () => {
+        this.reenactmentActor.setAngle(0);
+        this.reenactmentActorBody.setY(0);
+      },
+    });
+  }
+
+  private setReenactmentCamera(room: LevelRoom, localX: number, localY: number, zoom: number): void {
+    const bounds = this.roomBounds(room);
+    const point = levelPoint(this.level, this.levelGeometry, room, localX, localY);
+    this.cameras.main.stopFollow();
+    this.cameras.main.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+    this.cameras.main.setZoom(zoom);
+    this.cameras.main.centerOn(point.x, point.y);
+  }
+
   private updateTimeline(delta: number): void {
-    const paused = this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen();
+    const paused = this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive();
     this.timeline.setRunning(!paused);
     const events = this.timeline.update(delta, this.caseState.has('variant.miles.checks-office-next-loop'));
     events.forEach((beat) => this.applyTimelineBeat(beat));
@@ -365,9 +570,15 @@ export class ExplorationScene extends Phaser.Scene {
     this.caseState.record('accusation', ['outcome.level-one-solved']);
     this.lastInteraction = 'level-one-solved';
     this.updateCaseHud();
+    this.time.delayedCall(1_100, () => this.startReenactment());
   }
 
   private updatePrompt(): void {
+    if (this.isReenactmentActive()) {
+      this.promptText.setText('').setVisible(false);
+      this.setMobileLabels('PAUSE', 'SKIP');
+      return;
+    }
     if (this.transitionState !== 'idle') {
       this.promptText.setText('').setVisible(false);
       this.setMobileLabels('WAIT', 'WAIT');
@@ -535,7 +746,7 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private checkDoorTransition(): void {
-    if (this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen()) return;
+    if (this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive()) return;
     const room = this.room(this.currentRoomId);
     const position = this.player.position();
     const localX = Math.floor((position.x - this.levelGeometry.offsetX) / this.level.tileSize) - room.originX;
@@ -579,6 +790,22 @@ export class ExplorationScene extends Phaser.Scene {
     const query = new URLSearchParams(window.location.search);
     const pose = query.get('qaPose');
     const debugSolve = query.get('debugSolve');
+    const debugReenactment = query.get('debugReenactment');
+    const reenactmentPose = {
+      'reenactment-key': 'reconstruction.key-ledger',
+      'reenactment-door': 'reconstruction.room-317-door',
+      'reenactment-office-tell': 'reconstruction.office-deviation',
+      'reenactment-finale': 'reconstruction.finale',
+    }[pose ?? ''];
+    if (reenactmentPose || debugReenactment === 'level-one') {
+      const proof = solveLevelOneCase();
+      this.caseState.seed(proof.state.snapshot().flags);
+      this.debugSolveSteps = proof.steps;
+      this.caseBoard.showSolved(proof.result);
+      this.startReenactment(reenactmentPose, Boolean(reenactmentPose));
+      this.lastInteraction = reenactmentPose ? `qa-pose-${pose}` : 'debug-reenactment-level-one';
+      this.updateCaseHud();
+    }
     if (pose === 'case-altered-timeline') {
       const proof = solveLevelOneCase();
       this.caseState.seed(proof.state.snapshot().flags.filter((flag) => !flag.startsWith('outcome.')));
@@ -771,8 +998,8 @@ export class ExplorationScene extends Phaser.Scene {
     const activeRoom = this.room(this.currentRoomId);
     canvas.dataset.playerLocalX = (Math.floor((position.x - this.levelGeometry.offsetX) / this.level.tileSize) - activeRoom.originX).toString();
     canvas.dataset.playerLocalY = (Math.floor((position.y - this.levelGeometry.offsetY) / this.level.tileSize) - activeRoom.originY).toString();
-    canvas.dataset.inputLocked = (this.transitionState !== 'idle' || this.requiresNeutralInput).toString();
-    canvas.dataset.timelinePaused = (this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen()).toString();
+    canvas.dataset.inputLocked = (this.transitionState !== 'idle' || this.requiresNeutralInput || this.isReenactmentActive()).toString();
+    canvas.dataset.timelinePaused = (this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive()).toString();
     canvas.dataset.doorReentryLocked = this.requiresNeutralInput.toString();
     canvas.dataset.characterScale = EXPLORATION_CHARACTER_SCALE.toFixed(2);
     canvas.dataset.playerX = position.x.toFixed(1);
@@ -799,5 +1026,14 @@ export class ExplorationScene extends Phaser.Scene {
     canvas.dataset.caseOutcome = this.caseState.has('outcome.level-one-solved') ? 'solved' : 'investigating';
     canvas.dataset.debugSolveStatus = this.debugSolveSteps.at(-1) === 'accusation.solved' ? 'solved' : this.debugSolveSteps.length ? 'running' : 'idle';
     canvas.dataset.debugSolveSteps = this.debugSolveSteps.join('|');
+    const reenactment = this.reenactment.snapshot();
+    const reenactmentBeat = LEVEL_ONE_REENACTMENT_BEATS[reenactment.beatIndex];
+    canvas.dataset.reenactmentStatus = reenactment.status;
+    canvas.dataset.reenactmentBeat = reenactment.beatId ?? 'none';
+    canvas.dataset.reenactmentProvenance = reenactmentBeat?.provenance ?? 'none';
+    canvas.dataset.reenactmentBasis = reenactmentBeat?.basisIds.join('|') ?? 'none';
+    canvas.dataset.reenactmentReplayCount = reenactment.replayCount.toString();
+    canvas.dataset.reenactmentReducedMotion = this.reducedMotion.toString();
+    canvas.dataset.reenactmentLastBeat = this.lastReenactmentBeat;
   }
 }

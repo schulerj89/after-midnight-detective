@@ -14,6 +14,7 @@ interface CaseBoardOptions {
   onReplay: () => void;
   onSolved: (result: LevelOneAccusationResult) => void;
   onVisibilityChange: (visible: boolean) => void;
+  onReplayReenactment?: () => void;
 }
 
 const LABELS: Readonly<Record<string, string>> = {
@@ -169,6 +170,11 @@ export class CaseBoard {
         this.element('p', '', this.result.message),
         this.element('p', 'case-board__ending-note', 'Officer Hale takes Miles into the rain. The Marlowe keeps its secrets—except this one.'),
       );
+      if (this.options.onReplayReenactment) {
+        const replay = this.button('REPLAY RECONSTRUCTION', 'case-board__replay-reconstruction', this.options.onReplayReenactment);
+        replay.dataset.caseAction = 'replay-reconstruction';
+        ending.append(replay);
+      }
       content.append(ending);
       return;
     }
