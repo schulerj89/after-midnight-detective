@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import levelOneSource from '../../content/levels/level-1.lvl.txt?raw';
 import { buildLevelGeometry, levelPoint } from './LevelGeometry';
+import { assessLevelGrid } from './LevelGridAssessment';
 import { parseLevel } from './LevelParser';
 
 describe('text level construction', () => {
@@ -55,5 +56,20 @@ describe('text level construction', () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.errors.some((error) => error.message.includes('must have exactly one LINK'))).toBe(true);
+  });
+
+  it('keeps every clue and actor approachable on the authored grid', () => {
+    const result = parseLevel(levelOneSource);
+    if (!result.ok) throw new Error(result.errors.map((error) => error.message).join('\n'));
+    const assessments = assessLevelGrid(result.level);
+    expect(assessments).toHaveLength(4);
+    assessments.forEach((room) => {
+      expect(room.reachableTiles, room.roomId).toBe(room.walkableTiles);
+      room.placements.forEach((placement) => {
+        expect(placement.reachableApproach, placement.id).toBe(true);
+        if (placement.kind === 'clue') expect(placement.cardinalApproachTiles, placement.id).toBeGreaterThanOrEqual(2);
+        if (placement.kind === 'actor') expect(placement.cardinalApproachTiles, placement.id).toBeGreaterThanOrEqual(1);
+      });
+    });
   });
 });

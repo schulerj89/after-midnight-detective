@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "level-1-ledger-inspection-compact", "file": "level-1-ledger-inspection-compact.png", "pose": "case-ledger-inspection" },
+  "viewport": { "deviceScaleFactor": 1, "width": 844, "height": 390 },
+  "elements": [
+    { "id": "dialogue", "role": "dialogue", "x": 140, "y": 262, "width": 639, "height": 116 },
+    { "id": "portrait", "role": "portrait", "x": 151, "y": 273, "width": 94, "height": 94 },
+    { "id": "copy", "role": "text", "x": 258, "y": 294, "width": 375, "height": 42 },
+    { "id": "action-b", "role": "touch-control", "x": 690, "y": 278, "width": 62, "height": 62 },
+    { "id": "action-a", "role": "touch-control", "x": 766, "y": 296, "width": 62, "height": 62 }
+  ],
+  "containmentZones": [
+    { "id": "safe-area", "x": 8, "y": 8, "width": 828, "height": 374, "contains": ["dialogue", "portrait", "copy", "action-b", "action-a"] },
+    { "id": "dialogue-content", "x": 140, "y": 262, "width": 639, "height": 116, "contains": ["portrait", "copy"] }
+  ],
+  "forbiddenOverlaps": [ { "a": "portrait", "b": "copy" }, { "a": "copy", "b": "action-b" }, { "a": "copy", "b": "action-a" } ],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "compact-copy", "x": 258, "y": 294, "width": 375, "height": 42, "minLuminance": 5, "maxLuminance": 180, "minVariance": 8, "maxVariance": 9000 }
+  ]
+}

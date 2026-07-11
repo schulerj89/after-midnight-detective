@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "level-1-office-dressed-desktop", "file": "level-1-office-dressed-desktop.png", "pose": "level-room-office" },
+  "viewport": { "deviceScaleFactor": 1, "width": 1280, "height": 720 },
+  "elements": [
+    { "id": "hud", "role": "hud", "x": 20, "y": 20, "width": 433, "height": 70 },
+    { "id": "room-grid", "role": "room-grid", "x": 89, "y": 35, "width": 721, "height": 578 },
+    { "id": "player", "role": "character", "x": 506, "y": 89, "width": 104, "height": 282 },
+    { "id": "desk", "role": "placeholder-prop", "x": 231, "y": 180, "width": 293, "height": 146 },
+    { "id": "switchboard-log", "role": "clue", "x": 603, "y": 190, "width": 58, "height": 39 }
+  ],
+  "containmentZones": [
+    { "id": "viewport", "x": 0, "y": 0, "width": 1280, "height": 720, "contains": ["hud", "room-grid", "player", "desk", "switchboard-log"] },
+    { "id": "office", "x": 89, "y": 35, "width": 721, "height": 578, "contains": ["player", "desk", "switchboard-log"] }
+  ],
+  "forbiddenOverlaps": [ { "a": "desk", "b": "switchboard-log" } ],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "office-dressing", "x": 160, "y": 107, "width": 580, "height": 365, "minLuminance": 3, "maxLuminance": 110, "minVariance": 8, "maxVariance": 9000 }
+  ]
+}

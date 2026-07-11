@@ -27,12 +27,18 @@ MAP
 #..................#
 ####################
 ENDMAP
-PLACE npc.vera actor vera 5 11
-PLACE npc.miles actor miles 15 15
-PLACE clue.wet-footprints clue wet-footprints 11 5
-PLACE clue.torn-ledger clue torn-ledger 14 12
-PLACE prop.piano prop piano 12 3 w=4 h=2 solid=true
-PLACE prop.sofa prop sofa 4 7 w=4 h=2 solid=true
+PLACE prop.front-desk prop front-desk 2 2 w=5 h=2 solid=true
+PLACE prop.piano prop piano 13 2 w=4 h=2 solid=true
+PLACE prop.west-sofa prop sofa 3 6 w=4 h=2 solid=true
+PLACE prop.lounge-table prop low-table 4 12 w=2 h=1 solid=true
+PLACE prop.east-sofa prop sofa 13 13 w=4 h=2 solid=true
+PLACE prop.grand-clock prop grand-clock 17 5 w=1 h=2 solid=true
+PLACE prop.coat-rack prop coat-rack 2 15 w=1 h=2 solid=true
+PLACE prop.foreground-screen prop folding-screen 16 16 w=2 h=2 solid=true
+PLACE npc.vera actor vera 5 3
+PLACE npc.miles actor miles 15 3
+PLACE clue.wet-footprints clue wet-footprints 9 2
+PLACE clue.torn-ledger clue torn-ledger 7 4
 ENDROOM
 
 ROOM kitchen "Service Kitchen" 12 10 AT 20 5
@@ -48,8 +54,13 @@ MAP
 #..........#
 ############
 ENDMAP
-PLACE prop.kitchen-counter prop counter 4 2 w=5 h=2 solid=true
-PLACE clue.damp-matchbook clue damp-matchbook 8 7
+PLACE prop.kitchen-sink prop sink-counter 1 1 w=2 h=2 solid=true
+PLACE prop.kitchen-counter prop counter 4 1 w=6 h=2 solid=true
+PLACE prop.kitchen-stove prop stove 10 1 w=1 h=3 solid=true
+PLACE prop.prep-table prop prep-table 6 5 w=3 h=2 solid=true
+PLACE prop.pantry-crates prop pantry-crates 1 7 w=3 h=1 solid=true
+PLACE prop.kitchen-bin prop bin 10 7 w=1 h=1 solid=true
+PLACE clue.damp-matchbook clue damp-matchbook 8 3
 ENDROOM
 
 ROOM bedroom "Room 317 Bedroom" 8 8 AT 6 -8
@@ -63,8 +74,12 @@ MAP
 #......#
 ###+####
 ENDMAP
-PLACE prop.bed prop bed 1 1 w=4 h=3 solid=true
-PLACE clue.stopped-watch clue stopped-watch 6 5
+PLACE prop.bed prop bed 1 1 w=3 h=3 solid=true
+PLACE prop.nightstand prop nightstand 4 2 w=1 h=1 solid=true
+PLACE prop.wardrobe prop wardrobe 6 1 w=1 h=2 solid=true
+PLACE prop.luggage-rack prop luggage-rack 1 5 w=2 h=1 solid=true
+PLACE prop.bedroom-chair prop chair 6 5 w=1 h=1 solid=true
+PLACE clue.stopped-watch clue stopped-watch 4 4
 ENDROOM
 
 ROOM office "Manager Office" 10 8 AT -10 7
@@ -78,8 +93,14 @@ MAP
 #........#
 ##########
 ENDMAP
+PLACE prop.office-safe prop safe 1 1 w=1 h=2 solid=true
 PLACE prop.office-desk prop desk 2 2 w=4 h=2 solid=true
-PLACE clue.switchboard-log clue switchboard-log 7 5
+PLACE prop.manager-chair prop manager-chair 2 1 w=1 h=1 solid=true
+PLACE prop.switchboard prop switchboard 7 1 w=2 h=1 solid=true
+PLACE prop.filing-cabinets prop filing-cabinets 1 5 w=2 h=1 solid=true
+PLACE prop.visitor-chair prop visitor-chair 4 5 w=1 h=1 solid=true
+PLACE prop.office-coat-stand prop coat-stand 8 5 w=1 h=1 solid=true
+PLACE clue.switchboard-log clue switchboard-log 7 2
 ENDROOM
 
 LINK lounge 19 9 <-> kitchen 0 4 ID door.lounge-kitchen

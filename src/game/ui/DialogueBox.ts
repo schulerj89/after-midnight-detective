@@ -5,6 +5,7 @@ import {
 } from '../features/dialogue/DialogueModel';
 
 const FONT = '"Press Start 2P", monospace';
+export type DialogueCloseReason = 'completed' | 'dismissed';
 
 export class DialogueBox {
   private readonly model = new DialogueModel();
@@ -13,7 +14,7 @@ export class DialogueBox {
   private readonly speaker: Phaser.GameObjects.Text;
   private readonly body: Phaser.GameObjects.Text;
   private readonly prompt: Phaser.GameObjects.Text;
-  private onClosed?: () => void;
+  private onClosed?: (reason: DialogueCloseReason) => void;
 
   constructor(scene: Phaser.Scene) {
     const panel = scene.add.graphics();
@@ -60,7 +61,7 @@ export class DialogueBox {
     scene.input.keyboard?.on('keydown-ENTER', () => this.advance());
   }
 
-  open(script: DialogueScript, onClosed?: () => void): void {
+  open(script: DialogueScript, onClosed?: (reason: DialogueCloseReason) => void): void {
     this.model.open(script);
     this.onClosed = onClosed;
     this.root.setVisible(true);
@@ -71,7 +72,7 @@ export class DialogueBox {
     const result = this.model.advance();
 
     if (result === 'closed') {
-      this.finishClosing();
+      this.finishClosing('completed');
       return;
     }
 
@@ -82,7 +83,7 @@ export class DialogueBox {
 
   dismiss(): void {
     if (this.model.dismiss() === 'closed') {
-      this.finishClosing();
+      this.finishClosing('dismissed');
     }
   }
 
@@ -106,10 +107,10 @@ export class DialogueBox {
     this.prompt.setText(snapshot.pageIndex < snapshot.pageCount - 1 ? '▼' : '■');
   }
 
-  private finishClosing(): void {
+  private finishClosing(reason: DialogueCloseReason): void {
     this.root.setVisible(false);
     const onClosed = this.onClosed;
     this.onClosed = undefined;
-    onClosed?.();
+    onClosed?.(reason);
   }
 }

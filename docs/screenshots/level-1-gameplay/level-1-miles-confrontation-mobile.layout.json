@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "level-1-miles-confrontation-mobile", "file": "level-1-miles-confrontation-mobile.png", "pose": "case-miles-ledger" },
+  "viewport": { "deviceScaleFactor": 1, "width": 1000, "height": 560 },
+  "elements": [
+    { "id": "case-notes", "role": "hud", "x": 659, "y": 15, "width": 323, "height": 55 },
+    { "id": "miles", "role": "character", "x": 466, "y": 80, "width": 68, "height": 116 },
+    { "id": "dialogue", "role": "dialogue", "x": 42, "y": 376, "width": 918, "height": 166 },
+    { "id": "portrait", "role": "portrait", "x": 57, "y": 391, "width": 138, "height": 137 },
+    { "id": "copy", "role": "text", "x": 213, "y": 423, "width": 525, "height": 52 },
+    { "id": "action-b", "role": "touch-control", "x": 846, "y": 448, "width": 62, "height": 62 },
+    { "id": "action-a", "role": "touch-control", "x": 922, "y": 466, "width": 62, "height": 62 }
+  ],
+  "containmentZones": [
+    { "id": "safe-area", "x": 8, "y": 8, "width": 984, "height": 544, "contains": ["case-notes", "miles", "dialogue", "portrait", "copy", "action-b", "action-a"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "portrait", "b": "copy" },
+    { "a": "copy", "b": "action-b" },
+    { "a": "copy", "b": "action-a" }
+  ],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "miles-art", "x": 466, "y": 80, "width": 68, "height": 116, "minLuminance": 4, "maxLuminance": 170, "minVariance": 8, "maxVariance": 9000 },
+    { "id": "dialogue-copy", "x": 213, "y": 423, "width": 525, "height": 52, "minLuminance": 5, "maxLuminance": 180, "minVariance": 8, "maxVariance": 9000 }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "level-1-lounge-overview-desktop", "file": "level-1-lounge-overview-desktop.png", "pose": "level-room-lounge-overview" },
+  "viewport": { "deviceScaleFactor": 1, "width": 1280, "height": 720 },
+  "elements": [
+    { "id": "lounge-grid", "role": "room-grid", "x": 315, "y": 47, "width": 650, "height": 650 },
+    { "id": "office-grid", "role": "room-grid", "x": 17, "y": 275, "width": 298, "height": 260 },
+    { "id": "kitchen-grid", "role": "room-grid", "x": 965, "y": 210, "width": 315, "height": 294 },
+    { "id": "player", "role": "character", "x": 637, "y": 495, "width": 42, "height": 121 }
+  ],
+  "containmentZones": [
+    { "id": "viewport", "x": 0, "y": 0, "width": 1280, "height": 720, "contains": ["lounge-grid", "office-grid", "kitchen-grid", "player"] },
+    { "id": "lounge", "x": 315, "y": 47, "width": 650, "height": 650, "contains": ["player"] }
+  ],
+  "forbiddenOverlaps": [],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "full-lounge-dressing", "x": 315, "y": 47, "width": 650, "height": 650, "minLuminance": 3, "maxLuminance": 100, "minVariance": 8, "maxVariance": 9000 }
+  ]
+}

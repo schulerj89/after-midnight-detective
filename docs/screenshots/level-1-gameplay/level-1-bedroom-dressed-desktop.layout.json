@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "level-1-bedroom-dressed-desktop", "file": "level-1-bedroom-dressed-desktop.png", "pose": "level-room-bedroom" },
+  "viewport": { "deviceScaleFactor": 1, "width": 1280, "height": 720 },
+  "elements": [
+    { "id": "room-grid", "role": "room-grid", "x": 315, "y": 35, "width": 576, "height": 650 },
+    { "id": "player", "role": "character", "x": 586, "y": 89, "width": 107, "height": 282 },
+    { "id": "bed", "role": "placeholder-prop", "x": 387, "y": 107, "width": 216, "height": 218 },
+    { "id": "watch", "role": "clue", "x": 619, "y": 334, "width": 47, "height": 39 }
+  ],
+  "containmentZones": [
+    { "id": "viewport", "x": 0, "y": 0, "width": 1280, "height": 720, "contains": ["room-grid", "player", "bed", "watch"] },
+    { "id": "bedroom", "x": 315, "y": 35, "width": 576, "height": 650, "contains": ["player", "bed", "watch"] }
+  ],
+  "forbiddenOverlaps": [],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "bedroom-dressing", "x": 387, "y": 107, "width": 433, "height": 365, "minLuminance": 3, "maxLuminance": 115, "minVariance": 8, "maxVariance": 9000 }
+  ]
+}

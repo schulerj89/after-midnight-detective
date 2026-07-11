@@ -1,8 +1,11 @@
 import Phaser from 'phaser';
+import { resolveLevelOneInteraction, type LevelOneInteractionVariant } from '../../content/cases/levelOneCaseContent';
 import levelOneSource from '../../content/levels/level-1.lvl.txt?raw';
 import { ExplorationPlayer } from '../actors/ExplorationPlayer';
 import { GAME_WIDTH, SCENE_KEYS } from '../constants';
 import type { DialogueScript } from '../features/dialogue/DialogueModel';
+import { LevelOneCaseState } from '../features/case/LevelOneCaseState';
+import { applyLevelOneInteractionClose } from '../features/case/LevelOneInteractionController';
 import type { Rect } from '../features/movement/CollisionResolver';
 import { normalizeMovementVector, type MovementVector } from '../features/movement/MovementVector';
 import {
@@ -26,22 +29,8 @@ interface Interactable {
   activate: () => void;
 }
 
-const DIALOGUE: Record<string, DialogueScript> = {
-  'npc.vera': {
-    id: 'exploration-vera', speaker: 'VERA VALE', portraitKey: 'portrait-vera',
-    pages: ['You found the lounge. Now find out who crossed it after midnight.', 'The wet footprints stop at the piano. Curious, isn\'t it?'],
-  },
-  'npc.miles': {
-    id: 'exploration-miles', speaker: 'MILES PIKE', portraitKey: 'portrait-miles',
-    pages: ['Keep your questions quiet. These walls collect secrets.', 'I was by the north windows when the lights failed.'],
-  },
-  'clue.torn-ledger': {
-    id: 'exploration-ledger', speaker: 'DETECTIVE', portraitKey: 'portrait-detective',
-    pages: ['A torn hotel ledger. Room 317 was entered twice after midnight.', 'PLACEHOLDER CLUE RECORDED // THE NOTEBOOK WILL REMEMBER THIS.'],
-  },
-};
-
 export class ExplorationScene extends Phaser.Scene {
+  private readonly caseState = new LevelOneCaseState();
   private level!: LevelDefinition;
   private levelGeometry!: LevelGeometry;
   private player!: ExplorationPlayer;
@@ -53,6 +42,7 @@ export class ExplorationScene extends Phaser.Scene {
   private interactables: Interactable[] = [];
   private promptText!: Phaser.GameObjects.Text;
   private locationText!: Phaser.GameObjects.Text;
+  private caseText!: Phaser.GameObjects.Text;
   private removeMobileMove?: () => void;
   private removeMobileControl?: () => void;
   private lastInteraction = 'exploration-ready';
@@ -165,11 +155,22 @@ export class ExplorationScene extends Phaser.Scene {
 
   private addProp(room: LevelRoom, placement: LevelPlacement): void {
     const rect = placementRect(this.level, this.levelGeometry, room, placement);
+    const style = this.propStyle(placement.archetype);
     const prop = this.add.container(rect.x, rect.y + rect.height).setDepth(100 + rect.y + rect.height);
     const shadow = this.add.ellipse(rect.width / 2, 2, rect.width + 24, 28, 0x000000, 0.42);
-    const body = this.add.rectangle(rect.width / 2, -rect.height / 2, rect.width, rect.height, 0x201b19, 1).setStrokeStyle(4, 0x39322b, 1);
+    const body = this.add.rectangle(rect.width / 2, -rect.height / 2, rect.width, rect.height, style.body, 1).setStrokeStyle(4, 0x39322b, 1);
+    const accent = this.add.rectangle(rect.width / 2, -rect.height + 9, Math.max(12, rect.width - 12), 8, style.accent, 0.58);
     const name = this.add.text(rect.width / 2, -rect.height / 2, placement.archetype.toUpperCase().replaceAll('-', ' '), { color: '#817967', fontFamily: FONT, fontSize: '9px' }).setOrigin(0.5);
-    prop.add([shadow, body, name]);
+    prop.add([shadow, body, accent, name]);
+  }
+
+  private propStyle(archetype: string): { body: number; accent: number } {
+    if (archetype.includes('bed')) return { body: 0x321b22, accent: 0x8f2432 };
+    if (archetype.includes('piano')) return { body: 0x101218, accent: 0xd9cfb6 };
+    if (archetype.includes('sofa') || archetype.includes('chair')) return { body: 0x24212a, accent: 0x8f2432 };
+    if (archetype.includes('counter') || archetype.includes('desk')) return { body: 0x26211d, accent: 0xc7a85b };
+    if (archetype.includes('clock') || archetype.includes('switchboard')) return { body: 0x20231f, accent: 0xc7a85b };
+    return { body: 0x201b19, accent: 0x817967 };
   }
 
   private addNpc(room: LevelRoom, placement: LevelPlacement): void {
@@ -187,7 +188,8 @@ export class ExplorationScene extends Phaser.Scene {
     const point = levelPoint(this.level, this.levelGeometry, room, placement.x, placement.y);
     const clue = this.add.container(point.x, point.y).setDepth(100 + point.y);
     const halo = this.add.ellipse(0, 0, 62, 24, 0xc7a85b, 0.13);
-    const marker = this.add.rectangle(0, -7, 42, 30, 0x8f2432, 1).setRotation(-0.14).setStrokeStyle(2, 0xd9cfb6, 0.62).setInteractive({ useHandCursor: true });
+    const clueColor = placement.archetype === 'wet-footprints' ? 0x718293 : placement.archetype === 'stopped-watch' ? 0xc7a85b : 0x8f2432;
+    const marker = this.add.rectangle(0, -7, 42, 30, clueColor, 1).setRotation(-0.14).setStrokeStyle(2, 0xd9cfb6, 0.62).setInteractive({ useHandCursor: true });
     clue.add([halo, marker]);
     marker.on('pointerdown', () => this.openDialogue(placement.id));
     this.interactables.push({ id: placement.id, x: point.x, y: point.y, range: 145, activate: () => this.openDialogue(placement.id) });
@@ -197,22 +199,27 @@ export class ExplorationScene extends Phaser.Scene {
     const hud = this.add.graphics().setScrollFactor(0).setDepth(9000);
     hud.fillStyle(0x090a0d, 0.86).fillRoundedRect(22, 20, 430, 70, 5);
     hud.lineStyle(2, 0x817967, 0.8).strokeRoundedRect(22, 20, 430, 70, 5);
+    hud.fillStyle(0x090a0d, 0.86).fillRoundedRect(844, 20, 414, 70, 5);
+    hud.lineStyle(2, 0x817967, 0.8).strokeRoundedRect(844, 20, 414, 70, 5);
     this.locationText = this.add.text(42, 36, 'AFTER MIDNIGHT // HOTEL MARLOWE', { color: '#d9cfb6', fontFamily: FONT, fontSize: '12px' }).setScrollFactor(0).setDepth(9001);
     this.add.text(42, 61, 'MOVE: WASD / ARROWS / JOYSTICK', { color: '#817967', fontFamily: FONT, fontSize: '9px' }).setScrollFactor(0).setDepth(9001);
+    this.caseText = this.add.text(864, 34, '', { color: '#c7a85b', fontFamily: FONT, fontSize: '9px', lineSpacing: 8 }).setScrollFactor(0).setDepth(9001);
     this.promptText = this.add.text(GAME_WIDTH / 2, 452, '', { color: '#c7a85b', backgroundColor: '#090a0ddd', fontFamily: FONT, fontSize: '12px', padding: { x: 14, y: 9 } }).setOrigin(0.5).setScrollFactor(0).setDepth(9001);
+    this.updateCaseHud();
     this.setMobileLabels('ACT', 'BACK');
   }
 
   private updatePrompt(): void {
     if (this.dialogue.isOpen()) {
       this.promptText.setText('A: NEXT  //  B: CLOSE').setVisible(true);
-      this.setMobileLabels('NEXT', 'BACK');
+      this.setMobileLabels('NEXT', 'CLOSE');
       return;
     }
     const nearest = this.nearestInteractable();
+    const variant = nearest ? this.interactionFor(nearest.id) : undefined;
     this.promptText
-      .setText(nearest ? `A / E: ${nearest.id.startsWith('clue.') ? `INSPECT ${nearest.id.slice(5).replaceAll('-', ' ').toUpperCase()}` : `QUESTION ${nearest.id.slice(4).toUpperCase()}`}` : '')
-      .setVisible(Boolean(nearest));
+      .setText(variant ? `A / E: ${variant.prompt}` : '')
+      .setVisible(Boolean(variant));
     this.setMobileLabels('ACT', 'BACK');
   }
 
@@ -232,9 +239,28 @@ export class ExplorationScene extends Phaser.Scene {
 
   private openDialogue(id: Interactable['id']): void {
     if (this.dialogue?.isOpen()) return;
+    const variant = this.interactionFor(id);
+    if (!variant) return;
     this.lastInteraction = `opened-${id}`;
-    const script = DIALOGUE[id] ?? this.placeholderDialogue(id);
-    this.dialogue.open(script, () => { this.lastInteraction = `closed-${id}`; });
+    this.dialogue.open(variant.script, (reason) => {
+      if (reason === 'completed') {
+        const added = applyLevelOneInteractionClose(this.caseState, variant, reason);
+        this.lastInteraction = added.length ? `unlocked-${added.at(-1)}` : `completed-${variant.script.id}`;
+        this.updateCaseHud();
+      } else {
+        this.lastInteraction = `dismissed-${variant.script.id}`;
+      }
+    });
+  }
+
+  private interactionFor(id: string): LevelOneInteractionVariant | undefined {
+    return resolveLevelOneInteraction(id, this.caseState) ?? {
+      id: `placeholder-${id}`,
+      targetId: id,
+      prompt: id.startsWith('npc.') ? `QUESTION ${id.slice(4).toUpperCase()}` : `INSPECT ${id.toUpperCase()}`,
+      script: this.placeholderDialogue(id),
+      effects: [],
+    };
   }
 
   private placeholderDialogue(id: string): DialogueScript {
@@ -245,6 +271,15 @@ export class ExplorationScene extends Phaser.Scene {
       portraitKey: 'portrait-detective',
       pages: [`${label}. A placeholder clue positioned by the Level 1 text file.`, `ROOM: ${this.currentRoomId.toUpperCase()} // STABLE ID: ${id}`],
     };
+  }
+
+  private updateCaseHud(): void {
+    if (!this.caseText) return;
+    const snapshot = this.caseState.snapshot();
+    const last = snapshot.lastUnlock === 'variant.miles.checks-office-next-loop'
+      ? 'MILES CHECKS OFFICE NEXT LOOP'
+      : snapshot.lastUnlock?.replaceAll('.', ' ').toUpperCase() ?? 'NONE';
+    this.caseText.setText(`CASE NOTES // EVIDENCE ${snapshot.evidenceCount}/5\nLAST: ${last.slice(0, 34)}`);
   }
 
   private setMobileLabels(a: string, b: string): void {
@@ -291,16 +326,68 @@ export class ExplorationScene extends Phaser.Scene {
       this.lastInteraction = 'qa-pose-exploration-joystick';
     }
     if (pose === 'exploration-dialogue') this.openDialogue('npc.vera');
+    if (pose === 'case-ledger-inspection') {
+      this.centerQaCameraOnPlacement('clue.torn-ledger');
+      this.openDialogue('clue.torn-ledger');
+    }
+    if (pose === 'case-miles-ledger') {
+      this.caseState.seed(['evidence.torn-ledger', 'statement.miles.denies-317']);
+      this.updateCaseHud();
+      this.centerQaCameraOnPlacement('npc.miles');
+      this.openDialogue('npc.miles');
+    }
+    if (pose === 'case-vera-ledger-followup') {
+      this.caseState.seed(['evidence.torn-ledger', 'topic.vera.torn-ledger', 'confrontation.miles.torn-ledger']);
+      this.updateCaseHud();
+      this.centerQaCameraOnPlacement('npc.vera');
+      this.openDialogue('npc.vera');
+    }
+    if (pose === 'case-miles-missing-key') {
+      this.caseState.seed(['evidence.torn-ledger', 'topic.miles.missing-key', 'statement.vera.key-not-returned', 'reviewed.miles.first-question']);
+      this.updateCaseHud();
+      this.centerQaCameraOnPlacement('npc.miles');
+      this.openDialogue('npc.miles');
+    }
+    if (pose === 'case-miles-unlocked') {
+      this.caseState.seed(['evidence.torn-ledger', 'topic.miles.missing-key', 'statement.vera.key-not-returned', 'reviewed.miles.first-question']);
+      const variant = resolveLevelOneInteraction('npc.miles', this.caseState);
+      if (variant) applyLevelOneInteractionClose(this.caseState, variant, 'completed');
+      this.updateCaseHud();
+      this.centerQaCameraOnPlacement('npc.miles');
+      this.openDialogue('npc.miles');
+    }
+    if (pose === 'level-room-lounge-overview') {
+      const room = this.level.rooms.find((candidate) => candidate.id === 'lounge');
+      if (room) {
+        const point = levelPoint(this.level, this.levelGeometry, room, room.width / 2 - 0.5, room.height / 2 - 0.5);
+        this.cameras.main.stopFollow();
+        this.cameras.main.setZoom(0.45);
+        this.cameras.main.centerOn(point.x, point.y);
+        this.lastInteraction = 'qa-pose-level-room-lounge-overview';
+      }
+    }
     const roomPose = pose?.startsWith('level-room-') ? pose.slice('level-room-'.length) : undefined;
     if (roomPose) {
       const room = this.level.rooms.find((candidate) => candidate.id === roomPose);
       if (room) {
-        const poseX = room.id === 'office' ? 6 : Math.floor(room.width / 2);
-        const point = levelPoint(this.level, this.levelGeometry, room, poseX, Math.floor(room.height / 2));
+        const poseX = room.id === 'office' ? 6 : room.id === 'kitchen' ? 4 : Math.floor(room.width / 2);
+        const poseY = room.id === 'lounge' ? 6 : Math.floor(room.height / 2);
+        const point = levelPoint(this.level, this.levelGeometry, room, poseX, poseY);
         this.player.setPosition(point.x, point.y);
         this.cameras.main.centerOn(point.x, point.y);
         this.lastInteraction = `qa-pose-${pose}`;
       }
+    }
+  }
+
+  private centerQaCameraOnPlacement(id: string): void {
+    for (const room of this.level.rooms) {
+      const placement = room.placements.find((candidate) => candidate.id === id);
+      if (!placement) continue;
+      const point = levelPoint(this.level, this.levelGeometry, room, placement.x, placement.y);
+      this.cameras.main.stopFollow();
+      this.cameras.main.centerOn(point.x, point.y);
+      return;
     }
   }
 
@@ -358,5 +445,11 @@ export class ExplorationScene extends Phaser.Scene {
     canvas.dataset.nearestTarget = this.nearestInteractable()?.id ?? 'none';
     canvas.dataset.dialogue = this.dialogue.snapshot().scriptId ?? 'closed';
     canvas.dataset.lastInteraction = this.lastInteraction;
+    const caseSnapshot = this.caseState.snapshot();
+    canvas.dataset.caseFlags = caseSnapshot.flags.join('|');
+    canvas.dataset.caseEvidenceCount = caseSnapshot.evidenceCount.toString();
+    canvas.dataset.caseStatementCount = caseSnapshot.statementCount.toString();
+    canvas.dataset.caseLastUnlock = caseSnapshot.lastUnlock ?? 'none';
+    canvas.dataset.caseCompletedScripts = caseSnapshot.completedScripts.join('|');
   }
 }
