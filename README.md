@@ -38,8 +38,8 @@ Room blocking sandbox remains available at `/?scene=blocking`.
 
 On landscape mobile, drag the little inner knob anywhere inside the translucent
 circular pad for analog movement. A interacts or continues dialogue; B dismisses
-dialogue. The four directional sectors remain as accessible discrete fallbacks,
-and direct touch remains available.
+dialogue. The pad is one continuous drag surface with no directional buttons;
+direct touch remains available for people and clues.
 
 ## Technology
 

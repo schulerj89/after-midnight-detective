@@ -47,7 +47,7 @@ function bindAnalogJoystick(): void {
   pad.dataset.analogBound = 'true';
 
   let activePointer: number | null = null;
-  const knobTravel = 42;
+  const knobTravel = 44;
 
   const emit = (x: number, y: number) => {
     document.dispatchEvent(
