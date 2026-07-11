@@ -31,10 +31,14 @@ npm run validate:visual
 ```
 
 The current development build opens into a larger Hotel Marlowe exploration
-sandbox. Move through the 2D venue with WASD, the arrow keys, or the mobile
-analog stick. Approach or click placeholder characters to question them and
-inspect the red ledger to test clue dialogue. The original authored Lantern
-Room blocking sandbox remains available at `/?scene=blocking`.
+sandbox constructed from [`level-1.lvl.txt`](src/content/levels/level-1.lvl.txt).
+Move through its 20x20 lounge, 12x10 kitchen, 8x8 bedroom, and 10x8 manager
+office with WASD, the arrow keys, or the mobile analog stick. Approach or click
+placeholder characters and red clue markers to test dialogue. The original
+authored Lantern Room blocking sandbox remains available at `/?scene=blocking`.
+
+The text-level grammar and placement legend are documented in
+[`src/content/levels/README.md`](src/content/levels/README.md).
 
 On landscape mobile, drag the little inner knob anywhere inside the translucent
 circular pad for analog movement. A interacts or continues dialogue; B dismisses

@@ -10,7 +10,7 @@
   "findings": [],
   "summary": {
     "failures": 0,
-    "checksRun": 32
+    "checksRun": 37
   },
   "limitations": [
     "Pixel activity is a heuristic and does not establish readability or composition quality.",

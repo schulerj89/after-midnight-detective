@@ -1,16 +1,16 @@
 {
   "status": "pass",
-  "screenshot": "docs\\screenshots\\exploration\\exploration-desktop-overview.png",
-  "layout": "docs\\screenshots\\exploration\\exploration-desktop-overview.layout.json",
-  "annotated": "docs\\qa\\2026-07-11-roaming-exploration\\artifacts\\exploration-desktop-overview.annotated.png",
+  "screenshot": "docs\\screenshots\\exploration\\exploration-mobile-joystick.png",
+  "layout": "docs\\screenshots\\exploration\\exploration-mobile-joystick.layout.json",
+  "annotated": "docs\\qa\\2026-07-11-level-one\\artifacts\\exploration-mobile-joystick.annotated.png",
   "imageSize": {
-    "width": 1280,
-    "height": 720
+    "width": 1000,
+    "height": 560
   },
   "findings": [],
   "summary": {
     "failures": 0,
-    "checksRun": 21
+    "checksRun": 37
   },
   "limitations": [
     "Pixel activity is a heuristic and does not establish readability or composition quality.",

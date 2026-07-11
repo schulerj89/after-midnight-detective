@@ -40,10 +40,10 @@ export class DialogueBox {
       fontFamily: FONT,
       fontSize: '18px',
       lineSpacing: 12,
-      wordWrap: { width: 910, useAdvancedWrap: true },
+      wordWrap: { width: 700, useAdvancedWrap: true },
     });
     this.prompt = scene.add
-      .text(1138, 181, '▼', {
+      .text(930, 181, '▼', {
         color: '#8f2432',
         fontFamily: FONT,
         fontSize: '16px',

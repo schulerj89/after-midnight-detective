@@ -3,27 +3,31 @@
   "screenshot": { "name": "exploration-mobile-joystick", "file": "exploration-mobile-joystick.png", "pose": "exploration-joystick" },
   "viewport": { "deviceScaleFactor": 1, "width": 1000, "height": 560 },
   "elements": [
-    { "id": "dpad", "role": "control-group", "x": 8, "y": 208, "width": 160, "height": 160, "minWidth": 160, "minHeight": 160 },
-    { "id": "joystick-knob", "role": "touch-indicator", "x": 89, "y": 240, "width": 56, "height": 56, "minWidth": 56, "minHeight": 56 },
-    { "id": "action-a", "role": "touch-control", "x": 925.438, "y": 251.875, "width": 62, "height": 62 },
-    { "id": "action-b", "role": "touch-control", "x": 852.562, "y": 264.725, "width": 62, "height": 62 },
-    { "id": "player", "role": "character", "x": 446.55, "y": 62.22, "width": 108.89, "height": 217.78 },
-    { "id": "miles", "role": "character", "x": 726.55, "y": 326.67, "width": 108.89, "height": 217.78 },
-    { "id": "ledger", "role": "clue", "x": 570, "y": 330, "width": 52, "height": 48 }
+    { "id": "dpad", "role": "touch-control", "x": 16, "y": 384, "width": 160, "height": 160, "minWidth": 160, "minHeight": 160 },
+    { "id": "joystick-knob", "role": "touch-indicator", "x": 97, "y": 416, "width": 56, "height": 56 },
+    { "id": "action-a", "role": "touch-control", "x": 922, "y": 466, "width": 62, "height": 62 },
+    { "id": "action-b", "role": "touch-control", "x": 846, "y": 448, "width": 62, "height": 62 },
+    { "id": "player", "role": "character", "x": 446, "y": 132, "width": 110, "height": 218 },
+    { "id": "miles", "role": "character", "x": 726, "y": 18, "width": 110, "height": 220 },
+    { "id": "focused-clue", "role": "clue", "x": 699, "y": 42, "width": 54, "height": 42 }
   ],
   "containmentZones": [
-    { "id": "viewport", "x": 0, "y": 0, "width": 1000, "height": 560, "contains": ["dpad", "joystick-knob", "action-a", "action-b", "player", "miles", "ledger"] },
-    { "id": "dpad-housing", "x": 8, "y": 208, "width": 160, "height": 160, "contains": ["joystick-knob"] }
+    { "id": "viewport-safe-area", "x": 8, "y": 8, "width": 984, "height": 544, "contains": ["dpad", "joystick-knob", "action-a", "action-b", "player", "miles", "focused-clue"] },
+    { "id": "left-thumb-zone", "x": 8, "y": 376, "width": 176, "height": 176, "contains": ["dpad", "joystick-knob"] },
+    { "id": "right-thumb-zone", "x": 838, "y": 440, "width": 154, "height": 104, "contains": ["action-a", "action-b"] },
+    { "id": "dpad-housing", "x": 16, "y": 384, "width": 160, "height": 160, "contains": ["joystick-knob"] }
   ],
   "forbiddenOverlaps": [
-    { "a": "dpad", "b": "player" }, { "a": "dpad", "b": "ledger" },
+    { "a": "dpad", "b": "player" }, { "a": "dpad", "b": "focused-clue" },
     { "a": "action-a", "b": "miles" }, { "a": "action-b", "b": "miles" },
-    { "a": "action-a", "b": "ledger" }, { "a": "action-b", "b": "ledger" }
+    { "a": "action-a", "b": "focused-clue" }, { "a": "action-b", "b": "focused-clue" },
+    { "a": "dpad", "b": "action-b" }
   ],
-  "alignmentPairs": [],
+  "alignmentPairs": [
+    { "a": "dpad", "b": "action-b", "axis": "bottom", "tolerance": 36 }
+  ],
   "expectedPixelActivity": [
-    { "id": "dpad-art", "x": 8, "y": 208, "width": 160, "height": 160, "minLuminance": 4, "maxLuminance": 120, "minVariance": 8, "maxVariance": 8000 },
-    { "id": "player-art", "x": 446.55, "y": 62.22, "width": 108.89, "height": 217.78, "minLuminance": 5, "maxLuminance": 160, "minVariance": 10, "maxVariance": 9000 },
-    { "id": "ledger-art", "x": 570, "y": 330, "width": 52, "height": 48, "minLuminance": 5, "maxLuminance": 180, "minVariance": 10, "maxVariance": 9000 }
+    { "id": "dpad-art", "x": 16, "y": 384, "width": 160, "height": 160, "minLuminance": 3, "maxLuminance": 120, "minVariance": 8, "maxVariance": 8000 },
+    { "id": "player-art", "x": 446, "y": 132, "width": 110, "height": 218, "minLuminance": 4, "maxLuminance": 160, "minVariance": 10, "maxVariance": 9000 }
   ]
 }

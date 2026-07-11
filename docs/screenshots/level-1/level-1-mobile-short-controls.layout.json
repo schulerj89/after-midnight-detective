@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "level-1-mobile-short-controls", "file": "level-1-mobile-short-controls.png", "pose": "exploration-joystick-short" },
+  "viewport": { "deviceScaleFactor": 1, "width": 844, "height": 390 },
+  "elements": [
+    { "id": "dpad", "role": "touch-control", "x": 16, "y": 214, "width": 160, "height": 160, "minWidth": 160, "minHeight": 160 },
+    { "id": "joystick-knob", "role": "touch-indicator", "x": 97, "y": 246, "width": 56, "height": 56 },
+    { "id": "action-a", "role": "touch-control", "x": 766, "y": 296, "width": 62, "height": 62 },
+    { "id": "action-b", "role": "touch-control", "x": 690, "y": 278, "width": 62, "height": 62 }
+  ],
+  "containmentZones": [
+    { "id": "short-safe-area", "x": 8, "y": 8, "width": 828, "height": 374, "contains": ["dpad", "joystick-knob", "action-a", "action-b"] },
+    { "id": "dpad-housing", "x": 16, "y": 214, "width": 160, "height": 160, "contains": ["joystick-knob"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "dpad", "b": "action-a" }, { "a": "dpad", "b": "action-b" }
+  ],
+  "alignmentPairs": [
+    { "a": "dpad", "b": "action-b", "axis": "bottom", "tolerance": 36 }
+  ],
+  "expectedPixelActivity": [
+    { "id": "dpad-art", "x": 16, "y": 214, "width": 160, "height": 160, "minLuminance": 3, "maxLuminance": 120, "minVariance": 8, "maxVariance": 8000 }
+  ]
+}

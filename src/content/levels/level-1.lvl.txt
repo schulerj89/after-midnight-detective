@@ -1,0 +1,88 @@
+; After Midnight, Detective - Level 1 spatial construction
+LEVEL hotel-marlowe-floor-1 "Hotel Marlowe - Level One"
+VERSION 1
+TILE_SIZE 72
+START lounge 10 17
+
+ROOM lounge "Main Lounge" 20 20 AT 0 0
+MAP
+#########+##########
+#..................#
+#..................#
+#..................#
+#..................#
+#..................#
+#..................#
+#..................#
+#..................#
+#..................+
++..................#
+#..................#
+#..................#
+#..................#
+#..................#
+#..................#
+#..................#
+#..................#
+#..................#
+####################
+ENDMAP
+PLACE npc.vera actor vera 5 11
+PLACE npc.miles actor miles 15 15
+PLACE clue.wet-footprints clue wet-footprints 11 5
+PLACE clue.torn-ledger clue torn-ledger 14 12
+PLACE prop.piano prop piano 12 3 w=4 h=2 solid=true
+PLACE prop.sofa prop sofa 4 7 w=4 h=2 solid=true
+ENDROOM
+
+ROOM kitchen "Service Kitchen" 12 10 AT 20 5
+MAP
+############
+#..........#
+#..........#
+#..........#
++..........#
+#..........#
+#..........#
+#..........#
+#..........#
+############
+ENDMAP
+PLACE prop.kitchen-counter prop counter 4 2 w=5 h=2 solid=true
+PLACE clue.damp-matchbook clue damp-matchbook 8 7
+ENDROOM
+
+ROOM bedroom "Room 317 Bedroom" 8 8 AT 6 -8
+MAP
+########
+#......#
+#......#
+#......#
+#......#
+#......#
+#......#
+###+####
+ENDMAP
+PLACE prop.bed prop bed 1 1 w=4 h=3 solid=true
+PLACE clue.stopped-watch clue stopped-watch 6 5
+ENDROOM
+
+ROOM office "Manager Office" 10 8 AT -10 7
+MAP
+##########
+#........#
+#........#
+#........+
+#........#
+#........#
+#........#
+##########
+ENDMAP
+PLACE prop.office-desk prop desk 2 2 w=4 h=2 solid=true
+PLACE clue.switchboard-log clue switchboard-log 7 5
+ENDROOM
+
+LINK lounge 19 9 <-> kitchen 0 4 ID door.lounge-kitchen
+LINK lounge 9 0 <-> bedroom 3 7 ID door.lounge-317
+LINK lounge 0 10 <-> office 9 3 ID door.lounge-office
+ENDLEVEL

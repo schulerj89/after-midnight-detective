@@ -1,8 +1,8 @@
 {
   "status": "pass",
-  "screenshot": "docs\\screenshots\\exploration\\exploration-desktop-overview.png",
-  "layout": "docs\\screenshots\\exploration\\exploration-desktop-overview.layout.json",
-  "annotated": "docs\\qa\\2026-07-11-roaming-exploration\\artifacts\\exploration-desktop-overview.annotated.png",
+  "screenshot": "docs\\screenshots\\level-1\\level-1-office-desktop.png",
+  "layout": "docs\\screenshots\\level-1\\level-1-office-desktop.layout.json",
+  "annotated": "docs\\qa\\2026-07-11-level-one\\artifacts\\level-1-office-desktop.annotated.png",
   "imageSize": {
     "width": 1280,
     "height": 720
@@ -10,7 +10,7 @@
   "findings": [],
   "summary": {
     "failures": 0,
-    "checksRun": 21
+    "checksRun": 17
   },
   "limitations": [
     "Pixel activity is a heuristic and does not establish readability or composition quality.",

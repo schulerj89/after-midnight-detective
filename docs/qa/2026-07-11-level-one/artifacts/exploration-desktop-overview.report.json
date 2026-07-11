@@ -2,7 +2,7 @@
   "status": "pass",
   "screenshot": "docs\\screenshots\\exploration\\exploration-desktop-overview.png",
   "layout": "docs\\screenshots\\exploration\\exploration-desktop-overview.layout.json",
-  "annotated": "docs\\qa\\2026-07-11-roaming-exploration\\artifacts\\exploration-desktop-overview.annotated.png",
+  "annotated": "docs\\qa\\2026-07-11-level-one\\artifacts\\exploration-desktop-overview.annotated.png",
   "imageSize": {
     "width": 1280,
     "height": 720

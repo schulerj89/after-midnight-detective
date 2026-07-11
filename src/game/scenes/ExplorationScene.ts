@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import levelOneSource from '../../content/levels/level-1.lvl.txt?raw';
 import { ExplorationPlayer } from '../actors/ExplorationPlayer';
 import { GAME_WIDTH, SCENE_KEYS } from '../constants';
 import type { DialogueScript } from '../features/dialogue/DialogueModel';
@@ -10,37 +11,39 @@ import {
   type MobileControl,
   type MobileMoveVector,
 } from '../input/mobileControls';
+import type { LevelDefinition, LevelPlacement, LevelRoom } from '../levels/LevelDefinition';
+import { buildLevelGeometry, levelPoint, placementRect, type LevelGeometry } from '../levels/LevelGeometry';
+import { parseLevel } from '../levels/LevelParser';
 import { DialogueBox } from '../ui/DialogueBox';
 
 const FONT = '"Press Start 2P", monospace';
-const WORLD_WIDTH = 2400;
-const WORLD_HEIGHT = 1350;
-const PLAYER_BOUNDS: Rect = { x: 90, y: 190, width: 2220, height: 1070 };
 
 interface Interactable {
-  id: 'vera' | 'miles' | 'ledger';
+  id: string;
   x: number;
   y: number;
   range: number;
   activate: () => void;
 }
 
-const DIALOGUE: Record<Interactable['id'], DialogueScript> = {
-  vera: {
+const DIALOGUE: Record<string, DialogueScript> = {
+  'npc.vera': {
     id: 'exploration-vera', speaker: 'VERA VALE', portraitKey: 'portrait-vera',
     pages: ['You found the lounge. Now find out who crossed it after midnight.', 'The wet footprints stop at the piano. Curious, isn\'t it?'],
   },
-  miles: {
+  'npc.miles': {
     id: 'exploration-miles', speaker: 'MILES PIKE', portraitKey: 'portrait-miles',
     pages: ['Keep your questions quiet. These walls collect secrets.', 'I was by the north windows when the lights failed.'],
   },
-  ledger: {
+  'clue.torn-ledger': {
     id: 'exploration-ledger', speaker: 'DETECTIVE', portraitKey: 'portrait-detective',
     pages: ['A torn hotel ledger. Room 317 was entered twice after midnight.', 'PLACEHOLDER CLUE RECORDED // THE NOTEBOOK WILL REMEMBER THIS.'],
   },
 };
 
 export class ExplorationScene extends Phaser.Scene {
+  private level!: LevelDefinition;
+  private levelGeometry!: LevelGeometry;
   private player!: ExplorationPlayer;
   private dialogue!: DialogueBox;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -49,21 +52,32 @@ export class ExplorationScene extends Phaser.Scene {
   private obstacles: Rect[] = [];
   private interactables: Interactable[] = [];
   private promptText!: Phaser.GameObjects.Text;
+  private locationText!: Phaser.GameObjects.Text;
   private removeMobileMove?: () => void;
   private removeMobileControl?: () => void;
   private lastInteraction = 'exploration-ready';
+  private currentRoomId = 'unknown';
 
   constructor() {
     super(SCENE_KEYS.exploration);
   }
 
   create(): void {
+    const parsed = parseLevel(levelOneSource);
+    if (!parsed.ok) {
+      throw new Error(parsed.errors.map((error) => `Line ${error.line}: ${error.message}`).join('\n'));
+    }
+    this.level = parsed.level;
+    this.levelGeometry = buildLevelGeometry(this.level);
+    this.obstacles = [...this.levelGeometry.collisions];
     this.cameras.main.setBackgroundColor('#090a0d');
-    this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+    this.cameras.main.setBounds(0, 0, this.levelGeometry.worldWidth, this.levelGeometry.worldHeight);
     this.createTextures();
-    this.createWorld();
-    this.createInteractables();
-    this.player = new ExplorationPlayer(this, 1120, 780, 'exploration-detective');
+    this.createLevelWorld();
+    this.createLevelPlacements();
+    const startRoom = this.room(this.level.start.roomId);
+    const start = levelPoint(this.level, this.levelGeometry, startRoom, this.level.start.x, this.level.start.y);
+    this.player = new ExplorationPlayer(this, start.x, start.y, 'exploration-detective');
     this.cameras.main.startFollow(this.player.gameObject(), true, 0.09, 0.09);
     this.dialogue = new DialogueBox(this);
     this.createHud();
@@ -74,7 +88,8 @@ export class ExplorationScene extends Phaser.Scene {
 
   update(_time: number, delta: number): void {
     const vector = this.dialogue.isOpen() ? { x: 0, y: 0 } : this.readMovement();
-    this.player.update(vector, delta, PLAYER_BOUNDS, this.obstacles);
+    this.player.update(vector, delta, this.levelGeometry.playerBounds, this.obstacles);
+    this.updateCurrentRoom();
     this.updatePrompt();
     this.publishDebugSnapshot(vector);
   }
@@ -106,80 +121,83 @@ export class ExplorationScene extends Phaser.Scene {
     }
   }
 
-  private createWorld(): void {
+  private createLevelWorld(): void {
+    this.add.rectangle(0, 0, this.levelGeometry.worldWidth * 2, this.levelGeometry.worldHeight * 2, 0x090a0d, 1).setOrigin(0).setDepth(-10);
     const floor = this.add.graphics().setDepth(0);
-    floor.fillStyle(0x12141a, 1).fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-    floor.fillStyle(0x17191f, 1).fillRect(90, 190, 2220, 1070);
-    floor.lineStyle(2, 0x242731, 0.72);
-    for (let x = 90; x <= 2310; x += 90) floor.lineBetween(x, 190, x, 1260);
-    for (let y = 190; y <= 1260; y += 90) floor.lineBetween(90, y, 2310, y);
-    floor.lineStyle(8, 0x090a0d, 1).strokeRect(82, 182, 2236, 1086);
 
-    this.addZoneLabel(300, 245, 'WEST LOUNGE');
-    this.addZoneLabel(1130, 245, 'THE LANTERN ROOM');
-    this.addZoneLabel(1920, 245, 'NORTH WINDOWS');
-    this.addWindows();
+    this.level.rooms.forEach((room, roomIndex) => {
+      room.map.forEach((row, localY) => row.forEach((tile, localX) => {
+        const x = this.levelGeometry.offsetX + (room.originX + localX) * this.level.tileSize;
+        const y = this.levelGeometry.offsetY + (room.originY + localY) * this.level.tileSize;
+        if (tile !== '#') {
+          const shade = roomIndex % 2 === 0 ? 0x17191f : 0x151820;
+          floor.fillStyle(shade, 1).fillRect(x, y, this.level.tileSize, this.level.tileSize);
+          floor.lineStyle(1, 0x252832, 0.58).strokeRect(x, y, this.level.tileSize, this.level.tileSize);
+          if (tile === '+') {
+            floor.fillStyle(0xc7a85b, 0.24).fillRect(x, y, this.level.tileSize, this.level.tileSize);
+          }
+        } else {
+          this.add
+            .rectangle(x, y, this.level.tileSize, this.level.tileSize, 0x0c0e13, 1)
+            .setOrigin(0)
+            .setStrokeStyle(2, 0x2b2d35, 0.8)
+            .setDepth(100 + y + this.level.tileSize);
+        }
+      }));
 
-    this.addObstacle(720, 560, 380, 120, 0x201b19, 'SOFA');
-    this.addObstacle(1300, 410, 340, 120, 0x211c19, 'PIANO');
-    this.addObstacle(1710, 780, 440, 150, 0x181319, 'BAR');
-    this.addObstacle(310, 380, 220, 110, 0x25201c, 'DESK');
-    this.addObstacle(1080, 920, 230, 130, 0x201b19, 'TABLE');
-    this.addObstacle(2020, 430, 190, 100, 0x20231f, 'PLANTER');
-
-    const carpets = this.add.graphics().setDepth(1);
-    carpets.fillStyle(0x5b1722, 0.38).fillRoundedRect(320, 760, 650, 360, 20);
-    carpets.lineStyle(5, 0x8f2432, 0.35).strokeRoundedRect(320, 760, 650, 360, 20);
-    carpets.fillStyle(0x735e32, 0.16).fillRoundedRect(1370, 280, 700, 370, 20);
-
-    this.add.rectangle(1200, 1230, 600, 50, 0x08090c, 1).setDepth(1400);
-    this.add.text(1200, 1228, 'SERVICE CORRIDOR // LOCKED FOR THIS SANDBOX', { color: '#4f4a40', fontFamily: FONT, fontSize: '10px' }).setOrigin(0.5).setDepth(1401);
+      const center = levelPoint(this.level, this.levelGeometry, room, room.width / 2 - 0.5, 1);
+      this.add
+        .text(center.x, center.y, `${room.name.toUpperCase()} // ${room.width}x${room.height}`, {
+          color: '#4f4a40', fontFamily: FONT, fontSize: '11px',
+        })
+        .setOrigin(0.5)
+        .setDepth(80);
+    });
   }
 
-  private addWindows(): void {
-    const windows = this.add.graphics().setDepth(2);
-    for (let x = 160; x < 2240; x += 300) {
-      windows.fillStyle(0x0a1219, 1).fillRect(x, 105, 220, 100);
-      windows.lineStyle(6, 0x090a0d, 1).strokeRect(x, 105, 220, 100);
-      windows.lineStyle(2, 0x718293, 0.4);
-      for (let rain = x + 18; rain < x + 210; rain += 24) windows.lineBetween(rain, 118, rain - 22, 188);
-    }
+  private createLevelPlacements(): void {
+    this.level.rooms.forEach((room) => room.placements.forEach((placement) => {
+      if (placement.kind === 'prop') this.addProp(room, placement);
+      else if (placement.kind === 'actor') this.addNpc(room, placement);
+      else this.addClue(room, placement);
+    }));
   }
 
-  private addObstacle(x: number, y: number, width: number, height: number, color: number, label: string): void {
-    this.obstacles.push({ x, y, width, height });
-    const prop = this.add.container(x, y + height).setDepth(100 + y + height);
-    const shadow = this.add.ellipse(width / 2, 2, width + 40, 32, 0x000000, 0.42);
-    const body = this.add.rectangle(width / 2, -height / 2, width, height, color, 1).setStrokeStyle(4, 0x39322b, 1);
-    const name = this.add.text(width / 2, -height / 2, label, { color: '#817967', fontFamily: FONT, fontSize: '10px' }).setOrigin(0.5);
+  private addProp(room: LevelRoom, placement: LevelPlacement): void {
+    const rect = placementRect(this.level, this.levelGeometry, room, placement);
+    const prop = this.add.container(rect.x, rect.y + rect.height).setDepth(100 + rect.y + rect.height);
+    const shadow = this.add.ellipse(rect.width / 2, 2, rect.width + 24, 28, 0x000000, 0.42);
+    const body = this.add.rectangle(rect.width / 2, -rect.height / 2, rect.width, rect.height, 0x201b19, 1).setStrokeStyle(4, 0x39322b, 1);
+    const name = this.add.text(rect.width / 2, -rect.height / 2, placement.archetype.toUpperCase().replaceAll('-', ' '), { color: '#817967', fontFamily: FONT, fontSize: '9px' }).setOrigin(0.5);
     prop.add([shadow, body, name]);
   }
 
-  private createInteractables(): void {
-    this.addNpc('vera', 620, 690, 'exploration-vera');
-    this.addNpc('miles', 1480, 1120, 'exploration-miles');
-    const ledger = this.add.container(1240, 875).setDepth(975);
-    const halo = this.add.ellipse(0, 0, 80, 30, 0xc7a85b, 0.16);
-    const book = this.add.rectangle(0, -9, 58, 38, 0x8f2432, 1).setRotation(-0.18).setStrokeStyle(3, 0xd9cfb6, 0.7).setInteractive({ useHandCursor: true });
-    ledger.add([halo, book]);
-    book.on('pointerdown', () => this.openDialogue('ledger'));
-    this.interactables.push({ id: 'ledger', x: 1240, y: 875, range: 175, activate: () => this.openDialogue('ledger') });
-  }
-
-  private addNpc(id: 'vera' | 'miles', x: number, y: number, texture: string): void {
-    const root = this.add.container(x, y).setDepth(100 + y);
+  private addNpc(room: LevelRoom, placement: LevelPlacement): void {
+    const point = levelPoint(this.level, this.levelGeometry, room, placement.x, placement.y);
+    const texture = placement.archetype === 'vera' ? 'exploration-vera' : 'exploration-miles';
+    const root = this.add.container(point.x, point.y).setDepth(100 + point.y);
     const shadow = this.add.ellipse(0, 0, 112, 26, 0x000000, 0.5);
     const body = this.add.image(0, 0, texture).setOrigin(0.5, 1).setInteractive({ useHandCursor: true });
     root.add([shadow, body]);
-    body.on('pointerdown', () => this.openDialogue(id));
-    this.interactables.push({ id, x, y, range: 175, activate: () => this.openDialogue(id) });
+    body.on('pointerdown', () => this.openDialogue(placement.id));
+    this.interactables.push({ id: placement.id, x: point.x, y: point.y, range: 175, activate: () => this.openDialogue(placement.id) });
+  }
+
+  private addClue(room: LevelRoom, placement: LevelPlacement): void {
+    const point = levelPoint(this.level, this.levelGeometry, room, placement.x, placement.y);
+    const clue = this.add.container(point.x, point.y).setDepth(100 + point.y);
+    const halo = this.add.ellipse(0, 0, 62, 24, 0xc7a85b, 0.13);
+    const marker = this.add.rectangle(0, -7, 42, 30, 0x8f2432, 1).setRotation(-0.14).setStrokeStyle(2, 0xd9cfb6, 0.62).setInteractive({ useHandCursor: true });
+    clue.add([halo, marker]);
+    marker.on('pointerdown', () => this.openDialogue(placement.id));
+    this.interactables.push({ id: placement.id, x: point.x, y: point.y, range: 145, activate: () => this.openDialogue(placement.id) });
   }
 
   private createHud(): void {
     const hud = this.add.graphics().setScrollFactor(0).setDepth(9000);
     hud.fillStyle(0x090a0d, 0.86).fillRoundedRect(22, 20, 430, 70, 5);
     hud.lineStyle(2, 0x817967, 0.8).strokeRoundedRect(22, 20, 430, 70, 5);
-    this.add.text(42, 36, 'AFTER MIDNIGHT // HOTEL MARLOWE', { color: '#d9cfb6', fontFamily: FONT, fontSize: '12px' }).setScrollFactor(0).setDepth(9001);
+    this.locationText = this.add.text(42, 36, 'AFTER MIDNIGHT // HOTEL MARLOWE', { color: '#d9cfb6', fontFamily: FONT, fontSize: '12px' }).setScrollFactor(0).setDepth(9001);
     this.add.text(42, 61, 'MOVE: WASD / ARROWS / JOYSTICK', { color: '#817967', fontFamily: FONT, fontSize: '9px' }).setScrollFactor(0).setDepth(9001);
     this.promptText = this.add.text(GAME_WIDTH / 2, 452, '', { color: '#c7a85b', backgroundColor: '#090a0ddd', fontFamily: FONT, fontSize: '12px', padding: { x: 14, y: 9 } }).setOrigin(0.5).setScrollFactor(0).setDepth(9001);
     this.setMobileLabels('ACT', 'BACK');
@@ -193,7 +211,7 @@ export class ExplorationScene extends Phaser.Scene {
     }
     const nearest = this.nearestInteractable();
     this.promptText
-      .setText(nearest ? `A / E: ${nearest.id === 'ledger' ? 'INSPECT LEDGER' : `QUESTION ${nearest.id.toUpperCase()}`}` : '')
+      .setText(nearest ? `A / E: ${nearest.id.startsWith('clue.') ? `INSPECT ${nearest.id.slice(5).replaceAll('-', ' ').toUpperCase()}` : `QUESTION ${nearest.id.slice(4).toUpperCase()}`}` : '')
       .setVisible(Boolean(nearest));
     this.setMobileLabels('ACT', 'BACK');
   }
@@ -215,7 +233,18 @@ export class ExplorationScene extends Phaser.Scene {
   private openDialogue(id: Interactable['id']): void {
     if (this.dialogue?.isOpen()) return;
     this.lastInteraction = `opened-${id}`;
-    this.dialogue.open(DIALOGUE[id], () => { this.lastInteraction = `closed-${id}`; });
+    const script = DIALOGUE[id] ?? this.placeholderDialogue(id);
+    this.dialogue.open(script, () => { this.lastInteraction = `closed-${id}`; });
+  }
+
+  private placeholderDialogue(id: string): DialogueScript {
+    const label = id.split('.').at(-1)?.replaceAll('-', ' ').toUpperCase() ?? 'PLACEHOLDER';
+    return {
+      id: `level-placeholder-${id}`,
+      speaker: 'DETECTIVE',
+      portraitKey: 'portrait-detective',
+      pages: [`${label}. A placeholder clue positioned by the Level 1 text file.`, `ROOM: ${this.currentRoomId.toUpperCase()} // STABLE ID: ${id}`],
+    };
   }
 
   private setMobileLabels(a: string, b: string): void {
@@ -223,10 +252,30 @@ export class ExplorationScene extends Phaser.Scene {
     const bLabel = document.querySelector<HTMLElement>('.action-b span');
     if (aLabel) aLabel.textContent = a;
     if (bLabel) bLabel.textContent = b;
+    document
+      .querySelector<HTMLElement>('#mobile-controls')
+      ?.classList.toggle('is-dialogue-open', this.dialogue?.isOpen() ?? false);
   }
 
-  private addZoneLabel(x: number, y: number, text: string): void {
-    this.add.text(x, y, text, { color: '#4f4a40', fontFamily: FONT, fontSize: '13px' }).setOrigin(0.5).setDepth(2);
+  private room(id: string): LevelRoom {
+    const room = this.level.rooms.find((candidate) => candidate.id === id);
+    if (!room) throw new Error(`Unknown room: ${id}`);
+    return room;
+  }
+
+  private updateCurrentRoom(): void {
+    const position = this.player.position();
+    const worldTileX = Math.floor((position.x - this.levelGeometry.offsetX) / this.level.tileSize);
+    const worldTileY = Math.floor((position.y - this.levelGeometry.offsetY) / this.level.tileSize);
+    const room = this.level.rooms.find((candidate) =>
+      worldTileX >= candidate.originX && worldTileX < candidate.originX + candidate.width &&
+      worldTileY >= candidate.originY && worldTileY < candidate.originY + candidate.height,
+    );
+    if (room && room.id !== this.currentRoomId) {
+      this.currentRoomId = room.id;
+      this.locationText.setText(`LEVEL 1 // ${room.name.toUpperCase()}`);
+      this.lastInteraction = `entered-room-${room.id}`;
+    }
   }
 
   private applyQaPose(): void {
@@ -241,7 +290,18 @@ export class ExplorationScene extends Phaser.Scene {
       }
       this.lastInteraction = 'qa-pose-exploration-joystick';
     }
-    if (pose === 'exploration-dialogue') this.openDialogue('vera');
+    if (pose === 'exploration-dialogue') this.openDialogue('npc.vera');
+    const roomPose = pose?.startsWith('level-room-') ? pose.slice('level-room-'.length) : undefined;
+    if (roomPose) {
+      const room = this.level.rooms.find((candidate) => candidate.id === roomPose);
+      if (room) {
+        const poseX = room.id === 'office' ? 6 : Math.floor(room.width / 2);
+        const point = levelPoint(this.level, this.levelGeometry, room, poseX, Math.floor(room.height / 2));
+        this.player.setPosition(point.x, point.y);
+        this.cameras.main.centerOn(point.x, point.y);
+        this.lastInteraction = `qa-pose-${pose}`;
+      }
+    }
   }
 
   private createTextures(): void {
@@ -286,6 +346,9 @@ export class ExplorationScene extends Phaser.Scene {
     const canvas = this.game.canvas;
     canvas.dataset.explorationReady = 'true';
     canvas.dataset.sandboxScene = SCENE_KEYS.exploration;
+    canvas.dataset.levelId = this.level.id;
+    canvas.dataset.roomId = this.currentRoomId;
+    canvas.dataset.roomCount = this.level.rooms.length.toString();
     canvas.dataset.playerX = position.x.toFixed(1);
     canvas.dataset.playerY = position.y.toFixed(1);
     canvas.dataset.inputX = vector.x.toFixed(2);

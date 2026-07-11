@@ -78,6 +78,11 @@ export class ExplorationPlayer {
     return { x: this.root.x, y: this.root.y };
   }
 
+  setPosition(x: number, y: number): void {
+    this.root.setPosition(x, y);
+    this.updateDepth();
+  }
+
   snapshot(): ExplorationPlayerSnapshot {
     return {
       x: this.root.x,

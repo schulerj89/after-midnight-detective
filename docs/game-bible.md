@@ -209,16 +209,20 @@ music, ambience, dialogue, and SFX buses.
 
 ## Scope target
 
-The first playable slice should prove one room, one short loop, three characters,
-several inspectable props, one behavior-changing evidence confrontation, a
-functional notebook/timeline, and one explainable accusation.
+The first playable slice should prove one compact multi-room level anchored by a
+primary observation room, one short loop, three characters, several inspectable
+props, one behavior-changing evidence confrontation, a functional notebook/
+timeline, and one explainable accusation.
 
-Do not scale to multiple locations or a large cast until that slice is readable,
-replayable, and satisfying on desktop and landscape mobile.
+Keep Level 1 to a small connected room set and do not add another floor or a large
+cast until that slice is readable, replayable, and satisfying on desktop and
+landscape mobile.
 
 ## Technical implications
 
 - Author cases and schedules as data rather than embedding them in scene code.
+- Author room geometry, door links, placeholder placements, and spawn points in
+  validated text level files rather than embedding them in rendering scenes.
 - Separate canonical timeline events from player-caused variants.
 - Use fixed stage marks with depth, scale, occlusion, and interaction metadata.
 - Give every clue, statement, topic, event, pose, and stage mark a stable ID.

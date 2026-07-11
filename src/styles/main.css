@@ -82,8 +82,8 @@ body {
 
   .mobile-controls__dpad {
     position: absolute;
-    left: max(8px, env(safe-area-inset-left));
-    top: 50%;
+    left: max(16px, calc(env(safe-area-inset-left) + 8px));
+    bottom: max(16px, calc(env(safe-area-inset-bottom) + 8px));
     width: 160px;
     height: 160px;
     overflow: hidden;
@@ -99,7 +99,7 @@ body {
       0 6px 18px rgb(0 0 0 / 24%);
     pointer-events: auto;
     touch-action: none;
-    transform: translateY(-45%);
+    transition: opacity 140ms ease;
   }
 
   .dpad-center {
@@ -122,26 +122,35 @@ body {
 
   .mobile-controls__actions {
     position: absolute;
-    right: max(12px, env(safe-area-inset-right));
-    top: 50%;
-    display: flex;
-    align-items: flex-end;
-    gap: 12px;
-    transform: translateY(-35%) rotate(-10deg);
+    right: max(16px, calc(env(safe-area-inset-right) + 8px));
+    bottom: max(32px, calc(env(safe-area-inset-bottom) + 24px));
+    width: 138px;
+    height: 80px;
   }
 
   #mobile-controls .mobile-controls__actions button {
+    position: absolute;
     display: grid;
     width: 62px;
     height: 62px;
     place-content: center;
     gap: 5px;
     border-radius: 50%;
-    transform: rotate(10deg);
+    transform: none;
   }
 
   #mobile-controls .mobile-controls__actions button:active {
-    transform: rotate(10deg) scale(0.94);
+    transform: scale(0.94);
+  }
+
+  #mobile-controls .mobile-controls__actions .action-a {
+    right: 0;
+    bottom: 0;
+  }
+
+  #mobile-controls .mobile-controls__actions .action-b {
+    right: 76px;
+    bottom: 18px;
   }
 
   .mobile-controls__actions strong {
@@ -156,6 +165,11 @@ body {
   .mobile-controls__actions .action-a {
     border-color: rgb(143 36 50 / 64%);
     color: rgb(217 207 182 / 86%);
+  }
+
+  #mobile-controls.is-dialogue-open .mobile-controls__dpad {
+    opacity: 0;
+    pointer-events: none;
   }
 }
 

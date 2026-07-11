@@ -475,6 +475,9 @@ export class SandboxScene extends Phaser.Scene {
     if (bLabel) {
       bLabel.textContent = actionB;
     }
+    document
+      .querySelector<HTMLElement>('#mobile-controls')
+      ?.classList.toggle('is-dialogue-open', this.dialogue?.isOpen() ?? false);
   }
 
   private runTimelineEvent(event: TimelineEvent): void {
