@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "altered-loop-anticipate-mobile", "file": "altered-loop-anticipate-mobile.png", "pose": "altered-loop-anticipate" },
+  "viewport": { "deviceScaleFactor": 1, "width": 1280, "height": 540 },
+  "elements": [
+    { "id": "mode-label", "role": "hud", "x": 18, "y": 16, "width": 288, "height": 38 },
+    { "id": "end-restaging", "role": "touch-control", "x": 1108, "y": 16, "width": 156, "height": 48 },
+    { "id": "observation-card", "role": "dialogue", "x": 200, "y": 403, "width": 880, "height": 114 }
+  ],
+  "containmentZones": [
+    { "id": "safe-area", "x": 8, "y": 8, "width": 1264, "height": 524, "contains": ["mode-label", "end-restaging", "observation-card"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "mode-label", "b": "end-restaging" },
+    { "a": "end-restaging", "b": "observation-card" }
+  ],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "departure-copy", "x": 300, "y": 425, "width": 680, "height": 72, "minLuminance": 8, "maxLuminance": 210, "minVariance": 20, "maxVariance": 9000 }
+  ]
+}

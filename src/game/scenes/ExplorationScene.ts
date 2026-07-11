@@ -23,9 +23,16 @@ import { buildLevelGeometry, levelPoint, placementRect, type LevelGeometry } fro
 import { parseLevel } from '../levels/LevelParser';
 import { resolveRoomTransition, type RoomTransitionDestination } from '../levels/RoomTransitionModel';
 import { LevelOneTimeline, type LevelOneTimelineBeat } from '../features/timeline/LevelOneTimeline';
+import {
+  AlteredLoopRestage,
+  type AlteredLoopActorMark,
+  type AlteredLoopPhase,
+  type AlteredLoopPhaseId,
+} from '../features/timeline/AlteredLoopRestage';
 import { CaseBoard } from '../ui/CaseBoard';
 import { DialogueBox } from '../ui/DialogueBox';
 import { ReenactmentHud } from '../ui/ReenactmentHud';
+import { AlteredLoopHud } from '../ui/AlteredLoopHud';
 import { LEVEL_ONE_REENACTMENT_BEATS, type LevelOneReenactmentBeat, type ReenactmentStageAction } from '../../content/cases/levelOneReenactmentContent';
 
 const FONT = '"Press Start 2P", monospace';
@@ -44,6 +51,7 @@ type RoomTransitionState = 'idle' | 'fading-out' | 'relocating' | 'fading-in';
 export class ExplorationScene extends Phaser.Scene {
   private readonly caseState = new LevelOneCaseState();
   private readonly timeline = new LevelOneTimeline();
+  private readonly alteredLoopRestage = new AlteredLoopRestage();
   private readonly reenactment = new LevelOneReenactment(this.caseState);
   private level!: LevelDefinition;
   private levelGeometry!: LevelGeometry;
@@ -51,6 +59,9 @@ export class ExplorationScene extends Phaser.Scene {
   private dialogue!: DialogueBox;
   private caseBoard!: CaseBoard;
   private reenactmentHud!: ReenactmentHud;
+  private alteredLoopHud!: AlteredLoopHud;
+  private alteredLoopRoute!: Phaser.GameObjects.Graphics;
+  private alteredLoopDoorLabel!: Phaser.GameObjects.Text;
   private reenactmentActor!: Phaser.GameObjects.Container;
   private reenactmentActorBody!: Phaser.GameObjects.Image;
   private reenactmentOfficer!: Phaser.GameObjects.Container;
@@ -78,6 +89,8 @@ export class ExplorationScene extends Phaser.Scene {
   private lastHudSecond = -1;
   private debugSolveSteps: readonly string[] = [];
   private lastReenactmentBeat = 'none';
+  private lastAlteredLoopPhase = 'none';
+  private alteredLoopQaFrozen = false;
   private readonly reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches || new URLSearchParams(window.location.search).get('reducedMotion') === '1';
 
   constructor() {
@@ -107,6 +120,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.createHud();
     this.createCaseBoard();
     this.createReenactmentHud();
+    this.createAlteredLoopPresentation();
     this.createInput();
     this.applyQaPose();
     this.publishDebugSnapshot({ x: 0, y: 0 });
@@ -114,8 +128,9 @@ export class ExplorationScene extends Phaser.Scene {
 
   update(_time: number, delta: number): void {
     this.updateReenactment(delta);
+    this.updateAlteredLoopRestage(delta);
     const physicalVector = this.readMovement();
-    const interfaceOpen = this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive();
+    const interfaceOpen = this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive() || this.isAlteredLoopRestageActive();
     const gated = gateTransitionInput(physicalVector, this.transitionState !== 'idle', interfaceOpen, this.requiresNeutralInput);
     this.requiresNeutralInput = gated.requiresNeutral;
     const vector = gated.vector;
@@ -131,18 +146,25 @@ export class ExplorationScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
     this.wasd = { up: this.input.keyboard.addKey('W'), down: this.input.keyboard.addKey('S'), left: this.input.keyboard.addKey('A'), right: this.input.keyboard.addKey('D') };
     this.input.keyboard.on('keydown-E', () => {
+      if (this.isAlteredLoopRestageActive()) return;
       if (this.transitionState === 'idle') this.activateNearest();
     });
     this.input.keyboard.on('keydown-N', () => {
+      if (this.isAlteredLoopRestageActive()) return;
       if (!this.dialogue.isOpen() && this.transitionState === 'idle') this.caseBoard.toggle();
     });
     this.input.keyboard.on('keydown-T', () => {
+      if (this.isAlteredLoopRestageActive()) return;
       if (!this.dialogue.isOpen() && this.transitionState === 'idle') this.caseBoard.open('timeline');
     });
     this.input.keyboard.on('keydown-SPACE', () => {
       if (this.isReenactmentActive()) this.toggleReenactmentPause();
     });
     this.input.keyboard.on('keydown-ESC', () => {
+      if (this.isAlteredLoopRestageActive()) {
+        this.alteredLoopHud.requestEnd();
+        return;
+      }
       if (this.isReenactmentActive()) this.reenactmentHud.requestSkip();
     });
     this.removeMobileMove = onMobileMove((vector) => { this.mobileVector = vector; });
@@ -156,6 +178,7 @@ export class ExplorationScene extends Phaser.Scene {
       document.querySelector<HTMLElement>('#mobile-controls')?.classList.remove('is-room-transitioning');
       this.caseBoard.destroy();
       this.reenactmentHud.destroy();
+      this.alteredLoopHud.destroy();
       document.querySelector<HTMLElement>('#mobile-controls')?.removeAttribute('aria-hidden');
     });
   }
@@ -168,6 +191,7 @@ export class ExplorationScene extends Phaser.Scene {
 
   private handleMobileControl(control: MobileControl): void {
     if (this.transitionState !== 'idle') return;
+    if (this.isAlteredLoopRestageActive()) return;
     if (this.isReenactmentActive()) return;
     if (this.caseBoard.isOpen()) {
       if (control === 'action-b') this.caseBoard.close();
@@ -259,7 +283,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.npcRoots.set(placement.id, root);
     this.npcBodies.set(placement.id, body);
     hitTarget.on('pointerdown', () => {
-      if (this.currentRoomId === room.id && this.transitionState === 'idle') this.openDialogue(placement.id);
+      if (!this.isAlteredLoopRestageActive() && this.currentRoomId === room.id && this.transitionState === 'idle') this.openDialogue(placement.id);
     });
     this.trackRoomObject(room.id, root);
     this.interactables.push({ id: placement.id, roomId: room.id, x: point.x, y: point.y, range: 175, activate: () => this.openDialogue(placement.id) });
@@ -273,7 +297,7 @@ export class ExplorationScene extends Phaser.Scene {
     const marker = this.add.rectangle(0, -7, 42, 30, clueColor, 1).setRotation(-0.14).setStrokeStyle(2, 0xd9cfb6, 0.62).setInteractive({ useHandCursor: true });
     clue.add([halo, marker]);
     marker.on('pointerdown', () => {
-      if (this.currentRoomId === room.id && this.transitionState === 'idle') this.openDialogue(placement.id);
+      if (!this.isAlteredLoopRestageActive() && this.currentRoomId === room.id && this.transitionState === 'idle') this.openDialogue(placement.id);
     });
     this.trackRoomObject(room.id, clue);
     this.interactables.push({ id: placement.id, roomId: room.id, x: point.x, y: point.y, range: 145, activate: () => this.openDialogue(placement.id) });
@@ -325,6 +349,211 @@ export class ExplorationScene extends Phaser.Scene {
       onTogglePause: () => this.toggleReenactmentPause(),
       onSkip: () => this.finishReenactment('skipped'),
     });
+  }
+
+  private createAlteredLoopPresentation(): void {
+    this.alteredLoopHud = new AlteredLoopHud({
+      onExit: (openTimeline) => {
+        this.finishAlteredLoopRestage('ended');
+        if (openTimeline) this.caseBoard.open('timeline');
+      },
+    });
+    this.alteredLoopRoute = this.add.graphics().setDepth(8_500).setVisible(false);
+    this.alteredLoopDoorLabel = this.add
+      .text(0, 0, 'MANAGER OFFICE\nDESTINATION', {
+        color: '#d9cfb6',
+        backgroundColor: '#090a0ddd',
+        fontFamily: FONT,
+        fontSize: '9px',
+        align: 'center',
+        padding: { x: 10, y: 7 },
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(8_501)
+      .setVisible(false);
+  }
+
+  private isAlteredLoopRestageActive(): boolean {
+    return this.alteredLoopRestage.snapshot().status === 'playing';
+  }
+
+  private startAlteredLoopRestage(phaseId: AlteredLoopPhaseId = 'reset', freeze = false): void {
+    this.caseBoard.close();
+    this.dialogue.dismiss();
+    this.timeline.replay();
+    this.mobileVector = { x: 0, y: 0 };
+    this.alteredLoopQaFrozen = freeze;
+    this.prepareAlteredLoopStage();
+    const phase = this.alteredLoopRestage.start(phaseId);
+    this.stageAlteredLoopPhase(phase, freeze);
+    if (freeze) this.settleAlteredLoopQaPose(phase);
+    this.lastInteraction = `altered-loop-started-${phase.id}`;
+  }
+
+  private prepareAlteredLoopStage(): void {
+    const lounge = this.room('lounge');
+    this.activateRoom(lounge.id);
+    const playerMark = levelPoint(this.level, this.levelGeometry, lounge, 15, 14);
+    this.player.setPosition(playerMark.x, playerMark.y);
+    this.player.gameObject().setVisible(false);
+    document.querySelector<HTMLElement>('#mobile-controls')?.setAttribute('aria-hidden', 'true');
+    this.setNpcAtAlteredLoopMark('npc.miles', 'windows');
+    this.moveNpcToMark('npc.vera', 'desk');
+    this.drawAlteredLoopRoute();
+    this.alteredLoopRoute.setVisible(false);
+    this.alteredLoopDoorLabel.setVisible(false);
+    this.cameras.main.stopFollow();
+    this.setReenactmentCamera(lounge, 23, 6, 0.78);
+  }
+
+  private updateAlteredLoopRestage(delta: number): void {
+    if (this.alteredLoopQaFrozen) return;
+    const update = this.alteredLoopRestage.update(delta);
+    update.entered.forEach((phase) => this.stageAlteredLoopPhase(phase));
+    if (update.finished) this.finishAlteredLoopRestage('completed');
+  }
+
+  private stageAlteredLoopPhase(phase: AlteredLoopPhase, qaPose = false): void {
+    this.lastAlteredLoopPhase = phase.id;
+    this.alteredLoopHud.show(phase, this.reducedMotion);
+    const miles = this.npcRoots.get('npc.miles');
+    if (!miles) return;
+
+    if (phase.id === 'reset') {
+      this.setNpcAtAlteredLoopMark('npc.miles', 'windows');
+      if (!qaPose) this.cameras.main.fadeOut(180, 0, 0, 0);
+    } else if (phase.id === 'establish') {
+      if (!qaPose) this.cameras.main.fadeIn(220, 0, 0, 0);
+      this.setReenactmentCamera(this.room('lounge'), 23, 6, 0.78);
+    } else if (phase.id === 'anticipate') {
+      this.alteredLoopRoute.setVisible(true);
+      this.alteredLoopDoorLabel.setVisible(true);
+      miles.setAngle(-2);
+    } else if (phase.id === 'transit-1') {
+      this.alteredLoopRoute.setVisible(true);
+      this.alteredLoopDoorLabel.setVisible(true);
+      this.cameras.main.startFollow(miles, true, 0.045, 0.045);
+      this.slideNpcForAlteredLoop('npc.miles', 'center-aisle', 2_600);
+    } else if (phase.id === 'transit-2') {
+      this.slideNpcForAlteredLoop('npc.miles', 'office-door', 2_600);
+    } else if (phase.id === 'arrived') {
+      this.setNpcAtAlteredLoopMark('npc.miles', 'office-door');
+      this.alteredLoopRoute.setVisible(false);
+      this.alteredLoopDoorLabel.setVisible(true);
+    } else if (phase.recordsObservation) {
+      this.caseState.record('guided-altered-loop', [
+        'observation.miles-office-check',
+        'timeline.miles-office-deviation',
+      ]);
+      this.lastTimelineBeat = 'variant.miles-office-check';
+      this.updateCaseHud();
+    }
+    this.lastInteraction = `altered-loop-phase-${phase.id}`;
+  }
+
+  private alteredLoopPoint(mark: AlteredLoopActorMark): Phaser.Math.Vector2 {
+    const local = {
+      windows: { x: 23, y: 4 },
+      'center-aisle': { x: 14, y: 11 },
+      'office-door': { x: 2, y: 15 },
+    }[mark];
+    const point = levelPoint(this.level, this.levelGeometry, this.room('lounge'), local.x, local.y);
+    return new Phaser.Math.Vector2(point.x, point.y);
+  }
+
+  private setNpcAtAlteredLoopMark(actorId: string, mark: AlteredLoopActorMark): void {
+    const root = this.npcRoots.get(actorId);
+    const body = this.npcBodies.get(actorId);
+    if (!root) return;
+    const point = this.alteredLoopPoint(mark);
+    this.tweens.killTweensOf(root);
+    if (body) this.tweens.killTweensOf(body);
+    root.setPosition(point.x, point.y).setAngle(0).setDepth(100 + point.y).setVisible(true);
+    body?.setY(0);
+    const interactable = this.interactables.find((target) => target.id === actorId);
+    if (interactable) {
+      interactable.x = point.x;
+      interactable.y = point.y;
+    }
+  }
+
+  private slideNpcForAlteredLoop(actorId: string, mark: AlteredLoopActorMark, duration: number): void {
+    const root = this.npcRoots.get(actorId);
+    const body = this.npcBodies.get(actorId);
+    if (!root) return;
+    const destination = this.alteredLoopPoint(mark);
+    if (this.reducedMotion) {
+      this.setNpcAtAlteredLoopMark(actorId, mark);
+      return;
+    }
+    this.tweens.killTweensOf(root);
+    if (body) {
+      this.tweens.killTweensOf(body);
+      body.setY(0);
+      this.tweens.add({ targets: body, y: -4, duration: 220, ease: 'Sine.easeInOut', yoyo: true, repeat: 5 });
+    }
+    const direction = Math.sign(destination.x - root.x) || 1;
+    const interactable = this.interactables.find((target) => target.id === actorId);
+    this.tweens.add({
+      targets: root,
+      x: destination.x,
+      y: destination.y,
+      angle: direction * 3,
+      duration,
+      ease: 'Sine.easeInOut',
+      onUpdate: () => {
+        root.setDepth(100 + root.y);
+        if (interactable) {
+          interactable.x = root.x;
+          interactable.y = root.y;
+        }
+      },
+      onComplete: () => {
+        root.setAngle(0);
+        body?.setY(0);
+      },
+    });
+  }
+
+  private drawAlteredLoopRoute(): void {
+    const start = this.alteredLoopPoint('windows');
+    const middle = this.alteredLoopPoint('center-aisle');
+    const end = this.alteredLoopPoint('office-door');
+    this.alteredLoopRoute.clear();
+    this.alteredLoopRoute.lineStyle(5, 0xc7a85b, 0.34).beginPath().moveTo(start.x, start.y).lineTo(middle.x, middle.y).lineTo(end.x, end.y).strokePath();
+    this.alteredLoopRoute.fillStyle(0xc7a85b, 0.72).fillCircle(middle.x, middle.y, 7).fillCircle(end.x, end.y, 9);
+    this.alteredLoopDoorLabel.setPosition(end.x, end.y - 32);
+  }
+
+  private settleAlteredLoopQaPose(phase: AlteredLoopPhase): void {
+    this.cameras.main.resetFX();
+    this.setNpcAtAlteredLoopMark('npc.miles', phase.actorMark);
+    if (phase.id === 'anticipate' || phase.id.startsWith('transit')) this.alteredLoopRoute.setVisible(true);
+    if (phase.id !== 'reset' && phase.id !== 'establish') this.alteredLoopDoorLabel.setVisible(true);
+    const miles = this.npcRoots.get('npc.miles');
+    if (miles && (phase.id.startsWith('transit') || phase.id === 'arrived' || phase.id === 'recorded')) {
+      this.cameras.main.stopFollow();
+      this.cameras.main.centerOn(miles.x, miles.y);
+    }
+  }
+
+  private finishAlteredLoopRestage(reason: 'completed' | 'ended'): void {
+    if (reason === 'ended') this.alteredLoopRestage.end();
+    this.alteredLoopQaFrozen = false;
+    this.cameras.main.resetFX();
+    const miles = this.npcRoots.get('npc.miles');
+    const body = this.npcBodies.get('npc.miles');
+    if (miles) this.tweens.killTweensOf(miles);
+    if (body) this.tweens.killTweensOf(body);
+    this.alteredLoopRoute.setVisible(false);
+    this.alteredLoopDoorLabel.setVisible(false);
+    this.alteredLoopHud.hide();
+    document.querySelector<HTMLElement>('#mobile-controls')?.removeAttribute('aria-hidden');
+    this.player.gameObject().setVisible(true);
+    this.activateRoom('lounge');
+    this.setCameraForRoom(this.room('lounge'));
+    this.lastInteraction = `altered-loop-${reason}`;
+    this.updateCaseHud();
   }
 
   private isReenactmentActive(): boolean {
@@ -490,9 +719,10 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private updateTimeline(delta: number): void {
-    const paused = this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive();
+    const paused = this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive() || this.isAlteredLoopRestageActive();
     this.timeline.setRunning(!paused);
-    const events = this.timeline.update(delta, this.caseState.has('variant.miles.checks-office-next-loop'));
+    // The altered event is deduction-critical, so it only plays through the guided restaging.
+    const events = this.timeline.update(delta, false);
     events.forEach((beat) => this.applyTimelineBeat(beat));
     const second = Math.floor(this.timeline.snapshot().elapsedMs / 1_000);
     if (second !== this.lastHudSecond) {
@@ -505,12 +735,6 @@ export class ExplorationScene extends Phaser.Scene {
     this.lastTimelineBeat = beat.id;
     this.lastInteraction = `timeline-${beat.id}`;
     if (beat.actorId && beat.mark) this.moveNpcToMark(beat.actorId, beat.mark);
-    if (beat.id === 'variant.miles-office-check' && this.currentRoomId === 'lounge') {
-      this.caseState.record(beat.id, [
-        'observation.miles-office-check',
-        'timeline.miles-office-deviation',
-      ]);
-    }
     this.updateCaseHud();
   }
 
@@ -566,6 +790,10 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private replayNight(): void {
+    if (this.caseState.has('variant.miles.checks-office-next-loop')) {
+      this.startAlteredLoopRestage();
+      return;
+    }
     const lounge = this.room('lounge');
     this.activateRoom(lounge.id);
     const observationMark = levelPoint(this.level, this.levelGeometry, lounge, 15, 14);
@@ -589,6 +817,11 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private updatePrompt(): void {
+    if (this.isAlteredLoopRestageActive()) {
+      this.promptText.setText('').setVisible(false);
+      this.setMobileLabels('WATCH', 'WATCH');
+      return;
+    }
     if (this.isReenactmentActive()) {
       this.promptText.setText('').setVisible(false);
       this.setMobileLabels('PAUSE', 'SKIP');
@@ -627,7 +860,7 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private activateNearest(): void {
-    if (this.transitionState !== 'idle') return;
+    if (this.transitionState !== 'idle' || this.isAlteredLoopRestageActive()) return;
     const nearest = this.nearestInteractable();
     if (nearest) nearest.activate();
     else this.lastInteraction = 'nothing-in-range';
@@ -761,7 +994,7 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private checkDoorTransition(): void {
-    if (this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive()) return;
+    if (this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive() || this.isAlteredLoopRestageActive()) return;
     const room = this.room(this.currentRoomId);
     const position = this.player.position();
     const localX = Math.floor((position.x - this.levelGeometry.offsetX) / this.level.tileSize) - room.originX;
@@ -812,6 +1045,22 @@ export class ExplorationScene extends Phaser.Scene {
       'reenactment-office-tell': 'reconstruction.office-deviation',
       'reenactment-finale': 'reconstruction.finale',
     }[pose ?? ''];
+    const alteredLoopPose = {
+      'altered-loop-anticipate': 'anticipate',
+      'altered-loop-route': 'transit-1',
+      'altered-loop-arrived': 'arrived',
+      'altered-loop-recorded': 'recorded',
+    }[pose ?? ''] as AlteredLoopPhaseId | undefined;
+    if (alteredLoopPose) {
+      const proof = solveLevelOneCase();
+      this.caseState.seed(proof.state.snapshot().flags.filter((flag) =>
+        !flag.startsWith('outcome.')
+        && flag !== 'observation.miles-office-check'
+        && flag !== 'timeline.miles-office-deviation'));
+      this.startAlteredLoopRestage(alteredLoopPose, true);
+      this.lastInteraction = `qa-pose-${pose}`;
+      this.updateCaseHud();
+    }
     if (reenactmentPose || debugReenactment === 'level-one') {
       const proof = solveLevelOneCase();
       this.caseState.seed(proof.state.snapshot().flags);
@@ -1013,8 +1262,8 @@ export class ExplorationScene extends Phaser.Scene {
     const activeRoom = this.room(this.currentRoomId);
     canvas.dataset.playerLocalX = (Math.floor((position.x - this.levelGeometry.offsetX) / this.level.tileSize) - activeRoom.originX).toString();
     canvas.dataset.playerLocalY = (Math.floor((position.y - this.levelGeometry.offsetY) / this.level.tileSize) - activeRoom.originY).toString();
-    canvas.dataset.inputLocked = (this.transitionState !== 'idle' || this.requiresNeutralInput || this.isReenactmentActive()).toString();
-    canvas.dataset.timelinePaused = (this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive()).toString();
+    canvas.dataset.inputLocked = (this.transitionState !== 'idle' || this.requiresNeutralInput || this.isReenactmentActive() || this.isAlteredLoopRestageActive()).toString();
+    canvas.dataset.timelinePaused = (this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive() || this.isAlteredLoopRestageActive()).toString();
     canvas.dataset.doorReentryLocked = this.requiresNeutralInput.toString();
     canvas.dataset.characterScale = EXPLORATION_CHARACTER_SCALE.toFixed(2);
     canvas.dataset.playerX = position.x.toFixed(1);
@@ -1050,5 +1299,14 @@ export class ExplorationScene extends Phaser.Scene {
     canvas.dataset.reenactmentReplayCount = reenactment.replayCount.toString();
     canvas.dataset.reenactmentReducedMotion = this.reducedMotion.toString();
     canvas.dataset.reenactmentLastBeat = this.lastReenactmentBeat;
+    const alteredLoop = this.alteredLoopRestage.snapshot();
+    canvas.dataset.alteredLoopStatus = alteredLoop.status;
+    canvas.dataset.alteredLoopPhase = alteredLoop.phaseId ?? 'none';
+    canvas.dataset.alteredLoopPhaseElapsedMs = Math.round(alteredLoop.phaseElapsedMs).toString();
+    canvas.dataset.alteredLoopActorMark = alteredLoop.actorMark ?? 'none';
+    canvas.dataset.alteredLoopInputLocked = this.isAlteredLoopRestageActive().toString();
+    canvas.dataset.alteredLoopObservationRecorded = this.caseState.has('timeline.miles-office-deviation').toString();
+    canvas.dataset.alteredLoopReducedMotion = this.reducedMotion.toString();
+    canvas.dataset.alteredLoopLastPhase = this.lastAlteredLoopPhase;
   }
 }

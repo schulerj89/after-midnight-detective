@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "altered-loop-recorded-reduced-motion-mobile", "file": "altered-loop-recorded-reduced-motion-mobile.png", "pose": "altered-loop-recorded&reducedMotion=1" },
+  "viewport": { "deviceScaleFactor": 1, "width": 1280, "height": 540 },
+  "elements": [
+    { "id": "mode-label", "role": "hud", "x": 18, "y": 16, "width": 288, "height": 38 },
+    { "id": "return-to-case", "role": "touch-control", "x": 1108, "y": 16, "width": 156, "height": 48 },
+    { "id": "observation-card", "role": "dialogue", "x": 200, "y": 403, "width": 880, "height": 114 },
+    { "id": "miles-arrived", "role": "subject", "x": 82, "y": 159, "width": 47, "height": 112 }
+  ],
+  "containmentZones": [
+    { "id": "safe-area", "x": 8, "y": 8, "width": 1264, "height": 524, "contains": ["mode-label", "return-to-case", "observation-card", "miles-arrived"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "mode-label", "b": "return-to-case" },
+    { "a": "miles-arrived", "b": "observation-card" }
+  ],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "recorded-copy", "x": 330, "y": 425, "width": 620, "height": 72, "minLuminance": 8, "maxLuminance": 210, "minVariance": 20, "maxVariance": 9000 }
+  ]
+}
