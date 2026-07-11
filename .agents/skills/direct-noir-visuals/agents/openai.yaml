@@ -1,0 +1,4 @@
+interface:
+  display_name: "Noir Visual Director"
+  short_description: "Direct theatrical 2D noir visuals and motion"
+  default_prompt: "Use $direct-noir-visuals to define and document the visual treatment for this game scene."

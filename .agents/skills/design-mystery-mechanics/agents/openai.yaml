@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mystery Mechanics Designer"
+  short_description: "Design fair observation and deduction mechanics"
+  default_prompt: "Use $design-mystery-mechanics to design and document a mystery gameplay system."

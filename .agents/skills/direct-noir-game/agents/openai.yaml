@@ -1,0 +1,4 @@
+interface:
+  display_name: "Noir Game Director"
+  short_description: "Guard pacing, cohesion, scope, and player experience"
+  default_prompt: "Use $direct-noir-game to review and document this feature as the game director."
