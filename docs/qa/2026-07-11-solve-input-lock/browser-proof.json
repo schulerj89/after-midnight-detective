@@ -1,0 +1,64 @@
+{
+  "selectionStyles": {
+    "case-board": {
+      "userSelect": "none",
+      "webkitTouchCallout": "",
+      "webkitUserSelect": ""
+    },
+    "game": {
+      "userSelect": "none",
+      "webkitTouchCallout": "",
+      "webkitUserSelect": ""
+    },
+    "mobile-controls": {
+      "userSelect": "none",
+      "webkitTouchCallout": "",
+      "webkitUserSelect": ""
+    }
+  },
+  "finalLockGeometry": {
+    "enabledCaseButtons": 0,
+    "rects": {
+      "ending": {
+        "bottom": 348.1458435058594,
+        "height": 190,
+        "left": 18.666667938232422,
+        "right": 825.3333549499512,
+        "top": 158.14584350585938,
+        "width": 806.6666870117188,
+        "x": 18.666667938232422,
+        "y": 158.14584350585938
+      },
+      "shell": {
+        "bottom": 356.8125,
+        "height": 323.625,
+        "left": 6,
+        "right": 838,
+        "top": 33.1875,
+        "width": 832,
+        "x": 6,
+        "y": 33.1875
+      }
+    },
+    "state": {
+      "body": "case-board-open case-finale-pending",
+      "dialogue": "closed",
+      "last": "level-one-solved",
+      "pending": "true",
+      "reenactment": "locked",
+      "selection": ""
+    },
+    "visible": {
+      "officerNote": "none",
+      "replay": "none"
+    }
+  },
+  "finalLockEnd": {
+    "body": "reenactment-open",
+    "dialogue": "closed",
+    "last": "reenactment-started-reconstruction.title",
+    "pending": "false",
+    "reenactment": "playing",
+    "selection": ""
+  }
+}

@@ -106,6 +106,7 @@ export class ExplorationScene extends Phaser.Scene {
   private lastReenactmentBeat = 'none';
   private lastAlteredLoopPhase = 'none';
   private alteredLoopQaFrozen = false;
+  private finaleTransitionPending = false;
   private mobileLandscape = false;
   private explorationCameraZoom = 1;
   private presentationWidth = GAME_WIDTH;
@@ -160,7 +161,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.updateReenactment(delta);
     this.updateAlteredLoopRestage(delta);
     const physicalVector = this.readMovement();
-    const interfaceOpen = this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive() || this.isAlteredLoopRestageActive();
+    const interfaceOpen = this.finaleTransitionPending || this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive() || this.isAlteredLoopRestageActive();
     const gated = gateTransitionInput(physicalVector, this.transitionState !== 'idle', interfaceOpen, this.requiresNeutralInput);
     this.requiresNeutralInput = gated.requiresNeutral;
     const vector = gated.vector;
@@ -184,15 +185,15 @@ export class ExplorationScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
     this.wasd = { up: this.input.keyboard.addKey('W'), down: this.input.keyboard.addKey('S'), left: this.input.keyboard.addKey('A'), right: this.input.keyboard.addKey('D') };
     this.input.keyboard.on('keydown-E', () => {
-      if (this.isAlteredLoopRestageActive() || this.isReenactmentActive()) return;
+      if (this.finaleTransitionPending || this.isAlteredLoopRestageActive() || this.isReenactmentActive()) return;
       if (this.transitionState === 'idle') this.activateNearest();
     });
     this.input.keyboard.on('keydown-N', () => {
-      if (this.isAlteredLoopRestageActive() || this.isReenactmentActive()) return;
+      if (this.finaleTransitionPending || this.isAlteredLoopRestageActive() || this.isReenactmentActive()) return;
       if (!this.dialogue.isOpen() && this.transitionState === 'idle') this.caseBoard.toggle();
     });
     this.input.keyboard.on('keydown-T', () => {
-      if (this.isAlteredLoopRestageActive() || this.isReenactmentActive()) return;
+      if (this.finaleTransitionPending || this.isAlteredLoopRestageActive() || this.isReenactmentActive()) return;
       if (!this.dialogue.isOpen() && this.transitionState === 'idle') this.caseBoard.open('timeline');
     });
     this.input.keyboard.on('keydown-SPACE', () => {
@@ -214,6 +215,7 @@ export class ExplorationScene extends Phaser.Scene {
       this.cameras.main.removeAllListeners(Phaser.Cameras.Scene2D.Events.FADE_IN_COMPLETE);
       this.cameras.main.resetFX();
       document.querySelector<HTMLElement>('#mobile-controls')?.classList.remove('is-room-transitioning');
+      document.body.classList.remove('case-finale-pending');
       this.caseBoard.destroy();
       this.reenactmentHud.destroy();
       this.alteredLoopHud.destroy();
@@ -229,7 +231,7 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private handleMobileControl(control: MobileControl): void {
-    if (this.transitionState !== 'idle') return;
+    if (this.transitionState !== 'idle' || this.finaleTransitionPending) return;
     if (this.isAlteredLoopRestageActive()) return;
     if (this.isReenactmentActive()) return;
     if (this.caseBoard.isOpen()) {
@@ -335,7 +337,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.npcRoots.set(placement.id, root);
     this.npcBodies.set(placement.id, body);
     hitTarget.on('pointerdown', () => {
-      if (!this.isAlteredLoopRestageActive() && !this.isReenactmentActive() && this.currentRoomId === room.id && this.transitionState === 'idle') this.openDialogue(placement.id);
+      if (!this.finaleTransitionPending && !this.isAlteredLoopRestageActive() && !this.isReenactmentActive() && this.currentRoomId === room.id && this.transitionState === 'idle') this.openDialogue(placement.id);
     });
     this.trackRoomObject(room.id, root);
     this.interactables.push({ id: placement.id, roomId: room.id, x: point.x, y: point.y, range: 175, activate: () => this.openDialogue(placement.id) });
@@ -356,7 +358,7 @@ export class ExplorationScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
     clue.add([halo, marker, hitTarget]);
     hitTarget.on('pointerdown', () => {
-      if (!this.isAlteredLoopRestageActive() && !this.isReenactmentActive() && this.currentRoomId === room.id && this.transitionState === 'idle') this.openDialogue(placement.id);
+      if (!this.finaleTransitionPending && !this.isAlteredLoopRestageActive() && !this.isReenactmentActive() && this.currentRoomId === room.id && this.transitionState === 'idle') this.openDialogue(placement.id);
     });
     this.trackRoomObject(room.id, clue);
     this.interactables.push({ id: placement.id, roomId: room.id, x: point.x, y: point.y, range: 145, activate: () => this.openDialogue(placement.id) });
@@ -630,8 +632,12 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private startReenactment(beatId?: string, freeze = false): void {
+    if (this.isReenactmentActive()) return;
     const beat = this.reenactment.start(beatId);
     if (!beat) return;
+    this.finaleTransitionPending = false;
+    document.body.classList.remove('case-finale-pending');
+    this.caseBoard.setInputLocked(false);
     this.caseBoard.close();
     this.audio.requestMusic(AUDIO_KEYS.music.reconstruction, { loop: false, volume: 0.78 });
     this.setExplorationHudVisible(false);
@@ -817,7 +823,7 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private updateTimeline(delta: number): void {
-    const paused = this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive() || this.isAlteredLoopRestageActive();
+    const paused = this.finaleTransitionPending || this.transitionState !== 'idle' || this.dialogue.isOpen() || this.caseBoard.isOpen() || this.isReenactmentActive() || this.isAlteredLoopRestageActive();
     this.timeline.setRunning(!paused);
     // The altered event is deduction-critical, so it only plays through the guided restaging.
     const events = this.timeline.update(delta, false);
@@ -912,14 +918,28 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private completeLevelOne(result: LevelOneAccusationResult): void {
-    if (result.status !== 'solved') return;
+    if (result.status !== 'solved' || this.finaleTransitionPending || this.isReenactmentActive()) return;
     this.caseState.record('accusation', ['outcome.level-one-solved']);
+    this.finaleTransitionPending = true;
+    this.mobileVector = { x: 0, y: 0 };
+    this.dialogue.dismiss();
+    this.promptText.setText('').setVisible(false);
+    this.setMobileLabels('WAIT', 'WAIT');
+    this.caseBoard.setInputLocked(true);
+    document.body.classList.add('case-finale-pending');
     this.lastInteraction = 'level-one-solved';
     this.updateCaseHud();
-    this.time.delayedCall(1_100, () => this.startReenactment());
+    this.time.delayedCall(1_100, () => {
+      if (this.finaleTransitionPending) this.startReenactment();
+    });
   }
 
   private updatePrompt(): void {
+    if (this.finaleTransitionPending) {
+      this.promptText.setText('').setVisible(false);
+      this.setMobileLabels('WAIT', 'WAIT');
+      return;
+    }
     if (this.isAlteredLoopRestageActive()) {
       this.promptText.setText('').setVisible(false);
       this.setMobileLabels('WATCH', 'WATCH');
@@ -963,14 +983,14 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private activateNearest(): void {
-    if (this.transitionState !== 'idle' || this.isAlteredLoopRestageActive() || this.isReenactmentActive()) return;
+    if (this.transitionState !== 'idle' || this.finaleTransitionPending || this.isAlteredLoopRestageActive() || this.isReenactmentActive()) return;
     const nearest = this.nearestInteractable();
     if (nearest) nearest.activate();
     else this.lastInteraction = 'nothing-in-range';
   }
 
   private openDialogue(id: Interactable['id']): void {
-    if (this.dialogue?.isOpen()) return;
+    if (this.finaleTransitionPending || this.dialogue?.isOpen()) return;
     const variant = this.interactionFor(id);
     if (!variant) return;
     if (id.startsWith('clue.')) this.audio.playSfx(AUDIO_KEYS.sfx.inspect, { volume: 0.75, throttleMs: 250 });
@@ -1437,6 +1457,7 @@ export class ExplorationScene extends Phaser.Scene {
     canvas.dataset.timelineRunning = timeline.running.toString();
     canvas.dataset.timelineLastBeat = this.lastTimelineBeat;
     canvas.dataset.caseBoardOpen = this.caseBoard.isOpen().toString();
+    canvas.dataset.finaleTransitionPending = this.finaleTransitionPending.toString();
     canvas.dataset.caseOutcome = this.caseState.has('outcome.level-one-solved') ? 'solved' : 'investigating';
     canvas.dataset.debugSolveStatus = this.debugSolveSteps.at(-1) === 'accusation.solved' ? 'solved' : this.debugSolveSteps.length ? 'running' : 'idle';
     canvas.dataset.debugSolveSteps = this.debugSolveSteps.join('|');

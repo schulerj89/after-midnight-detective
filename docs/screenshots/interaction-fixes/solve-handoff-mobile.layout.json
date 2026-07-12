@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "screenshot": {
+    "name": "solve-handoff-mobile",
+    "file": "solve-handoff-mobile.png",
+    "pose": "case-accusation-ready-double-click"
+  },
+  "viewport": { "width": 844, "height": 390, "deviceScaleFactor": 1 },
+  "elements": [
+    { "id": "case-shell", "role": "modal-panel", "x": 6, "y": 33.19, "width": 832, "height": 323.63 },
+    { "id": "solved-ending", "role": "ending-copy", "x": 18.67, "y": 158.15, "width": 806.66, "height": 190 },
+    { "id": "handoff-status", "role": "status-text", "x": 300, "y": 324, "width": 244, "height": 20 }
+  ],
+  "containmentZones": [
+    { "id": "safe-area", "x": 6, "y": 6, "width": 832, "height": 378, "contains": ["case-shell", "solved-ending", "handoff-status"] }
+  ],
+  "forbiddenOverlaps": [],
+  "alignmentPairs": [
+    { "a": "solved-ending", "b": "handoff-status", "axis": "centerX", "tolerance": 1 }
+  ],
+  "expectedPixelActivity": [
+    { "id": "handoff-copy", "x": 300, "y": 324, "width": 244, "height": 20, "minVariance": 4, "maxVariance": 10000 }
+  ]
+}

@@ -36,6 +36,7 @@ export class CaseBoard {
   private readonly options: CaseBoardOptions;
   private tab: CaseTab = 'notebook';
   private visible = false;
+  private inputLocked = false;
   private result: LevelOneAccusationResult | null = null;
   private draft: LevelOneAccusationDraft = {
     suspectId: null,
@@ -78,6 +79,10 @@ export class CaseBoard {
 
   toggle(): void {
     this.visible ? this.close() : this.open();
+  }
+
+  setInputLocked(locked: boolean): void {
+    this.inputLocked = locked;
   }
 
   showSolved(result: LevelOneAccusationResult): void {
@@ -258,6 +263,7 @@ export class CaseBoard {
   private button(text: string, className: string, action: () => void): HTMLButtonElement {
     const button = this.element('button', className, text);
     button.type = 'button';
+    button.disabled = this.inputLocked;
     button.addEventListener('click', action);
     return button;
   }

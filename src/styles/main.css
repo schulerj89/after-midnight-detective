@@ -19,6 +19,21 @@ body,
   overflow: hidden;
 }
 
+html,
+body,
+#game,
+#mobile-controls,
+#case-board,
+#reenactment-ui,
+#altered-loop-ui,
+#audio-control,
+#rotate-device {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   min-height: 100dvh;
   background: #090a0d;
@@ -127,6 +142,24 @@ body {
 .case-board-open #mobile-controls {
   opacity: 0;
   pointer-events: none;
+}
+
+.case-finale-pending #case-board,
+.case-finale-pending #mobile-controls {
+  pointer-events: none;
+}
+
+.case-finale-pending .case-board__ending-note,
+.case-finale-pending .case-board__replay-reconstruction {
+  display: none;
+}
+
+.case-finale-pending .case-board__ending::after {
+  margin-top: 18px;
+  color: #c7a85b;
+  content: 'RECONSTRUCTION STARTING...';
+  font-size: 8px;
+  line-height: 1.5;
 }
 
 .case-board__shell {
