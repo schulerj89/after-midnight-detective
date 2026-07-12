@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "title-mobile-main", "file": "title-mobile-main.png", "pose": "title-main" },
+  "viewport": { "width": 844, "height": 390, "deviceScaleFactor": 1 },
+  "elements": [
+    { "id": "start", "role": "touch-control", "x": 286.58, "y": 211.25, "width": 270.83, "height": 52, "minWidth": 48, "minHeight": 48 },
+    { "id": "settings", "role": "touch-control", "x": 286.58, "y": 275.17, "width": 270.83, "height": 52, "minWidth": 48, "minHeight": 48 }
+  ],
+  "containmentZones": [
+    { "id": "safe-area", "x": 8, "y": 8, "width": 828, "height": 374, "contains": ["start", "settings"] }
+  ],
+  "forbiddenOverlaps": [{ "a": "start", "b": "settings" }],
+  "alignmentPairs": [{ "a": "start", "b": "settings", "axis": "centerX", "tolerance": 1 }],
+  "expectedPixelActivity": []
+}
+

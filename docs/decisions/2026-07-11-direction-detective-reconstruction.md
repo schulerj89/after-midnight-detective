@@ -72,6 +72,7 @@ doorway, observed office-tell, and finale poses on desktop and mobile.
 
 ## Validation results
 
-The 28-second six-beat sequence completes and returns to CASE CLOSED. Browser
+The original 28-second six-beat sequence completed and returned to CASE CLOSED.
+Its timing is superseded by the 35.3-second readable-pacing decision. Browser
 interaction proves pause, confirmed skip, and replay; deterministic tests prove
 unlock and order. Desktop/mobile captures confirm the evidence-bounded staging.

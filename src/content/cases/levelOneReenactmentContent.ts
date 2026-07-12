@@ -23,7 +23,7 @@ export interface LevelOneReenactmentBeat {
 export const LEVEL_ONE_REENACTMENT_BEATS: readonly LevelOneReenactmentBeat[] = [
   {
     id: 'reconstruction.title',
-    durationMs: 2_000,
+    durationMs: 2_800,
     roomId: 'lounge',
     time: 'AFTER MIDNIGHT',
     heading: "THE DETECTIVE'S RECONSTRUCTION",
@@ -34,7 +34,7 @@ export const LEVEL_ONE_REENACTMENT_BEATS: readonly LevelOneReenactmentBeat[] = [
   },
   {
     id: 'reconstruction.window-alibi',
-    durationMs: 4_000,
+    durationMs: 5_000,
     roomId: 'lounge',
     time: '12:08',
     heading: 'THE ALIBI',
@@ -45,7 +45,7 @@ export const LEVEL_ONE_REENACTMENT_BEATS: readonly LevelOneReenactmentBeat[] = [
   },
   {
     id: 'reconstruction.key-ledger',
-    durationMs: 5_000,
+    durationMs: 6_000,
     roomId: 'lounge',
     time: '12:08',
     heading: 'KEY 317 // M. PIKE',
@@ -56,7 +56,7 @@ export const LEVEL_ONE_REENACTMENT_BEATS: readonly LevelOneReenactmentBeat[] = [
   },
   {
     id: 'reconstruction.room-317-door',
-    durationMs: 5_000,
+    durationMs: 6_000,
     roomId: 'bedroom',
     time: '12:09',
     heading: 'THE DOOR TO 317',
@@ -67,7 +67,7 @@ export const LEVEL_ONE_REENACTMENT_BEATS: readonly LevelOneReenactmentBeat[] = [
   },
   {
     id: 'reconstruction.office-deviation',
-    durationMs: 7_000,
+    durationMs: 8_500,
     roomId: 'lounge',
     time: 'LATER LOOP // 12:11',
     heading: 'WHAT GAVE HIM AWAY',
@@ -78,7 +78,7 @@ export const LEVEL_ONE_REENACTMENT_BEATS: readonly LevelOneReenactmentBeat[] = [
   },
   {
     id: 'reconstruction.finale',
-    durationMs: 5_000,
+    durationMs: 7_000,
     roomId: 'lounge',
     time: 'CASE CLOSED',
     heading: 'THE KEY MADE HIM LOOK',
@@ -89,3 +89,7 @@ export const LEVEL_ONE_REENACTMENT_BEATS: readonly LevelOneReenactmentBeat[] = [
   },
 ] as const;
 
+export const LEVEL_ONE_REENACTMENT_TOTAL_DURATION_MS = LEVEL_ONE_REENACTMENT_BEATS.reduce(
+  (total, beat) => total + beat.durationMs,
+  0,
+);

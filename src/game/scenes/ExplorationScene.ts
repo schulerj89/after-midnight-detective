@@ -449,9 +449,9 @@ export class ExplorationScene extends Phaser.Scene {
       this.alteredLoopRoute.setVisible(true);
       this.alteredLoopDoorLabel.setVisible(true);
       this.cameras.main.startFollow(miles, true, 0.045, 0.045);
-      this.slideNpcForAlteredLoop('npc.miles', 'center-aisle', 2_600);
+      this.slideNpcForAlteredLoop('npc.miles', 'center-aisle', phase.durationMs);
     } else if (phase.id === 'transit-2') {
-      this.slideNpcForAlteredLoop('npc.miles', 'office-door', 2_600);
+      this.slideNpcForAlteredLoop('npc.miles', 'office-door', phase.durationMs);
     } else if (phase.id === 'arrived') {
       this.setNpcAtAlteredLoopMark('npc.miles', 'office-door');
       this.alteredLoopRoute.setVisible(false);
@@ -653,12 +653,16 @@ export class ExplorationScene extends Phaser.Scene {
     this.tweens.killTweensOf(this.reenactmentActor);
     this.tweens.killTweensOf(this.reenactmentActorBody);
     this.reenactmentActorBody.setY(0);
-    this.stageReenactmentAction(beat.stageAction, beat.roomId);
+    this.stageReenactmentAction(beat.stageAction, beat.roomId, beat.durationMs);
     this.npcRoots.forEach((root) => root.setVisible(false));
     this.lastInteraction = `reenactment-beat-${beat.id}`;
   }
 
-  private stageReenactmentAction(action: ReenactmentStageAction, roomId: LevelOneReenactmentBeat['roomId']): void {
+  private stageReenactmentAction(
+    action: ReenactmentStageAction,
+    roomId: LevelOneReenactmentBeat['roomId'],
+    beatDurationMs: number,
+  ): void {
     const room = this.room(roomId);
     this.activateRoom(room.id);
     const place = (target: Phaser.GameObjects.Container, x: number, y: number) => {
@@ -680,7 +684,10 @@ export class ExplorationScene extends Phaser.Scene {
     if (action === 'key-ledger') {
       place(this.reenactmentActor, 18, 6);
       this.setReenactmentCamera(room, 12, 6, 0.72);
-      this.slideReenactmentActor(levelPoint(this.level, this.levelGeometry, room, 11, 6), 3_100);
+      this.slideReenactmentActor(
+        levelPoint(this.level, this.levelGeometry, room, 11, 6),
+        Math.min(4_200, beatDurationMs - 800),
+      );
       return;
     }
     if (action === 'room-317-door') {
@@ -692,7 +699,10 @@ export class ExplorationScene extends Phaser.Scene {
       place(this.reenactmentActor, 23, 4);
       this.setReenactmentCamera(room, 23, 6, 0.72);
       this.cameras.main.startFollow(this.reenactmentActor, true, 0.045, 0.045);
-      this.slideReenactmentActor(levelPoint(this.level, this.levelGeometry, room, 2, 15), 4_800);
+      this.slideReenactmentActor(
+        levelPoint(this.level, this.levelGeometry, room, 2, 15),
+        Math.min(6_200, beatDurationMs - 1_200),
+      );
       return;
     }
     place(this.reenactmentActor, 14, 14);

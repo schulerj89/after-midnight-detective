@@ -1,6 +1,6 @@
 {
   "status": "completed",
-  "durationMs": 28000,
+  "durationMs": 35300,
   "debugRoute": "/?debugReenactment=level-one",
   "beats": [
     { "id": "reconstruction.title", "provenance": "INFERRED", "basisIds": ["outcome.level-one-solved"] },

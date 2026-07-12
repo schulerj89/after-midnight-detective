@@ -12,8 +12,8 @@ vi.mock('phaser', () => ({
   },
 }));
 
-function harness(locked = false) {
-  const values = new Map<string, string>();
+function harness(locked = false, initial: Record<string, string> = {}) {
+  const values = new Map<string, string>(Object.entries(initial));
   const storage = {
     getItem: (key: string) => values.get(key) ?? null,
     setItem: (key: string, value: string) => { values.set(key, value); },
@@ -48,6 +48,27 @@ describe('AudioManager', () => {
     expect(manager.isMusicMuted()).toBe(true);
     expect(values.get('after-midnight.audio.music-muted.v1')).toBe('true');
     expect(manager.effectiveLevel('sfx')).toBeGreaterThan(0);
+  });
+
+  it('persists and restores independent music and SFX levels', () => {
+    const { manager, values } = harness();
+    manager.setLevel('music', 0.4);
+    manager.setLevel('sfx', 0.8);
+    expect(values.get('after-midnight.audio.music-level.v1')).toBe('0.4');
+    expect(values.get('after-midnight.audio.sfx-level.v1')).toBe('0.8');
+
+    const restored = harness(false, Object.fromEntries(values)).manager;
+    expect(restored.getLevel('music')).toBe(0.4);
+    expect(restored.getLevel('sfx')).toBe(0.8);
+  });
+
+  it('clamps persisted levels', () => {
+    const { manager } = harness(false, {
+      'after-midnight.audio.music-level.v1': '4',
+      'after-midnight.audio.sfx-level.v1': '-2',
+    });
+    expect(manager.getLevel('music')).toBe(1);
+    expect(manager.getLevel('sfx')).toBe(0.82);
   });
 
   it('defers music until browser audio is unlocked', () => {

@@ -37,7 +37,9 @@ export class PreloadScene extends Phaser.Scene {
             ? SCENE_KEYS.sandbox
             : scene === SCENE_KEYS.caseClosed
               ? SCENE_KEYS.caseClosed
-              : SCENE_KEYS.exploration,
+              : scene === SCENE_KEYS.exploration
+                ? SCENE_KEYS.exploration
+                : SCENE_KEYS.title,
         );
       },
     });

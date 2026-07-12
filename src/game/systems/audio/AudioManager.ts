@@ -40,6 +40,10 @@ const DEFAULT_LEVELS: Record<AudioBus, number> = {
 };
 
 const MUSIC_MUTED_KEY = 'after-midnight.audio.music-muted.v1';
+const LEVEL_STORAGE_KEYS: Partial<Record<AudioBus, string>> = {
+  music: 'after-midnight.audio.music-level.v1',
+  sfx: 'after-midnight.audio.sfx-level.v1',
+};
 const managers = new WeakMap<Phaser.Sound.BaseSoundManager, AudioManager>();
 
 export const AUDIO_KEYS = {
@@ -82,6 +86,11 @@ export class AudioManager {
     private readonly storage: StorageLike | undefined = safeStorage(),
   ) {
     this.musicMuted = this.storage?.getItem(MUSIC_MUTED_KEY) === 'true';
+    (['music', 'sfx'] as const).forEach((bus) => {
+      const raw = this.storage?.getItem(LEVEL_STORAGE_KEYS[bus] ?? '');
+      const stored = raw === null || raw === undefined ? Number.NaN : Number(raw);
+      if (Number.isFinite(stored) && stored >= 0) this.levels[bus] = Phaser.Math.Clamp(stored, 0, 1);
+    });
     this.sound.volume = this.levels.master;
     this.sound.on(Phaser.Sound.Events.UNLOCKED, () => this.startDesiredMusic());
     this.bindBrowserUnlock();
@@ -89,8 +98,13 @@ export class AudioManager {
 
   setLevel(bus: AudioBus, level: number): void {
     this.levels[bus] = Phaser.Math.Clamp(level, 0, 1);
+    const storageKey = LEVEL_STORAGE_KEYS[bus];
+    if (storageKey) {
+      try { this.storage?.setItem(storageKey, this.levels[bus].toString()); } catch { /* storage can be unavailable */ }
+    }
     if (bus === 'master') this.sound.volume = this.levels.master;
     if (bus === 'music') this.applyMusicVolume();
+    this.emit();
   }
 
   getLevel(bus: AudioBus): number {

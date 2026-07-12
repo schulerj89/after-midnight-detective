@@ -21,15 +21,20 @@ export interface AlteredLoopPhase {
 }
 
 export const ALTERED_LOOP_PHASES: readonly AlteredLoopPhase[] = [
-  { id: 'reset', durationMs: 220, time: 'ALTERED LOOP', heading: 'RESETTING THE STAGE', caption: 'LIVE OBSERVATION', actorMark: 'windows' },
-  { id: 'establish', durationMs: 1_200, time: '12:08', heading: 'MILES — NORTH WINDOWS', caption: 'His claimed post.', actorMark: 'windows' },
-  { id: 'anticipate', durationMs: 800, time: '12:11', heading: 'MILES LEAVES HIS CLAIMED POST', caption: 'Watch where he goes.', actorMark: 'windows' },
-  { id: 'transit-1', durationMs: 2_600, time: '12:11', heading: 'CENTER AISLE', caption: 'Miles crosses the lounge instead of holding his alibi.', actorMark: 'center-aisle' },
-  { id: 'transit-2', durationMs: 2_600, time: '12:12', heading: 'MANAGER OFFICE', caption: 'The office door becomes his destination.', actorMark: 'office-door' },
-  { id: 'arrived', durationMs: 1_300, time: '12:13', heading: 'MANAGER OFFICE', caption: 'Not the north windows.', actorMark: 'office-door' },
-  { id: 'recorded', durationMs: 2_500, time: 'OBSERVATION RECORDED', heading: 'MILES CHECKED THE OFFICE', caption: 'Added to CASE > TIMELINE.', actorMark: 'office-door', recordsObservation: true },
-  { id: 'released', durationMs: 400, time: 'ALTERED LOOP', heading: 'LIVE OBSERVATION COMPLETE', caption: 'Control restored.', actorMark: 'office-door' },
+  { id: 'reset', durationMs: 300, time: 'ALTERED LOOP', heading: 'RESETTING THE STAGE', caption: 'LIVE OBSERVATION', actorMark: 'windows' },
+  { id: 'establish', durationMs: 2_200, time: '12:08', heading: 'MILES — NORTH WINDOWS', caption: 'His claimed post.', actorMark: 'windows' },
+  { id: 'anticipate', durationMs: 1_800, time: '12:11', heading: 'MILES LEAVES HIS CLAIMED POST', caption: 'Watch where he goes.', actorMark: 'windows' },
+  { id: 'transit-1', durationMs: 3_400, time: '12:11', heading: 'CENTER AISLE', caption: 'Miles crosses the lounge instead of holding his alibi.', actorMark: 'center-aisle' },
+  { id: 'transit-2', durationMs: 3_400, time: '12:12', heading: 'MANAGER OFFICE', caption: 'The office door becomes his destination.', actorMark: 'office-door' },
+  { id: 'arrived', durationMs: 2_200, time: '12:13', heading: 'MANAGER OFFICE', caption: 'Not the north windows.', actorMark: 'office-door' },
+  { id: 'recorded', durationMs: 3_200, time: 'OBSERVATION RECORDED', heading: 'MILES CHECKED THE OFFICE', caption: 'Added to CASE > TIMELINE.', actorMark: 'office-door', recordsObservation: true },
+  { id: 'released', durationMs: 700, time: 'ALTERED LOOP', heading: 'LIVE OBSERVATION COMPLETE', caption: 'Control restored.', actorMark: 'office-door' },
 ] as const;
+
+export const ALTERED_LOOP_TOTAL_DURATION_MS = ALTERED_LOOP_PHASES.reduce(
+  (total, phase) => total + phase.durationMs,
+  0,
+);
 
 export type AlteredLoopRestageStatus = 'idle' | 'playing' | 'completed' | 'ended';
 
@@ -94,4 +99,3 @@ export class AlteredLoopRestage {
     };
   }
 }
-

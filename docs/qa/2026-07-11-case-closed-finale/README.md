@@ -31,7 +31,7 @@ retained solved case.
 
 - Confirming `SKIP` in the reconstruction launches the case-closed scene with
   `caseClosedSolved=true`.
-- An uninterrupted 28-second reconstruction launched the arrest animation, settled
+- An uninterrupted 35.3-second reconstruction launched the arrest animation, settled
   the bars, emitted exactly two flashes, and reached `caseClosedStatus=settled`.
 - The scene retained 23 knowledge flags from entry through return.
 - Enter returned to Exploration with `caseOutcome=solved`, the case board open,

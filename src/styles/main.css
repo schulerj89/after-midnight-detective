@@ -80,6 +80,12 @@ body {
   transform: none;
 }
 
+.title-screen-open #audio-control,
+.title-screen-open #mobile-controls {
+  display: none !important;
+  pointer-events: none;
+}
+
 #game {
   display: grid;
   place-items: center;

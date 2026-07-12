@@ -15,7 +15,7 @@ Run:
 npm run debug:reenact-level-one
 ```
 
-The command verifies the solved unlock, six deterministic beats, 28-second
+The command verifies the solved unlock, six deterministic beats, 35.3-second
 duration, evidence basis for every beat, pause/skip/replay behavior, and all
 screenshot reports. The live debug route is `/?debugReenactment=level-one`.
 

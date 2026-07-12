@@ -207,6 +207,9 @@ music, ambience, dialogue, and SFX buses.
 - In landscape mobile, expand the scene to the full available viewport and layer
   the translucent joystick and action buttons over the lower corners. Controls
   must not reserve black side gutters or reduce the visible play area.
+- Normal play opens on a pixel-noir title card with large `START CASE` and
+  `SETTINGS` choices. Settings remains compact and audio-focused: music mute,
+  music volume, and SFX volume, with choices persisted between sessions.
 
 ## Difficulty and fairness
 

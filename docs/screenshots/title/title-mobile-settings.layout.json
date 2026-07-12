@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "title-mobile-settings", "file": "title-mobile-settings.png", "pose": "title-settings" },
+  "viewport": { "width": 844, "height": 390, "deviceScaleFactor": 1 },
+  "elements": [
+    { "id": "music-toggle", "role": "touch-control", "x": 286.58, "y": 107.25, "width": 270.83, "height": 52, "minWidth": 48, "minHeight": 48 },
+    { "id": "music-volume", "role": "touch-control", "x": 286.58, "y": 166.83, "width": 270.83, "height": 52, "minWidth": 48, "minHeight": 48 },
+    { "id": "sfx-volume", "role": "touch-control", "x": 286.58, "y": 226.42, "width": 270.83, "height": 52, "minWidth": 48, "minHeight": 48 },
+    { "id": "back", "role": "touch-control", "x": 286.58, "y": 291.42, "width": 270.83, "height": 52, "minWidth": 48, "minHeight": 48 }
+  ],
+  "containmentZones": [
+    { "id": "safe-area", "x": 8, "y": 8, "width": 828, "height": 374, "contains": ["music-toggle", "music-volume", "sfx-volume", "back"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "music-toggle", "b": "music-volume" },
+    { "a": "music-volume", "b": "sfx-volume" },
+    { "a": "sfx-volume", "b": "back" }
+  ],
+  "alignmentPairs": [
+    { "a": "music-toggle", "b": "music-volume", "axis": "centerX", "tolerance": 1 },
+    { "a": "music-volume", "b": "sfx-volume", "axis": "centerX", "tolerance": 1 },
+    { "a": "sfx-volume", "b": "back", "axis": "centerX", "tolerance": 1 }
+  ],
+  "expectedPixelActivity": []
+}
+

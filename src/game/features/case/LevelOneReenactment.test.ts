@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { LEVEL_ONE_REENACTMENT_BEATS } from '../../../content/cases/levelOneReenactmentContent';
+import {
+  LEVEL_ONE_REENACTMENT_BEATS,
+  LEVEL_ONE_REENACTMENT_TOTAL_DURATION_MS,
+} from '../../../content/cases/levelOneReenactmentContent';
 import { solveLevelOneCase } from './LevelOneSolutionPath';
 import { LevelOneCaseState } from './LevelOneCaseState';
 import { LevelOneReenactment, validateLevelOneReenactmentBasis } from './LevelOneReenactment';
@@ -13,9 +16,13 @@ describe('LevelOneReenactment', () => {
     const proof = solveLevelOneCase();
     const reenactment = new LevelOneReenactment(proof.state);
     expect(reenactment.start()?.id).toBe(LEVEL_ONE_REENACTMENT_BEATS[0].id);
-    const entered = reenactment.update(30_000).entered.map((beat) => beat.id);
+    const entered = reenactment.update(LEVEL_ONE_REENACTMENT_TOTAL_DURATION_MS).entered.map((beat) => beat.id);
     expect(entered).toEqual(LEVEL_ONE_REENACTMENT_BEATS.slice(1).map((beat) => beat.id));
     expect(reenactment.snapshot().status).toBe('completed');
+  });
+
+  it('holds the solved reconstruction for 35.3 seconds', () => {
+    expect(LEVEL_ONE_REENACTMENT_TOTAL_DURATION_MS).toBe(35_300);
   });
 
   it('pauses, resumes, skips, and counts replay', () => {
