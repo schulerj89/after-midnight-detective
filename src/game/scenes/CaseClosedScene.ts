@@ -2,11 +2,13 @@ import Phaser from 'phaser';
 import { GAME_HEIGHT, GAME_WIDTH, SCENE_KEYS } from '../constants';
 import { CaseClosedFinale } from '../features/case/CaseClosedFinale';
 import { resolveCaseClosedLayout } from '../features/case/CaseClosedLayout';
+import { AUDIO_ASSETS, AUDIO_KEYS, getAudioManager, type AudioManager } from '../systems/audio/AudioManager';
 
 const FONT = '"Press Start 2P", monospace';
 
 export class CaseClosedScene extends Phaser.Scene {
   private finale = new CaseClosedFinale(true, 0);
+  private audio!: AudioManager;
   private prisoner!: Phaser.GameObjects.Container;
   private bars!: Phaser.GameObjects.Container;
   private spotlight!: Phaser.GameObjects.Graphics;
@@ -25,6 +27,8 @@ export class CaseClosedScene extends Phaser.Scene {
 
   create(data?: { solved?: boolean; knowledgeCount?: number }): void {
     const query = new URLSearchParams(window.location.search);
+    this.audio = getAudioManager(this.sound);
+    this.audio.requestMusic(AUDIO_KEYS.music.reconstruction, { loop: false, volume: 0.78 });
     this.qaPose = query.get('qaPose') ?? 'none';
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches || query.get('reducedMotion') === '1';
     const solved = data?.solved ?? (this.qaPose.startsWith('case-closed') || query.get('scene') === SCENE_KEYS.caseClosed);
@@ -150,6 +154,7 @@ export class CaseClosedScene extends Phaser.Scene {
       duration: 760,
       ease: 'Cubic.easeOut',
       onComplete: () => {
+        this.audio.playSfx(AUDIO_KEYS.sfx.bars, { volume: 0.82, throttleMs: 500 });
         this.cameraFlash();
         this.time.delayedCall(720, () => this.cameraFlash());
         this.time.delayedCall(1_050, () => this.finale.settle());
@@ -197,5 +202,16 @@ export class CaseClosedScene extends Phaser.Scene {
     canvas.dataset.caseClosedCellWidth = this.cellWidth.toFixed(1);
     canvas.dataset.caseClosedSpotlightX = this.spotlight?.x.toFixed(1) ?? 'none';
     canvas.dataset.caseClosedSpotlightDelta = this.spotlight && this.prisoner ? Math.abs(this.spotlight.x - this.prisoner.x).toFixed(1) : 'none';
+    canvas.dataset.audioLocked = this.audio.isLocked().toString();
+    canvas.dataset.musicMuted = this.audio.isMusicMuted().toString();
+    canvas.dataset.musicTrack = this.audio.musicKey();
+    canvas.dataset.musicRequestedTrack = this.audio.requestedMusicKey();
+    canvas.dataset.musicPlaying = this.audio.isMusicPlaying().toString();
+    canvas.dataset.musicVolume = this.audio.musicVolume().toFixed(3);
+    canvas.dataset.audioAssetsLoaded = AUDIO_ASSETS.filter((asset) => this.cache.audio.exists(asset.key)).length.toString();
+    canvas.dataset.audioBackend = this.audio.backendName();
+    canvas.dataset.audioContextState = this.audio.contextState();
+    canvas.dataset.lastSfxRequested = this.audio.lastSfxRequested();
+    canvas.dataset.lastSfxPlayed = this.audio.lastSfxPlayed();
   }
 }

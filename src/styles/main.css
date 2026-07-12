@@ -26,6 +26,60 @@ body {
   touch-action: none;
 }
 
+#audio-control {
+  position: fixed;
+  top: max(12px, calc(env(safe-area-inset-top) + 6px));
+  left: 43%;
+  z-index: 16;
+  display: flex;
+  min-width: 108px;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 2px solid rgb(217 207 182 / 46%);
+  border-radius: 4px;
+  color: #d9cfb6;
+  background: rgb(9 10 13 / 82%);
+  box-shadow: 0 5px 16px rgb(0 0 0 / 26%);
+  font-family: 'Press Start 2P', monospace;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+#audio-control span {
+  color: #c7a85b;
+  font-size: 16px;
+  line-height: 1;
+}
+
+#audio-control strong {
+  font-size: 7px;
+  line-height: 1;
+}
+
+#audio-control.is-muted {
+  border-color: rgb(143 36 50 / 68%);
+  color: #817967;
+}
+
+#audio-control.is-muted span {
+  color: #8f2432;
+}
+
+#audio-control:focus-visible,
+#audio-control:hover {
+  border-color: #c7a85b;
+  outline: none;
+}
+
+.case-closed-open #audio-control {
+  right: auto;
+  left: max(14px, calc(env(safe-area-inset-left) + 8px));
+  transform: none;
+}
+
 #game {
   display: grid;
   place-items: center;
@@ -706,6 +760,17 @@ body {
 }
 
 @media (orientation: landscape) and (max-width: 1400px) and (max-height: 600px) {
+  #audio-control {
+    top: max(8px, calc(env(safe-area-inset-top) + 4px));
+    min-width: 98px;
+    min-height: 48px;
+    padding: 6px 8px;
+  }
+
+  #audio-control strong {
+    font-size: 6px;
+  }
+
   #mobile-controls {
     position: fixed;
     inset: 0;
@@ -843,6 +908,10 @@ body {
 }
 
 @media (orientation: portrait) and (max-width: 900px) {
+  #audio-control {
+    display: none;
+  }
+
   #game {
     visibility: hidden;
   }

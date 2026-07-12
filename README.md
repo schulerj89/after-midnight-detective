@@ -30,6 +30,12 @@ Run the geometry-backed screenshot regression checks with Python and Pillow:
 npm run validate:visual
 ```
 
+Validate generated music/SFX assets, payload budget, and audio-manager behavior:
+
+```bash
+npm run validate:audio
+```
+
 The current development build opens into a larger Hotel Marlowe exploration
 sandbox constructed from [`level-1.lvl.txt`](src/content/levels/level-1.lvl.txt).
 Move through its 20x20 lounge, 12x10 kitchen, 8x8 bedroom, and 10x8 manager
@@ -44,6 +50,10 @@ On landscape mobile, drag the little inner knob anywhere inside the translucent
 circular pad for analog movement. A interacts or continues dialogue; B dismisses
 dialogue. The pad is one continuous drag surface with no directional buttons;
 direct touch remains available for people and clues.
+
+The small music control toggles and persists music mute state; keyboard players
+can also press M. Sound effects remain enabled so inspection, doors, movement,
+and the solved-case jail tableau retain tactile feedback.
 
 ## Technology
 

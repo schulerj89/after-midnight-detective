@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "music-control-case-closed-mobile", "file": "music-control-case-closed-mobile.png", "pose": "case-closed" },
+  "viewport": { "deviceScaleFactor": 1, "width": 844, "height": 390 },
+  "elements": [
+    { "id": "music-control", "role": "touch-control", "x": 14, "y": 8, "width": 98, "height": 48 },
+    { "id": "ending-title", "role": "text", "x": 320, "y": 27, "width": 205, "height": 36 },
+    { "id": "jail-cell", "role": "stage", "x": 160, "y": 68, "width": 524, "height": 240 },
+    { "id": "return-to-case", "role": "touch-control", "x": 330, "y": 331, "width": 184, "height": 50 }
+  ],
+  "containmentZones": [
+    { "id": "safe-area", "x": 8, "y": 8, "width": 828, "height": 374, "contains": ["music-control", "ending-title", "jail-cell", "return-to-case"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "music-control", "b": "ending-title" },
+    { "a": "music-control", "b": "jail-cell" }
+  ],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "muted-label", "x": 28, "y": 20, "width": 70, "height": 22, "minLuminance": 3, "maxLuminance": 130, "minVariance": 5, "maxVariance": 9000 }
+  ]
+}

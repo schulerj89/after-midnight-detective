@@ -34,6 +34,7 @@ import { DialogueBox } from '../ui/DialogueBox';
 import { ReenactmentHud } from '../ui/ReenactmentHud';
 import { AlteredLoopHud } from '../ui/AlteredLoopHud';
 import { LEVEL_ONE_REENACTMENT_BEATS, type LevelOneReenactmentBeat, type ReenactmentStageAction } from '../../content/cases/levelOneReenactmentContent';
+import { AUDIO_ASSETS, AUDIO_KEYS, getAudioManager, type AudioManager } from '../systems/audio/AudioManager';
 
 const FONT = '"Press Start 2P", monospace';
 
@@ -56,6 +57,7 @@ export class ExplorationScene extends Phaser.Scene {
   private level!: LevelDefinition;
   private levelGeometry!: LevelGeometry;
   private player!: ExplorationPlayer;
+  private audio!: AudioManager;
   private dialogue!: DialogueBox;
   private caseBoard!: CaseBoard;
   private reenactmentHud!: ReenactmentHud;
@@ -104,6 +106,8 @@ export class ExplorationScene extends Phaser.Scene {
       throw new Error(parsed.errors.map((error) => `Line ${error.line}: ${error.message}`).join('\n'));
     }
     this.level = parsed.level;
+    this.audio = getAudioManager(this.sound);
+    this.audio.requestMusic(AUDIO_KEYS.music.levelOne, { loop: true, volume: 0.72 });
     this.levelGeometry = buildLevelGeometry(this.level);
     this.cameras.main.setBackgroundColor('#090a0d');
     this.cameras.main.setBounds(0, 0, this.levelGeometry.worldWidth, this.levelGeometry.worldHeight);
@@ -136,6 +140,14 @@ export class ExplorationScene extends Phaser.Scene {
     const gated = gateTransitionInput(physicalVector, this.transitionState !== 'idle', interfaceOpen, this.requiresNeutralInput);
     this.requiresNeutralInput = gated.requiresNeutral;
     const vector = gated.vector;
+    if (Math.abs(vector.x) + Math.abs(vector.y) > 0.08) {
+      this.audio.playSfx(AUDIO_KEYS.sfx.movement, {
+        volume: 0.28,
+        rate: 0.96 + Math.random() * 0.08,
+        throttleId: 'movement.player',
+        throttleMs: 520,
+      });
+    }
     this.player.update(vector, delta, this.roomBounds(this.room(this.currentRoomId)), this.obstacles);
     this.checkDoorTransition();
     this.updateTimeline(delta);
@@ -569,6 +581,7 @@ export class ExplorationScene extends Phaser.Scene {
     const beat = this.reenactment.start(beatId);
     if (!beat) return;
     this.caseBoard.close();
+    this.audio.requestMusic(AUDIO_KEYS.music.reconstruction, { loop: false, volume: 0.78 });
     this.setExplorationHudVisible(false);
     document.querySelector<HTMLElement>('#mobile-controls')?.setAttribute('aria-hidden', 'true');
     this.player.gameObject().setVisible(false);
@@ -617,6 +630,7 @@ export class ExplorationScene extends Phaser.Scene {
 
   private returnFromCaseClosed(): void {
     this.scene.resume(SCENE_KEYS.exploration);
+    this.audio.requestMusic(AUDIO_KEYS.music.levelOne, { loop: true, volume: 0.72 });
     document.querySelector<HTMLElement>('#mobile-controls')?.removeAttribute('aria-hidden');
     this.player.gameObject().setVisible(true);
     this.setExplorationHudVisible(true);
@@ -714,6 +728,7 @@ export class ExplorationScene extends Phaser.Scene {
       return;
     }
     const direction = Math.sign(destination.x - this.reenactmentActor.x) || 1;
+    this.audio.playSfx(AUDIO_KEYS.sfx.movement, { volume: 0.28, throttleId: 'movement.reconstruction', throttleMs: 420 });
     this.tweens.add({ targets: this.reenactmentActorBody, y: -4, duration: 220, ease: 'Sine.easeInOut', yoyo: true, repeat: 8 });
     this.tweens.add({
       targets: this.reenactmentActor,
@@ -774,6 +789,11 @@ export class ExplorationScene extends Phaser.Scene {
     const interactable = this.interactables.find((target) => target.id === actorId);
     const travelDistance = Phaser.Math.Distance.Between(root.x, root.y, point.x, point.y);
     const travelDuration = Phaser.Math.Clamp((travelDistance / 480) * 1_000, 700, 3_400);
+    if (travelDistance > 12) this.audio.playSfx(AUDIO_KEYS.sfx.movement, {
+      volume: 0.2,
+      throttleId: `movement.${actorId}`,
+      throttleMs: 420,
+    });
     this.tweens.killTweensOf(root);
     if (body) {
       this.tweens.killTweensOf(body);
@@ -891,6 +911,7 @@ export class ExplorationScene extends Phaser.Scene {
     if (this.dialogue?.isOpen()) return;
     const variant = this.interactionFor(id);
     if (!variant) return;
+    if (id.startsWith('clue.')) this.audio.playSfx(AUDIO_KEYS.sfx.inspect, { volume: 0.75, throttleMs: 250 });
     this.lastInteraction = `opened-${id}`;
     this.dialogue.open(variant.script, (reason) => {
       if (reason === 'completed') {
@@ -1028,6 +1049,7 @@ export class ExplorationScene extends Phaser.Scene {
   private beginRoomTransition(destination: RoomTransitionDestination): void {
     if (this.transitionState !== 'idle') return;
     this.transition = destination;
+    this.audio.playSfx(AUDIO_KEYS.sfx.door, { volume: 0.76, throttleId: 'room-door', throttleMs: 250 });
     this.lastTransition = destination;
     this.transitionState = 'fading-out';
     document.querySelector<HTMLElement>('#mobile-controls')?.classList.add('is-room-transitioning');
@@ -1329,5 +1351,16 @@ export class ExplorationScene extends Phaser.Scene {
     canvas.dataset.alteredLoopObservationRecorded = this.caseState.has('timeline.miles-office-deviation').toString();
     canvas.dataset.alteredLoopReducedMotion = this.reducedMotion.toString();
     canvas.dataset.alteredLoopLastPhase = this.lastAlteredLoopPhase;
+    canvas.dataset.audioLocked = this.audio.isLocked().toString();
+    canvas.dataset.musicMuted = this.audio.isMusicMuted().toString();
+    canvas.dataset.musicTrack = this.audio.musicKey();
+    canvas.dataset.musicRequestedTrack = this.audio.requestedMusicKey();
+    canvas.dataset.musicPlaying = this.audio.isMusicPlaying().toString();
+    canvas.dataset.musicVolume = this.audio.musicVolume().toFixed(3);
+    canvas.dataset.audioAssetsLoaded = AUDIO_ASSETS.filter((asset) => this.cache.audio.exists(asset.key)).length.toString();
+    canvas.dataset.audioBackend = this.audio.backendName();
+    canvas.dataset.audioContextState = this.audio.contextState();
+    canvas.dataset.lastSfxRequested = this.audio.lastSfxRequested();
+    canvas.dataset.lastSfxPlayed = this.audio.lastSfxPlayed();
   }
 }

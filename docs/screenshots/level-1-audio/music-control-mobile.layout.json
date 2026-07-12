@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "music-control-mobile", "file": "music-control-mobile.png", "pose": "exploration-joystick" },
+  "viewport": { "deviceScaleFactor": 1, "width": 844, "height": 390 },
+  "elements": [
+    { "id": "location-hud", "role": "hud", "x": 11, "y": 10, "width": 234, "height": 40 },
+    { "id": "music-control", "role": "touch-control", "x": 314, "y": 8, "width": 98, "height": 48 },
+    { "id": "case-notes", "role": "hud", "x": 457, "y": 10, "width": 224, "height": 40 }
+  ],
+  "containmentZones": [
+    { "id": "safe-area", "x": 8, "y": 8, "width": 828, "height": 374, "contains": ["location-hud", "music-control", "case-notes"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "location-hud", "b": "music-control" },
+    { "a": "music-control", "b": "case-notes" }
+  ],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "music-label", "x": 329, "y": 21, "width": 68, "height": 22, "minLuminance": 5, "maxLuminance": 190, "minVariance": 8, "maxVariance": 9000 }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "provider": "ElevenLabs",
+  "generatedOn": "2026-07-11",
+  "music": [
+    {
+      "id": "music.level-one",
+      "file": "public/assets/audio/music/hotel-marlowe-after-midnight.mp3",
+      "durationMs": 45000,
+      "outputFormat": "mp3_44100_128",
+      "prompt": "Instrumental loopable 1940s noir detective underscore for a rain-soaked hotel mystery at midnight. 72 BPM. Brushed jazz drums, warm upright bass, sparse felt piano, distant muted trumpet phrases, very restrained low strings, smoky intimate room tone. Suspicious and observant rather than frightening. No vocals, no spoken words, no big-band energy, no trailer impacts, no abrupt stingers. Leave generous space for dialogue and subtle sound effects. The final texture and harmony should flow naturally back into the opening for a game loop."
+    },
+    {
+      "id": "music.reconstruction",
+      "file": "public/assets/audio/music/detectives-reconstruction.mp3",
+      "durationMs": 36000,
+      "outputFormat": "mp3_44100_128",
+      "prompt": "Instrumental noir detective reconstruction score for the solved case at Hotel Marlowe. Begin sparse and analytical with felt piano, upright bass, brushed snare and muted trumpet echoes. Gradually assemble the evidence with restrained low strings and a measured pulse, then conclude in a sober minor-to-ambiguous cadence as the suspect is shown behind bars. Serious, elegant, rain-soaked, never heroic or triumphant. No vocals, no spoken words, no trailer braams, no loud percussion. Leave room for captions and metal bar sound effects."
+    }
+  ],
+  "sfx": [
+    {
+      "id": "sfx.inspect",
+      "file": "public/assets/audio/sfx/inspect-clue.mp3",
+      "durationSeconds": 1.0,
+      "outputFormat": "mp3_44100_128",
+      "prompt": "One-shot close-up detective clue inspection: a small paper card shifts, one soft pencil note, and a faint magnifying glass tap on a wooden desk. Restrained, dry, intimate, no music, no voice."
+    },
+    {
+      "id": "sfx.door",
+      "file": "public/assets/audio/sfx/hotel-door.mp3",
+      "durationSeconds": 1.3,
+      "outputFormat": "mp3_44100_128",
+      "postProcessing": "Normalized +8 dB with FFmpeg and re-encoded at 128 kbps for phone-speaker audibility.",
+      "prompt": "One-shot 1940s hotel interior door transition: brass latch clicks, medium wooden door swings, then closes softly with short carpeted hallway reverb. No footsteps, no voice, no music."
+    },
+    {
+      "id": "sfx.bars",
+      "file": "public/assets/audio/sfx/jail-bars.mp3",
+      "durationSeconds": 1.8,
+      "outputFormat": "mp3_44100_128",
+      "prompt": "One-shot heavy iron jail bars descend on a mechanical track and settle with one controlled low metallic clang. Noir police station, weighty but not explosive, no alarm, no voice, no music."
+    },
+    {
+      "id": "sfx.movement",
+      "file": "public/assets/audio/sfx/stage-movement.mp3",
+      "durationSeconds": 0.65,
+      "outputFormat": "mp3_44100_128",
+      "prompt": "One-shot subtle theatrical character movement: soft leather shoe scuff and coat fabric shift across an old hotel carpet and wood floor. Quiet, close, restrained, no walking sequence, no voice, no music."
+    }
+  ]
+}
