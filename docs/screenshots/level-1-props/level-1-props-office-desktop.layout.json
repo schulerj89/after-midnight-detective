@@ -1,0 +1,324 @@
+{
+  "schemaVersion": 1,
+  "screenshot": {
+    "name": "level-1-props-office-desktop",
+    "file": "level-1-props-office-desktop.png",
+    "pose": "level-room-office"
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720,
+    "deviceScaleFactor": 1
+  },
+  "elements": [
+    {
+      "id": "prop.office-safe-sprite",
+      "role": "prop-sprite",
+      "x": 72,
+      "y": 72,
+      "width": 72,
+      "height": 144
+    },
+    {
+      "id": "prop.office-safe-collision",
+      "role": "collision-box",
+      "x": 72,
+      "y": 72,
+      "width": 72,
+      "height": 144
+    },
+    {
+      "id": "prop.office-desk-sprite",
+      "role": "prop-sprite",
+      "x": 144,
+      "y": 144,
+      "width": 288,
+      "height": 144
+    },
+    {
+      "id": "prop.office-desk-collision",
+      "role": "collision-box",
+      "x": 144,
+      "y": 144,
+      "width": 288,
+      "height": 144
+    },
+    {
+      "id": "prop.manager-chair-sprite",
+      "role": "prop-sprite",
+      "x": 144,
+      "y": 72,
+      "width": 72,
+      "height": 72
+    },
+    {
+      "id": "prop.manager-chair-collision",
+      "role": "collision-box",
+      "x": 144,
+      "y": 72,
+      "width": 72,
+      "height": 72
+    },
+    {
+      "id": "prop.switchboard-sprite",
+      "role": "prop-sprite",
+      "x": 504,
+      "y": 72,
+      "width": 144,
+      "height": 72
+    },
+    {
+      "id": "prop.switchboard-collision",
+      "role": "collision-box",
+      "x": 504,
+      "y": 72,
+      "width": 144,
+      "height": 72
+    },
+    {
+      "id": "prop.filing-cabinets-sprite",
+      "role": "prop-sprite",
+      "x": 72,
+      "y": 360,
+      "width": 144,
+      "height": 72
+    },
+    {
+      "id": "prop.filing-cabinets-collision",
+      "role": "collision-box",
+      "x": 72,
+      "y": 360,
+      "width": 144,
+      "height": 72
+    },
+    {
+      "id": "prop.visitor-chair-sprite",
+      "role": "prop-sprite",
+      "x": 288,
+      "y": 360,
+      "width": 72,
+      "height": 72
+    },
+    {
+      "id": "prop.visitor-chair-collision",
+      "role": "collision-box",
+      "x": 288,
+      "y": 360,
+      "width": 72,
+      "height": 72
+    },
+    {
+      "id": "prop.office-coat-stand-sprite",
+      "role": "prop-sprite",
+      "x": 576,
+      "y": 360,
+      "width": 72,
+      "height": 72
+    },
+    {
+      "id": "prop.office-coat-stand-collision",
+      "role": "collision-box",
+      "x": 576,
+      "y": 360,
+      "width": 72,
+      "height": 72
+    }
+  ],
+  "containmentZones": [
+    {
+      "id": "viewport",
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 720,
+      "contains": [
+        "prop.office-safe-sprite",
+        "prop.office-safe-collision",
+        "prop.office-desk-sprite",
+        "prop.office-desk-collision",
+        "prop.manager-chair-sprite",
+        "prop.manager-chair-collision",
+        "prop.switchboard-sprite",
+        "prop.switchboard-collision",
+        "prop.filing-cabinets-sprite",
+        "prop.filing-cabinets-collision",
+        "prop.visitor-chair-sprite",
+        "prop.visitor-chair-collision",
+        "prop.office-coat-stand-sprite",
+        "prop.office-coat-stand-collision"
+      ]
+    }
+  ],
+  "forbiddenOverlaps": [],
+  "alignmentPairs": [
+    {
+      "a": "prop.office-safe-sprite",
+      "b": "prop.office-safe-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.office-safe-sprite",
+      "b": "prop.office-safe-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.office-safe-sprite",
+      "b": "prop.office-safe-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.office-safe-sprite",
+      "b": "prop.office-safe-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.office-desk-sprite",
+      "b": "prop.office-desk-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.office-desk-sprite",
+      "b": "prop.office-desk-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.office-desk-sprite",
+      "b": "prop.office-desk-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.office-desk-sprite",
+      "b": "prop.office-desk-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.manager-chair-sprite",
+      "b": "prop.manager-chair-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.manager-chair-sprite",
+      "b": "prop.manager-chair-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.manager-chair-sprite",
+      "b": "prop.manager-chair-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.manager-chair-sprite",
+      "b": "prop.manager-chair-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.switchboard-sprite",
+      "b": "prop.switchboard-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.switchboard-sprite",
+      "b": "prop.switchboard-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.switchboard-sprite",
+      "b": "prop.switchboard-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.switchboard-sprite",
+      "b": "prop.switchboard-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.filing-cabinets-sprite",
+      "b": "prop.filing-cabinets-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.filing-cabinets-sprite",
+      "b": "prop.filing-cabinets-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.filing-cabinets-sprite",
+      "b": "prop.filing-cabinets-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.filing-cabinets-sprite",
+      "b": "prop.filing-cabinets-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.visitor-chair-sprite",
+      "b": "prop.visitor-chair-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.visitor-chair-sprite",
+      "b": "prop.visitor-chair-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.visitor-chair-sprite",
+      "b": "prop.visitor-chair-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.visitor-chair-sprite",
+      "b": "prop.visitor-chair-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.office-coat-stand-sprite",
+      "b": "prop.office-coat-stand-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.office-coat-stand-sprite",
+      "b": "prop.office-coat-stand-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.office-coat-stand-sprite",
+      "b": "prop.office-coat-stand-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.office-coat-stand-sprite",
+      "b": "prop.office-coat-stand-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    }
+  ],
+  "expectedPixelActivity": []
+}

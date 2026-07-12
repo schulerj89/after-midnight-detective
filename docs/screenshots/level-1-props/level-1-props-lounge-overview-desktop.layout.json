@@ -1,0 +1,366 @@
+{
+  "schemaVersion": 1,
+  "screenshot": {
+    "name": "level-1-props-lounge-overview-desktop",
+    "file": "level-1-props-lounge-overview-desktop.png",
+    "pose": "level-room-lounge-overview"
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720,
+    "deviceScaleFactor": 1
+  },
+  "elements": [
+    {
+      "id": "prop.front-desk-sprite",
+      "role": "prop-sprite",
+      "x": 307.8,
+      "y": 109.8,
+      "width": 108,
+      "height": 43.2
+    },
+    {
+      "id": "prop.front-desk-collision",
+      "role": "collision-box",
+      "x": 307.8,
+      "y": 109.8,
+      "width": 108,
+      "height": 43.2
+    },
+    {
+      "id": "prop.piano-sprite",
+      "role": "prop-sprite",
+      "x": 696.59,
+      "y": 109.8,
+      "width": 86.4,
+      "height": 43.2
+    },
+    {
+      "id": "prop.piano-collision",
+      "role": "collision-box",
+      "x": 696.59,
+      "y": 109.8,
+      "width": 86.4,
+      "height": 43.2
+    },
+    {
+      "id": "prop.west-sofa-sprite",
+      "role": "prop-sprite",
+      "x": 351,
+      "y": 239.4,
+      "width": 86.4,
+      "height": 43.2
+    },
+    {
+      "id": "prop.west-sofa-collision",
+      "role": "collision-box",
+      "x": 351,
+      "y": 239.4,
+      "width": 86.4,
+      "height": 43.2
+    },
+    {
+      "id": "prop.lounge-table-sprite",
+      "role": "prop-sprite",
+      "x": 394.2,
+      "y": 433.8,
+      "width": 43.2,
+      "height": 21.6
+    },
+    {
+      "id": "prop.lounge-table-collision",
+      "role": "collision-box",
+      "x": 394.2,
+      "y": 433.8,
+      "width": 43.2,
+      "height": 21.6
+    },
+    {
+      "id": "prop.east-sofa-sprite",
+      "role": "prop-sprite",
+      "x": 696.59,
+      "y": 477,
+      "width": 86.4,
+      "height": 43.2
+    },
+    {
+      "id": "prop.east-sofa-collision",
+      "role": "collision-box",
+      "x": 696.59,
+      "y": 477,
+      "width": 86.4,
+      "height": 43.2
+    },
+    {
+      "id": "prop.grand-clock-sprite",
+      "role": "prop-sprite",
+      "x": 826.19,
+      "y": 217.8,
+      "width": 21.6,
+      "height": 43.2
+    },
+    {
+      "id": "prop.grand-clock-collision",
+      "role": "collision-box",
+      "x": 826.19,
+      "y": 217.8,
+      "width": 21.6,
+      "height": 43.2
+    },
+    {
+      "id": "prop.coat-rack-sprite",
+      "role": "prop-sprite",
+      "x": 307.8,
+      "y": 541.8,
+      "width": 21.6,
+      "height": 43.2
+    },
+    {
+      "id": "prop.coat-rack-collision",
+      "role": "collision-box",
+      "x": 307.8,
+      "y": 541.8,
+      "width": 21.6,
+      "height": 43.2
+    },
+    {
+      "id": "prop.foreground-screen-sprite",
+      "role": "prop-sprite",
+      "x": 782.99,
+      "y": 585,
+      "width": 43.2,
+      "height": 43.2
+    },
+    {
+      "id": "prop.foreground-screen-collision",
+      "role": "collision-box",
+      "x": 782.99,
+      "y": 585,
+      "width": 43.2,
+      "height": 43.2
+    }
+  ],
+  "containmentZones": [
+    {
+      "id": "viewport",
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 720,
+      "contains": [
+        "prop.front-desk-sprite",
+        "prop.front-desk-collision",
+        "prop.piano-sprite",
+        "prop.piano-collision",
+        "prop.west-sofa-sprite",
+        "prop.west-sofa-collision",
+        "prop.lounge-table-sprite",
+        "prop.lounge-table-collision",
+        "prop.east-sofa-sprite",
+        "prop.east-sofa-collision",
+        "prop.grand-clock-sprite",
+        "prop.grand-clock-collision",
+        "prop.coat-rack-sprite",
+        "prop.coat-rack-collision",
+        "prop.foreground-screen-sprite",
+        "prop.foreground-screen-collision"
+      ]
+    }
+  ],
+  "forbiddenOverlaps": [],
+  "alignmentPairs": [
+    {
+      "a": "prop.front-desk-sprite",
+      "b": "prop.front-desk-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.front-desk-sprite",
+      "b": "prop.front-desk-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.front-desk-sprite",
+      "b": "prop.front-desk-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.front-desk-sprite",
+      "b": "prop.front-desk-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.piano-sprite",
+      "b": "prop.piano-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.piano-sprite",
+      "b": "prop.piano-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.piano-sprite",
+      "b": "prop.piano-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.piano-sprite",
+      "b": "prop.piano-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.west-sofa-sprite",
+      "b": "prop.west-sofa-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.west-sofa-sprite",
+      "b": "prop.west-sofa-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.west-sofa-sprite",
+      "b": "prop.west-sofa-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.west-sofa-sprite",
+      "b": "prop.west-sofa-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.lounge-table-sprite",
+      "b": "prop.lounge-table-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.lounge-table-sprite",
+      "b": "prop.lounge-table-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.lounge-table-sprite",
+      "b": "prop.lounge-table-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.lounge-table-sprite",
+      "b": "prop.lounge-table-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.east-sofa-sprite",
+      "b": "prop.east-sofa-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.east-sofa-sprite",
+      "b": "prop.east-sofa-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.east-sofa-sprite",
+      "b": "prop.east-sofa-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.east-sofa-sprite",
+      "b": "prop.east-sofa-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.grand-clock-sprite",
+      "b": "prop.grand-clock-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.grand-clock-sprite",
+      "b": "prop.grand-clock-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.grand-clock-sprite",
+      "b": "prop.grand-clock-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.grand-clock-sprite",
+      "b": "prop.grand-clock-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.coat-rack-sprite",
+      "b": "prop.coat-rack-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.coat-rack-sprite",
+      "b": "prop.coat-rack-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.coat-rack-sprite",
+      "b": "prop.coat-rack-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.coat-rack-sprite",
+      "b": "prop.coat-rack-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.foreground-screen-sprite",
+      "b": "prop.foreground-screen-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.foreground-screen-sprite",
+      "b": "prop.foreground-screen-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.foreground-screen-sprite",
+      "b": "prop.foreground-screen-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.foreground-screen-sprite",
+      "b": "prop.foreground-screen-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    }
+  ],
+  "expectedPixelActivity": []
+}

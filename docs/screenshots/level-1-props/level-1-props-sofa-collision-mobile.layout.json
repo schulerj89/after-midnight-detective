@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "screenshot": {
+    "name": "level-1-props-sofa-collision-mobile",
+    "file": "level-1-props-sofa-collision-mobile.png",
+    "pose": "level-props-sofa"
+  },
+  "viewport": {
+    "width": 844,
+    "height": 390,
+    "deviceScaleFactor": 1
+  },
+  "elements": [
+    {
+      "id": "prop.east-sofa-sprite",
+      "role": "prop-sprite",
+      "x": 493.01,
+      "y": 156,
+      "width": 156,
+      "height": 78
+    },
+    {
+      "id": "prop.east-sofa-collision",
+      "role": "collision-box",
+      "x": 493.01,
+      "y": 156,
+      "width": 156,
+      "height": 78
+    },
+    {
+      "id": "player-body",
+      "role": "actor-body",
+      "x": 461.59,
+      "y": 206.38,
+      "width": 23.83,
+      "height": 16.25
+    }
+  ],
+  "containmentZones": [
+    {
+      "id": "viewport",
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390,
+      "contains": [
+        "prop.east-sofa-sprite",
+        "prop.east-sofa-collision",
+        "player-body"
+      ]
+    }
+  ],
+  "forbiddenOverlaps": [
+    {
+      "a": "player-body",
+      "b": "prop.east-sofa-collision"
+    }
+  ],
+  "alignmentPairs": [
+    {
+      "a": "prop.east-sofa-sprite",
+      "b": "prop.east-sofa-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.east-sofa-sprite",
+      "b": "prop.east-sofa-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.east-sofa-sprite",
+      "b": "prop.east-sofa-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.east-sofa-sprite",
+      "b": "prop.east-sofa-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    }
+  ],
+  "expectedPixelActivity": [
+    {
+      "id": "sofa-art",
+      "x": 493.01,
+      "y": 156,
+      "width": 156,
+      "height": 78,
+      "minVariance": 10,
+      "maxVariance": 10000
+    }
+  ]
+}

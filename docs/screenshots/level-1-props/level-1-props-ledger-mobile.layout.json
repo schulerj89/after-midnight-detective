@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "screenshot": {
+    "name": "level-1-props-ledger-mobile",
+    "file": "level-1-props-ledger-mobile.png",
+    "pose": "level-props-ledger"
+  },
+  "viewport": {
+    "width": 844,
+    "height": 390,
+    "deviceScaleFactor": 1
+  },
+  "elements": [
+    {
+      "id": "ledger-sprite",
+      "role": "clue-sprite",
+      "x": 404.67,
+      "y": 169,
+      "width": 34.67,
+      "height": 34.67
+    },
+    {
+      "id": "ledger-hit-target",
+      "role": "touch-control",
+      "x": 396,
+      "y": 160.33,
+      "width": 52,
+      "height": 52,
+      "minWidth": 48,
+      "minHeight": 48
+    }
+  ],
+  "containmentZones": [
+    {
+      "id": "viewport",
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390,
+      "contains": [
+        "ledger-sprite",
+        "ledger-hit-target"
+      ]
+    }
+  ],
+  "forbiddenOverlaps": [],
+  "alignmentPairs": [
+    {
+      "a": "ledger-sprite",
+      "b": "ledger-hit-target",
+      "axis": "centerX",
+      "tolerance": 0.5
+    },
+    {
+      "a": "ledger-sprite",
+      "b": "ledger-hit-target",
+      "axis": "centerY",
+      "tolerance": 0.5
+    }
+  ],
+  "expectedPixelActivity": [
+    {
+      "id": "ledger-art",
+      "x": 404.67,
+      "y": 169,
+      "width": 34.67,
+      "height": 34.67,
+      "minVariance": 10,
+      "maxVariance": 10000
+    }
+  ]
+}

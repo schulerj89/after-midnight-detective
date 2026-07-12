@@ -1,6 +1,11 @@
 import Phaser from 'phaser';
 import { GAME_HEIGHT, GAME_WIDTH, SCENE_KEYS } from '../constants';
 import { AUDIO_ASSETS } from '../systems/audio/AudioManager';
+import {
+  LEVEL_ONE_PROP_ATLAS_IMAGE,
+  LEVEL_ONE_PROP_ATLAS_JSON,
+  LEVEL_ONE_PROP_ATLAS_KEY,
+} from '../../content/assets/levelOnePropAtlas';
 
 export class PreloadScene extends Phaser.Scene {
   private loadingText!: Phaser.GameObjects.Text;
@@ -21,6 +26,7 @@ export class PreloadScene extends Phaser.Scene {
       this.loadingText.setText(`The city is holding its breath... ${Math.round(progress * 100)}%`);
     });
     AUDIO_ASSETS.forEach((asset) => this.load.audio(asset.key, asset.path));
+    this.load.atlas(LEVEL_ONE_PROP_ATLAS_KEY, LEVEL_ONE_PROP_ATLAS_IMAGE, LEVEL_ONE_PROP_ATLAS_JSON);
   }
 
   create(): void {

@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "screenshot": {
+    "name": "level-1-props-bedroom-desktop",
+    "file": "level-1-props-bedroom-desktop.png",
+    "pose": "level-room-bedroom"
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720,
+    "deviceScaleFactor": 1
+  },
+  "elements": [
+    {
+      "id": "prop.bed-sprite",
+      "role": "prop-sprite",
+      "x": 72,
+      "y": 72,
+      "width": 216,
+      "height": 216
+    },
+    {
+      "id": "prop.bed-collision",
+      "role": "collision-box",
+      "x": 72,
+      "y": 72,
+      "width": 216,
+      "height": 216
+    },
+    {
+      "id": "prop.nightstand-sprite",
+      "role": "prop-sprite",
+      "x": 288,
+      "y": 144,
+      "width": 72,
+      "height": 72
+    },
+    {
+      "id": "prop.nightstand-collision",
+      "role": "collision-box",
+      "x": 288,
+      "y": 144,
+      "width": 72,
+      "height": 72
+    },
+    {
+      "id": "prop.wardrobe-sprite",
+      "role": "prop-sprite",
+      "x": 432,
+      "y": 72,
+      "width": 72,
+      "height": 144
+    },
+    {
+      "id": "prop.wardrobe-collision",
+      "role": "collision-box",
+      "x": 432,
+      "y": 72,
+      "width": 72,
+      "height": 144
+    },
+    {
+      "id": "prop.luggage-rack-sprite",
+      "role": "prop-sprite",
+      "x": 72,
+      "y": 360,
+      "width": 144,
+      "height": 72
+    },
+    {
+      "id": "prop.luggage-rack-collision",
+      "role": "collision-box",
+      "x": 72,
+      "y": 360,
+      "width": 144,
+      "height": 72
+    },
+    {
+      "id": "prop.bedroom-chair-sprite",
+      "role": "prop-sprite",
+      "x": 432,
+      "y": 360,
+      "width": 72,
+      "height": 72
+    },
+    {
+      "id": "prop.bedroom-chair-collision",
+      "role": "collision-box",
+      "x": 432,
+      "y": 360,
+      "width": 72,
+      "height": 72
+    }
+  ],
+  "containmentZones": [
+    {
+      "id": "viewport",
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 720,
+      "contains": [
+        "prop.bed-sprite",
+        "prop.bed-collision",
+        "prop.nightstand-sprite",
+        "prop.nightstand-collision",
+        "prop.wardrobe-sprite",
+        "prop.wardrobe-collision",
+        "prop.luggage-rack-sprite",
+        "prop.luggage-rack-collision",
+        "prop.bedroom-chair-sprite",
+        "prop.bedroom-chair-collision"
+      ]
+    }
+  ],
+  "forbiddenOverlaps": [],
+  "alignmentPairs": [
+    {
+      "a": "prop.bed-sprite",
+      "b": "prop.bed-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.bed-sprite",
+      "b": "prop.bed-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.bed-sprite",
+      "b": "prop.bed-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.bed-sprite",
+      "b": "prop.bed-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.nightstand-sprite",
+      "b": "prop.nightstand-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.nightstand-sprite",
+      "b": "prop.nightstand-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.nightstand-sprite",
+      "b": "prop.nightstand-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.nightstand-sprite",
+      "b": "prop.nightstand-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.wardrobe-sprite",
+      "b": "prop.wardrobe-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.wardrobe-sprite",
+      "b": "prop.wardrobe-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.wardrobe-sprite",
+      "b": "prop.wardrobe-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.wardrobe-sprite",
+      "b": "prop.wardrobe-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.luggage-rack-sprite",
+      "b": "prop.luggage-rack-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.luggage-rack-sprite",
+      "b": "prop.luggage-rack-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.luggage-rack-sprite",
+      "b": "prop.luggage-rack-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.luggage-rack-sprite",
+      "b": "prop.luggage-rack-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.bedroom-chair-sprite",
+      "b": "prop.bedroom-chair-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.bedroom-chair-sprite",
+      "b": "prop.bedroom-chair-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.bedroom-chair-sprite",
+      "b": "prop.bedroom-chair-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.bedroom-chair-sprite",
+      "b": "prop.bedroom-chair-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    }
+  ],
+  "expectedPixelActivity": []
+}

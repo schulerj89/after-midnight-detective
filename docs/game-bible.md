@@ -258,6 +258,9 @@ motion, and returns to the solved board with its replay control.
   validated text level files rather than embedding them in rendering scenes.
 - Separate canonical timeline events from player-caused variants.
 - Use fixed stage marks with depth, scale, occlusion, and interaction metadata.
+- Render Level 1 furniture and clue art from one named transparent prop atlas,
+  while keeping placement, interaction points, and collision proxies authored
+  exclusively by the text level.
 - Give every clue, statement, topic, event, pose, and stage mark a stable ID.
 - Keep rendering scenes thin; case state belongs in testable domain systems.
 - Treat save data as versioned and support safe migration during development.

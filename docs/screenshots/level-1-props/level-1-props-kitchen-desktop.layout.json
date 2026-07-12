@@ -1,0 +1,282 @@
+{
+  "schemaVersion": 1,
+  "screenshot": {
+    "name": "level-1-props-kitchen-desktop",
+    "file": "level-1-props-kitchen-desktop.png",
+    "pose": "level-room-kitchen"
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720,
+    "deviceScaleFactor": 1
+  },
+  "elements": [
+    {
+      "id": "prop.kitchen-sink-sprite",
+      "role": "prop-sprite",
+      "x": 72,
+      "y": 72,
+      "width": 144,
+      "height": 144
+    },
+    {
+      "id": "prop.kitchen-sink-collision",
+      "role": "collision-box",
+      "x": 72,
+      "y": 72,
+      "width": 144,
+      "height": 144
+    },
+    {
+      "id": "prop.kitchen-counter-sprite",
+      "role": "prop-sprite",
+      "x": 288,
+      "y": 72,
+      "width": 432,
+      "height": 144
+    },
+    {
+      "id": "prop.kitchen-counter-collision",
+      "role": "collision-box",
+      "x": 288,
+      "y": 72,
+      "width": 432,
+      "height": 144
+    },
+    {
+      "id": "prop.kitchen-stove-sprite",
+      "role": "prop-sprite",
+      "x": 720,
+      "y": 72,
+      "width": 72,
+      "height": 216
+    },
+    {
+      "id": "prop.kitchen-stove-collision",
+      "role": "collision-box",
+      "x": 720,
+      "y": 72,
+      "width": 72,
+      "height": 216
+    },
+    {
+      "id": "prop.prep-table-sprite",
+      "role": "prop-sprite",
+      "x": 432,
+      "y": 360,
+      "width": 216,
+      "height": 144
+    },
+    {
+      "id": "prop.prep-table-collision",
+      "role": "collision-box",
+      "x": 432,
+      "y": 360,
+      "width": 216,
+      "height": 144
+    },
+    {
+      "id": "prop.pantry-crates-sprite",
+      "role": "prop-sprite",
+      "x": 72,
+      "y": 504,
+      "width": 216,
+      "height": 72
+    },
+    {
+      "id": "prop.pantry-crates-collision",
+      "role": "collision-box",
+      "x": 72,
+      "y": 504,
+      "width": 216,
+      "height": 72
+    },
+    {
+      "id": "prop.kitchen-bin-sprite",
+      "role": "prop-sprite",
+      "x": 720,
+      "y": 504,
+      "width": 72,
+      "height": 72
+    },
+    {
+      "id": "prop.kitchen-bin-collision",
+      "role": "collision-box",
+      "x": 720,
+      "y": 504,
+      "width": 72,
+      "height": 72
+    }
+  ],
+  "containmentZones": [
+    {
+      "id": "viewport",
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 720,
+      "contains": [
+        "prop.kitchen-sink-sprite",
+        "prop.kitchen-sink-collision",
+        "prop.kitchen-counter-sprite",
+        "prop.kitchen-counter-collision",
+        "prop.kitchen-stove-sprite",
+        "prop.kitchen-stove-collision",
+        "prop.prep-table-sprite",
+        "prop.prep-table-collision",
+        "prop.pantry-crates-sprite",
+        "prop.pantry-crates-collision",
+        "prop.kitchen-bin-sprite",
+        "prop.kitchen-bin-collision"
+      ]
+    }
+  ],
+  "forbiddenOverlaps": [],
+  "alignmentPairs": [
+    {
+      "a": "prop.kitchen-sink-sprite",
+      "b": "prop.kitchen-sink-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-sink-sprite",
+      "b": "prop.kitchen-sink-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-sink-sprite",
+      "b": "prop.kitchen-sink-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-sink-sprite",
+      "b": "prop.kitchen-sink-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-counter-sprite",
+      "b": "prop.kitchen-counter-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-counter-sprite",
+      "b": "prop.kitchen-counter-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-counter-sprite",
+      "b": "prop.kitchen-counter-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-counter-sprite",
+      "b": "prop.kitchen-counter-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-stove-sprite",
+      "b": "prop.kitchen-stove-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-stove-sprite",
+      "b": "prop.kitchen-stove-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-stove-sprite",
+      "b": "prop.kitchen-stove-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-stove-sprite",
+      "b": "prop.kitchen-stove-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.prep-table-sprite",
+      "b": "prop.prep-table-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.prep-table-sprite",
+      "b": "prop.prep-table-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.prep-table-sprite",
+      "b": "prop.prep-table-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.prep-table-sprite",
+      "b": "prop.prep-table-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.pantry-crates-sprite",
+      "b": "prop.pantry-crates-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.pantry-crates-sprite",
+      "b": "prop.pantry-crates-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.pantry-crates-sprite",
+      "b": "prop.pantry-crates-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.pantry-crates-sprite",
+      "b": "prop.pantry-crates-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-bin-sprite",
+      "b": "prop.kitchen-bin-collision",
+      "axis": "left",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-bin-sprite",
+      "b": "prop.kitchen-bin-collision",
+      "axis": "right",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-bin-sprite",
+      "b": "prop.kitchen-bin-collision",
+      "axis": "top",
+      "tolerance": 0.5
+    },
+    {
+      "a": "prop.kitchen-bin-sprite",
+      "b": "prop.kitchen-bin-collision",
+      "axis": "bottom",
+      "tolerance": 0.5
+    }
+  ],
+  "expectedPixelActivity": []
+}

@@ -34,6 +34,12 @@ import { DialogueBox } from '../ui/DialogueBox';
 import { ReenactmentHud } from '../ui/ReenactmentHud';
 import { AlteredLoopHud } from '../ui/AlteredLoopHud';
 import { LEVEL_ONE_REENACTMENT_BEATS, type LevelOneReenactmentBeat, type ReenactmentStageAction } from '../../content/cases/levelOneReenactmentContent';
+import {
+  buildPropRenderPlan,
+  LEVEL_ONE_PROP_ATLAS_DECODED_BYTES,
+  LEVEL_ONE_PROP_ATLAS_KEY,
+  LEVEL_ONE_PROP_FRAMES,
+} from '../../content/assets/levelOnePropAtlas';
 import { AUDIO_ASSETS, AUDIO_KEYS, getAudioManager, type AudioManager } from '../systems/audio/AudioManager';
 
 const FONT = '"Press Start 2P", monospace';
@@ -268,23 +274,18 @@ export class ExplorationScene extends Phaser.Scene {
 
   private addProp(room: LevelRoom, placement: LevelPlacement): void {
     const rect = placementRect(this.level, this.levelGeometry, room, placement);
-    const style = this.propStyle(placement.archetype);
+    const plan = buildPropRenderPlan(this.level, this.levelGeometry, room, placement);
+    if (!plan) return;
     const prop = this.add.container(rect.x, rect.y + rect.height).setDepth(100 + rect.y + rect.height);
     const shadow = this.add.ellipse(rect.width / 2, 2, rect.width + 24, 28, 0x000000, 0.42);
-    const body = this.add.rectangle(rect.width / 2, -rect.height / 2, rect.width, rect.height, style.body, 1).setStrokeStyle(4, 0x39322b, 1);
-    const accent = this.add.rectangle(rect.width / 2, -rect.height + 9, Math.max(12, rect.width - 12), 8, style.accent, 0.58);
-    const name = this.add.text(rect.width / 2, -rect.height / 2, placement.archetype.toUpperCase().replaceAll('-', ' '), { color: '#817967', fontFamily: FONT, fontSize: '9px' }).setOrigin(0.5);
-    prop.add([shadow, body, accent, name]);
+    const sprite = this.textures.exists(LEVEL_ONE_PROP_ATLAS_KEY)
+      ? this.add.image(rect.width / 2, 0, LEVEL_ONE_PROP_ATLAS_KEY, plan.frame)
+        .setOrigin(0.5, 1)
+        .setDisplaySize(rect.width, rect.height)
+      : this.add.rectangle(rect.width / 2, -rect.height / 2, rect.width, rect.height, 0x26211d, 1)
+        .setStrokeStyle(4, 0xc7a85b, 0.5);
+    prop.add([shadow, sprite]);
     this.trackRoomObject(room.id, prop);
-  }
-
-  private propStyle(archetype: string): { body: number; accent: number } {
-    if (archetype.includes('bed')) return { body: 0x321b22, accent: 0x8f2432 };
-    if (archetype.includes('piano')) return { body: 0x101218, accent: 0xd9cfb6 };
-    if (archetype.includes('sofa') || archetype.includes('chair')) return { body: 0x24212a, accent: 0x8f2432 };
-    if (archetype.includes('counter') || archetype.includes('desk')) return { body: 0x26211d, accent: 0xc7a85b };
-    if (archetype.includes('clock') || archetype.includes('switchboard')) return { body: 0x20231f, accent: 0xc7a85b };
-    return { body: 0x201b19, accent: 0x817967 };
   }
 
   private addNpc(room: LevelRoom, placement: LevelPlacement): void {
@@ -306,12 +307,19 @@ export class ExplorationScene extends Phaser.Scene {
 
   private addClue(room: LevelRoom, placement: LevelPlacement): void {
     const point = levelPoint(this.level, this.levelGeometry, room, placement.x, placement.y);
+    const plan = buildPropRenderPlan(this.level, this.levelGeometry, room, placement);
+    if (!plan) return;
     const clue = this.add.container(point.x, point.y).setDepth(100 + point.y);
     const halo = this.add.ellipse(0, 0, 62, 24, 0xc7a85b, 0.13);
-    const clueColor = placement.archetype === 'wet-footprints' ? 0x718293 : placement.archetype === 'stopped-watch' ? 0xc7a85b : 0x8f2432;
-    const marker = this.add.rectangle(0, -7, 42, 30, clueColor, 1).setRotation(-0.14).setStrokeStyle(2, 0xd9cfb6, 0.62).setInteractive({ useHandCursor: true });
-    clue.add([halo, marker]);
-    marker.on('pointerdown', () => {
+    const marker = this.textures.exists(LEVEL_ONE_PROP_ATLAS_KEY)
+      ? this.add.image(0, -16, LEVEL_ONE_PROP_ATLAS_KEY, plan.frame)
+        .setDisplaySize(plan.visualRect.width, plan.visualRect.height)
+      : this.add.rectangle(0, -16, plan.visualRect.width, plan.visualRect.height, 0x8f2432, 1)
+        .setStrokeStyle(2, 0xd9cfb6, 0.62);
+    const hitTarget = this.add.rectangle(0, -16, 96, 96, 0xffffff, 0.001)
+      .setInteractive({ useHandCursor: true });
+    clue.add([halo, marker, hitTarget]);
+    hitTarget.on('pointerdown', () => {
       if (!this.isAlteredLoopRestageActive() && !this.isReenactmentActive() && this.currentRoomId === room.id && this.transitionState === 'idle') this.openDialogue(placement.id);
     });
     this.trackRoomObject(room.id, clue);
@@ -1207,6 +1215,23 @@ export class ExplorationScene extends Phaser.Scene {
         this.lastInteraction = 'qa-pose-level-room-lounge-overview';
       }
     }
+    if (pose === 'level-props-sofa') {
+      const room = this.room('lounge');
+      const sofa = room.placements.find((placement) => placement.id === 'prop.east-sofa');
+      if (sofa) {
+        this.activateRoom(room.id);
+        const playerPoint = levelPoint(this.level, this.levelGeometry, room, sofa.x - 1, sofa.y + 1);
+        const sofaCenter = levelPoint(this.level, this.levelGeometry, room, sofa.x + sofa.width / 2 - 0.5, sofa.y + sofa.height / 2 - 0.5);
+        this.player.setPosition(playerPoint.x, playerPoint.y);
+        this.cameras.main.stopFollow();
+        this.cameras.main.centerOn(sofaCenter.x, sofaCenter.y);
+        this.lastInteraction = 'qa-pose-level-props-sofa';
+      }
+    }
+    if (pose === 'level-props-ledger') {
+      this.centerQaCameraOnPlacement('clue.torn-ledger');
+      this.lastInteraction = 'qa-pose-level-props-ledger';
+    }
     const roomPose = pose?.startsWith('level-room-') ? pose.slice('level-room-'.length) : undefined;
     if (roomPose) {
       const room = this.level.rooms.find((candidate) => candidate.id === roomPose);
@@ -1304,6 +1329,11 @@ export class ExplorationScene extends Phaser.Scene {
     canvas.dataset.levelId = this.level.id;
     canvas.dataset.roomId = this.currentRoomId;
     canvas.dataset.roomCount = this.level.rooms.length.toString();
+    canvas.dataset.propAtlasLoaded = this.textures.exists(LEVEL_ONE_PROP_ATLAS_KEY).toString();
+    canvas.dataset.propAtlasFrameCount = LEVEL_ONE_PROP_FRAMES.length.toString();
+    canvas.dataset.propAtlasDecodedBytes = LEVEL_ONE_PROP_ATLAS_DECODED_BYTES.toString();
+    canvas.dataset.textureCount = this.textures.getTextureKeys().length.toString();
+    canvas.dataset.actualFps = this.game.loop.actualFps.toFixed(1);
     canvas.dataset.activeRoomCount = [...this.roomObjects.values()].filter((objects) => objects.some((object) => object.active)).length.toString();
     canvas.dataset.transitionState = this.transitionState;
     canvas.dataset.transitionLinkId = this.transition?.linkId ?? 'none';
@@ -1313,6 +1343,10 @@ export class ExplorationScene extends Phaser.Scene {
     canvas.dataset.lastTransitionFromRoom = this.lastTransition?.fromRoomId ?? 'none';
     canvas.dataset.lastTransitionToRoom = this.lastTransition?.toRoomId ?? 'none';
     const activeRoom = this.room(this.currentRoomId);
+    canvas.dataset.activePropLayout = JSON.stringify(activeRoom.placements
+      .filter((placement) => placement.kind !== 'actor')
+      .map((placement) => buildPropRenderPlan(this.level, this.levelGeometry, activeRoom, placement))
+      .filter((plan) => plan !== null));
     canvas.dataset.playerLocalX = (Math.floor((position.x - this.levelGeometry.offsetX) / this.level.tileSize) - activeRoom.originX).toString();
     canvas.dataset.playerLocalY = (Math.floor((position.y - this.levelGeometry.offsetY) / this.level.tileSize) - activeRoom.originY).toString();
     canvas.dataset.inputLocked = (this.transitionState !== 'idle' || this.requiresNeutralInput || this.isReenactmentActive() || this.isAlteredLoopRestageActive()).toString();
@@ -1325,6 +1359,9 @@ export class ExplorationScene extends Phaser.Scene {
     canvas.dataset.inputY = vector.y.toFixed(2);
     canvas.dataset.cameraX = camera.x.toFixed(1);
     canvas.dataset.cameraY = camera.y.toFixed(1);
+    canvas.dataset.cameraZoom = this.cameras.main.zoom.toFixed(3);
+    canvas.dataset.cameraWorldWidth = camera.width.toFixed(1);
+    canvas.dataset.cameraWorldHeight = camera.height.toFixed(1);
     canvas.dataset.nearestTarget = this.nearestInteractable()?.id ?? 'none';
     canvas.dataset.dialogue = this.dialogue.snapshot().scriptId ?? 'closed';
     canvas.dataset.lastInteraction = this.lastInteraction;
