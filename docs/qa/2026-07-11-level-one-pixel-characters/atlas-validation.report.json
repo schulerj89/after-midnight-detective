@@ -1,0 +1,56 @@
+{
+  "status": "pass",
+  "atlasSize": [
+    1792,
+    720
+  ],
+  "frameCount": 20,
+  "decodedBytes": 5160960,
+  "metrics": {
+    "detective": {
+      "topRange": [
+        12,
+        12
+      ],
+      "bottomRange": [
+        276,
+        276
+      ],
+      "opaqueColorCount": 24
+    },
+    "vera": {
+      "topRange": [
+        12,
+        12
+      ],
+      "bottomRange": [
+        276,
+        276
+      ],
+      "opaqueColorCount": 24
+    },
+    "miles": {
+      "topRange": [
+        12,
+        12
+      ],
+      "bottomRange": [
+        276,
+        276
+      ],
+      "opaqueColorCount": 24
+    },
+    "officer": {
+      "topRange": [
+        12,
+        24
+      ],
+      "bottomRange": [
+        276,
+        276
+      ],
+      "opaqueColorCount": 24
+    }
+  },
+  "failures": []
+}

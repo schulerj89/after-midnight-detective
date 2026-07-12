@@ -27,9 +27,10 @@ export class ExplorationPlayer {
     x: number,
     y: number,
     textureKey: string,
+    frame?: string,
   ) {
     this.shadow = scene.add.ellipse(0, 0, 78, 18, 0x000000, 0.5);
-    this.body = scene.add.image(0, 0, textureKey).setOrigin(0.5, 1).setScale(EXPLORATION_CHARACTER_SCALE);
+    this.body = scene.add.image(0, 0, textureKey, frame).setOrigin(0.5, 1).setScale(EXPLORATION_CHARACTER_SCALE);
     this.root = scene.add.container(x, y, [this.shadow, this.body]);
     this.updateDepth();
   }
@@ -83,6 +84,14 @@ export class ExplorationPlayer {
   setPosition(x: number, y: number): void {
     this.root.setPosition(x, y);
     this.updateDepth();
+  }
+
+  setFrame(frame: string): void {
+    this.body.setFrame(frame);
+  }
+
+  frameName(): string {
+    return this.body.frame.name;
   }
 
   snapshot(): ExplorationPlayerSnapshot {

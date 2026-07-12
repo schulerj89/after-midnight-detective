@@ -1,0 +1,415 @@
+{
+  "frames": {
+    "detective-neutral": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "detective-speaking": {
+      "frame": {
+        "x": 224,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "detective-suspicious": {
+      "frame": {
+        "x": 448,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "detective-alarmed": {
+      "frame": {
+        "x": 672,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "vera-neutral": {
+      "frame": {
+        "x": 896,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "vera-speaking": {
+      "frame": {
+        "x": 1120,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "vera-suspicious": {
+      "frame": {
+        "x": 1344,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "vera-alarmed": {
+      "frame": {
+        "x": 1568,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "miles-neutral": {
+      "frame": {
+        "x": 0,
+        "y": 280,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "miles-speaking": {
+      "frame": {
+        "x": 224,
+        "y": 280,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "miles-suspicious": {
+      "frame": {
+        "x": 448,
+        "y": 280,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "miles-alarmed": {
+      "frame": {
+        "x": 672,
+        "y": 280,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "officer-neutral": {
+      "frame": {
+        "x": 896,
+        "y": 280,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "officer-speaking": {
+      "frame": {
+        "x": 1120,
+        "y": 280,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "officer-suspicious": {
+      "frame": {
+        "x": 1344,
+        "y": 280,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "officer-alarmed": {
+      "frame": {
+        "x": 1568,
+        "y": 280,
+        "w": 224,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 280
+      }
+    },
+    "portrait-detective": {
+      "frame": {
+        "x": 0,
+        "y": 560,
+        "w": 160,
+        "h": 160
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 160
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 160
+      }
+    },
+    "portrait-vera": {
+      "frame": {
+        "x": 160,
+        "y": 560,
+        "w": 160,
+        "h": 160
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 160
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 160
+      }
+    },
+    "portrait-miles": {
+      "frame": {
+        "x": 320,
+        "y": 560,
+        "w": 160,
+        "h": 160
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 160
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 160
+      }
+    },
+    "portrait-officer": {
+      "frame": {
+        "x": 480,
+        "y": 560,
+        "w": 160,
+        "h": 160
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 160
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 160
+      }
+    }
+  },
+  "meta": {
+    "app": "after-midnight-detective character atlas builder",
+    "version": "1.0",
+    "image": "level-one-characters-atlas.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 1792,
+      "h": 720
+    },
+    "scale": "1"
+  }
+}

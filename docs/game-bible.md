@@ -155,6 +155,9 @@ a general decoration color.
   shapes over realistic rendering.
 - Present characters as full-body transparent cutouts with a consistent camera
   height, light direction, edge treatment, and foot line.
+- Render the Level 1 cast as hard-edged pixel cutouts from one shared atlas. The
+  detective uses the selected long-coat gumshoe design; Miles is a narrow night
+  porter, Vera an angular hotel manager, and Hale a broad blue-gray officer.
 - Use foreground furniture, door frames, curtains, and counters to occasionally
   hide feet and reinforce the miniature-stage illusion.
 - Keep interactive objects readable through composition and restrained response,
@@ -178,6 +181,10 @@ intentional theatrical convention:
 5. Keep a soft oval contact shadow beneath the character.
 6. Swap static poses at motivated beats rather than continuously animating limbs.
 7. Use foreground occlusion to sell depth and soften foot sliding.
+
+Level 1 uses four planted pose families—neutral, speaking/inspect, suspicious/
+guarded, and alarmed/finale. Pose changes happen at dialogue, altered-loop, and
+reconstruction beats; they are not movement frames or walk animations.
 
 Player-directed movement may travel on both X and Y while retaining the same
 lean, bob, shadow, and pose language. Movement timing should communicate character: hurried, hesitant, controlled,

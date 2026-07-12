@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "character-miles-dialogue-mobile", "file": "character-miles-dialogue-mobile.png", "pose": "case-miles-ledger" },
+  "viewport": { "width": 844, "height": 390, "deviceScaleFactor": 1 },
+  "elements": [
+    { "id": "miles-world", "role": "actor-body", "x": 603, "y": 100, "width": 31, "height": 52 },
+    { "id": "miles-portrait", "role": "dialogue-portrait", "x": 84, "y": 262, "width": 83, "height": 86 },
+    { "id": "dialogue-copy", "role": "dialogue-text", "x": 178, "y": 281, "width": 388, "height": 49 }
+  ],
+  "containmentZones": [
+    { "id": "viewport", "x": 8, "y": 8, "width": 828, "height": 374, "contains": ["miles-world", "miles-portrait", "dialogue-copy"] }
+  ],
+  "forbiddenOverlaps": [{ "a": "miles-portrait", "b": "dialogue-copy" }],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "portrait-pixels", "x": 84, "y": 262, "width": 83, "height": 86, "minVariance": 20, "maxVariance": 10000 }
+  ]
+}

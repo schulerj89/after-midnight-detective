@@ -11,6 +11,11 @@ import {
   LEVEL_ONE_ROOM_TEXTURE_JSON,
   LEVEL_ONE_ROOM_TEXTURE_KEY,
 } from '../../content/assets/levelOneRoomTextures';
+import {
+  LEVEL_ONE_CHARACTER_ATLAS_IMAGE,
+  LEVEL_ONE_CHARACTER_ATLAS_JSON,
+  LEVEL_ONE_CHARACTER_ATLAS_KEY,
+} from '../../content/assets/levelOneCharacterAtlas';
 
 export class PreloadScene extends Phaser.Scene {
   private loadingText!: Phaser.GameObjects.Text;
@@ -33,9 +38,13 @@ export class PreloadScene extends Phaser.Scene {
     AUDIO_ASSETS.forEach((asset) => this.load.audio(asset.key, asset.path));
     this.load.atlas(LEVEL_ONE_PROP_ATLAS_KEY, LEVEL_ONE_PROP_ATLAS_IMAGE, LEVEL_ONE_PROP_ATLAS_JSON);
     this.load.atlas(LEVEL_ONE_ROOM_TEXTURE_KEY, LEVEL_ONE_ROOM_TEXTURE_IMAGE, LEVEL_ONE_ROOM_TEXTURE_JSON);
+    this.load.atlas(LEVEL_ONE_CHARACTER_ATLAS_KEY, LEVEL_ONE_CHARACTER_ATLAS_IMAGE, LEVEL_ONE_CHARACTER_ATLAS_JSON);
   }
 
   create(): void {
+    if (this.textures.exists(LEVEL_ONE_CHARACTER_ATLAS_KEY)) {
+      this.textures.get(LEVEL_ONE_CHARACTER_ATLAS_KEY).setFilter(Phaser.Textures.FilterMode.NEAREST);
+    }
     this.loadingText.setText('The city is holding its breath...');
     this.tweens.add({
       targets: this.loadingText,

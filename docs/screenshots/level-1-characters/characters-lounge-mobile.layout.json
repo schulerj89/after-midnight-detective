@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "characters-lounge-mobile", "file": "characters-lounge-mobile.png", "pose": "level-room-lounge" },
+  "viewport": { "width": 844, "height": 390, "deviceScaleFactor": 1 },
+  "elements": [
+    { "id": "detective", "role": "actor-body", "x": 402, "y": 99, "width": 38, "height": 99 },
+    { "id": "officer", "role": "actor-body", "x": 678, "y": 205, "width": 35, "height": 78 }
+  ],
+  "containmentZones": [
+    { "id": "play-area", "x": 8, "y": 72, "width": 828, "height": 310, "contains": ["detective", "officer"] }
+  ],
+  "forbiddenOverlaps": [],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "detective-pixels", "x": 402, "y": 99, "width": 38, "height": 99, "minVariance": 12, "maxVariance": 10000 },
+    { "id": "officer-pixels", "x": 678, "y": 205, "width": 35, "height": 78, "minVariance": 12, "maxVariance": 10000 }
+  ]
+}

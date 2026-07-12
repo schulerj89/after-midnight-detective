@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "character-miles-custody-mobile", "file": "character-miles-custody-mobile.png", "pose": "case-closed-arrest" },
+  "viewport": { "width": 844, "height": 390, "deviceScaleFactor": 1 },
+  "elements": [
+    { "id": "miles-prisoner", "role": "actor-body", "x": 394, "y": 152, "width": 48, "height": 140 },
+    { "id": "cell", "role": "foreground-frame", "x": 159, "y": 67, "width": 525, "height": 241 }
+  ],
+  "containmentZones": [
+    { "id": "viewport", "x": 8, "y": 8, "width": 828, "height": 374, "contains": ["miles-prisoner", "cell"] },
+    { "id": "cell-interior", "x": 170, "y": 84, "width": 503, "height": 210, "contains": ["miles-prisoner"] }
+  ],
+  "forbiddenOverlaps": [],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "prisoner-pixels", "x": 394, "y": 152, "width": 48, "height": 140, "minVariance": 12, "maxVariance": 10000 }
+  ]
+}

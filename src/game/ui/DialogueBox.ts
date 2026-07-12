@@ -3,6 +3,7 @@ import {
   DialogueModel,
   type DialogueScript,
 } from '../features/dialogue/DialogueModel';
+import { LEVEL_ONE_CHARACTER_ATLAS_KEY } from '../../content/assets/levelOneCharacterAtlas';
 
 const FONT = '"Press Start 2P", monospace';
 export type DialogueCloseReason = 'completed' | 'dismissed';
@@ -16,7 +17,7 @@ export class DialogueBox {
   private readonly prompt: Phaser.GameObjects.Text;
   private onClosed?: (reason: DialogueCloseReason) => void;
 
-  constructor(scene: Phaser.Scene) {
+  constructor(private readonly scene: Phaser.Scene) {
     const panel = scene.add.graphics();
     panel.fillStyle(0x090a0d, 0.97);
     panel.fillRoundedRect(0, 0, 1176, 210, 8);
@@ -101,7 +102,12 @@ export class DialogueBox {
       return;
     }
 
-    this.portrait.setTexture(snapshot.portraitKey).setDisplaySize(158, 158);
+    if (this.scene.textures.exists(LEVEL_ONE_CHARACTER_ATLAS_KEY)
+      && this.scene.textures.get(LEVEL_ONE_CHARACTER_ATLAS_KEY).has(snapshot.portraitKey)) {
+      this.portrait.setTexture(LEVEL_ONE_CHARACTER_ATLAS_KEY, snapshot.portraitKey).setDisplaySize(158, 158);
+    } else {
+      this.portrait.setTexture(snapshot.portraitKey).setDisplaySize(158, 158);
+    }
     this.speaker.setText(snapshot.speaker ?? '');
     this.body.setText(snapshot.text ?? '');
     this.prompt.setText(snapshot.pageIndex < snapshot.pageCount - 1 ? '▼' : '■');

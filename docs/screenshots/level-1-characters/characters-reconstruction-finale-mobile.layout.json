@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "characters-reconstruction-finale-mobile", "file": "characters-reconstruction-finale-mobile.png", "pose": "reenactment-finale" },
+  "viewport": { "width": 844, "height": 390, "deviceScaleFactor": 1 },
+  "elements": [
+    { "id": "miles-caught", "role": "actor-body", "x": 392, "y": 118, "width": 31, "height": 80 },
+    { "id": "officer-arrest", "role": "actor-body", "x": 459, "y": 114, "width": 61, "height": 85 },
+    { "id": "reconstruction-card", "role": "cinematic-caption", "x": 8, "y": 308, "width": 828, "height": 74 }
+  ],
+  "containmentZones": [
+    { "id": "viewport", "x": 8, "y": 8, "width": 828, "height": 374, "contains": ["miles-caught", "officer-arrest", "reconstruction-card"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "miles-caught", "b": "officer-arrest" },
+    { "a": "miles-caught", "b": "reconstruction-card" },
+    { "a": "officer-arrest", "b": "reconstruction-card" }
+  ],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "finale-cast", "x": 386, "y": 108, "width": 140, "height": 98, "minVariance": 12, "maxVariance": 10000 }
+  ]
+}

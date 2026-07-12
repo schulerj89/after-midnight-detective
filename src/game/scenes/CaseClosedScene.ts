@@ -3,6 +3,7 @@ import { GAME_HEIGHT, GAME_WIDTH, SCENE_KEYS } from '../constants';
 import { CaseClosedFinale } from '../features/case/CaseClosedFinale';
 import { resolveCaseClosedLayout } from '../features/case/CaseClosedLayout';
 import { AUDIO_ASSETS, AUDIO_KEYS, getAudioManager, type AudioManager } from '../systems/audio/AudioManager';
+import { LEVEL_ONE_CHARACTER_ATLAS_KEY, levelOneCharacterFrame } from '../../content/assets/levelOneCharacterAtlas';
 
 const FONT = '"Press Start 2P", monospace';
 
@@ -113,6 +114,12 @@ export class CaseClosedScene extends Phaser.Scene {
 
   private createPrisoner(x: number, y: number): Phaser.GameObjects.Container {
     const shadow = this.add.ellipse(0, 0, 112, 25, 0x000000, 0.72);
+    if (this.textures.exists(LEVEL_ONE_CHARACTER_ATLAS_KEY)) {
+      const body = this.add.image(0, 0, LEVEL_ONE_CHARACTER_ATLAS_KEY, levelOneCharacterFrame('miles', 'alarmed'))
+        .setOrigin(0.5, 1)
+        .setScale(0.95);
+      return this.add.container(x, y, [shadow, body]);
+    }
     const body = this.add.graphics();
     body.fillStyle(0xd0b69f, 1).fillCircle(0, -224, 32);
     body.fillStyle(0x090a0d, 1).fillRoundedRect(-28, -252, 56, 25, 12);
@@ -202,6 +209,8 @@ export class CaseClosedScene extends Phaser.Scene {
     canvas.dataset.caseClosedCellWidth = this.cellWidth.toFixed(1);
     canvas.dataset.caseClosedSpotlightX = this.spotlight?.x.toFixed(1) ?? 'none';
     canvas.dataset.caseClosedSpotlightDelta = this.spotlight && this.prisoner ? Math.abs(this.spotlight.x - this.prisoner.x).toFixed(1) : 'none';
+    canvas.dataset.characterAtlasLoaded = this.textures.exists(LEVEL_ONE_CHARACTER_ATLAS_KEY).toString();
+    canvas.dataset.caseClosedPrisonerFrame = levelOneCharacterFrame('miles', 'alarmed');
     canvas.dataset.audioLocked = this.audio.isLocked().toString();
     canvas.dataset.musicMuted = this.audio.isMusicMuted().toString();
     canvas.dataset.musicTrack = this.audio.musicKey();

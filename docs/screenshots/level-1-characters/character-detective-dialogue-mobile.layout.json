@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "character-detective-dialogue-mobile", "file": "character-detective-dialogue-mobile.png", "pose": "case-ledger-inspection" },
+  "viewport": { "width": 844, "height": 390, "deviceScaleFactor": 1 },
+  "elements": [
+    { "id": "detective-portrait", "role": "dialogue-portrait", "x": 84, "y": 262, "width": 83, "height": 86 },
+    { "id": "dialogue-copy", "role": "dialogue-text", "x": 178, "y": 281, "width": 410, "height": 50 }
+  ],
+  "containmentZones": [
+    { "id": "viewport", "x": 8, "y": 8, "width": 828, "height": 374, "contains": ["detective-portrait", "dialogue-copy"] }
+  ],
+  "forbiddenOverlaps": [{ "a": "detective-portrait", "b": "dialogue-copy" }],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "portrait-pixels", "x": 84, "y": 262, "width": 83, "height": 86, "minVariance": 20, "maxVariance": 10000 }
+  ]
+}

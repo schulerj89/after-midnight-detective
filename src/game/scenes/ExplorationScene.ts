@@ -46,6 +46,15 @@ import {
   LEVEL_ONE_ROOM_TEXTURE_KEY,
   levelOneRoomTextureFrame,
 } from '../../content/assets/levelOneRoomTextures';
+import {
+  LEVEL_ONE_CHARACTER_ATLAS_DECODED_BYTES,
+  LEVEL_ONE_CHARACTER_ATLAS_KEY,
+  LEVEL_ONE_CHARACTER_FRAMES,
+  LEVEL_ONE_CHARACTER_PORTRAITS,
+  levelOneCharacterFrame,
+  type LevelOneCharacterId,
+  type LevelOneCharacterPose,
+} from '../../content/assets/levelOneCharacterAtlas';
 import { AUDIO_ASSETS, AUDIO_KEYS, getAudioManager, type AudioManager } from '../systems/audio/AudioManager';
 
 const FONT = '"Press Start 2P", monospace';
@@ -79,6 +88,7 @@ export class ExplorationScene extends Phaser.Scene {
   private reenactmentActor!: Phaser.GameObjects.Container;
   private reenactmentActorBody!: Phaser.GameObjects.Image;
   private reenactmentOfficer!: Phaser.GameObjects.Container;
+  private reenactmentOfficerBody!: Phaser.GameObjects.Image;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<'up' | 'down' | 'left' | 'right', Phaser.Input.Keyboard.Key>;
   private mobileVector: MobileMoveVector = { x: 0, y: 0 };
@@ -143,7 +153,9 @@ export class ExplorationScene extends Phaser.Scene {
     this.currentRoomId = startRoom.id;
     this.activateRoom(startRoom.id);
     const start = levelPoint(this.level, this.levelGeometry, startRoom, this.level.start.x, this.level.start.y);
-    this.player = new ExplorationPlayer(this, start.x, start.y, 'exploration-detective');
+    this.player = this.textures.exists(LEVEL_ONE_CHARACTER_ATLAS_KEY)
+      ? new ExplorationPlayer(this, start.x, start.y, LEVEL_ONE_CHARACTER_ATLAS_KEY, levelOneCharacterFrame('detective', 'neutral'))
+      : new ExplorationPlayer(this, start.x, start.y, 'exploration-detective');
     this.createReenactmentActors();
     this.setCameraForRoom(startRoom);
     this.dialogue = new DialogueBox(this);
@@ -331,7 +343,10 @@ export class ExplorationScene extends Phaser.Scene {
     const texture = `exploration-${placement.archetype}`;
     const root = this.add.container(point.x, point.y).setDepth(100 + point.y);
     const shadow = this.add.ellipse(0, 0, 80, 19, 0x000000, 0.5);
-    const body = this.add.image(0, 0, texture).setOrigin(0.5, 1).setScale(EXPLORATION_CHARACTER_SCALE);
+    const character = placement.archetype as LevelOneCharacterId;
+    const body = this.textures.exists(LEVEL_ONE_CHARACTER_ATLAS_KEY)
+      ? this.add.image(0, 0, LEVEL_ONE_CHARACTER_ATLAS_KEY, levelOneCharacterFrame(character, 'neutral')).setOrigin(0.5, 1).setScale(EXPLORATION_CHARACTER_SCALE)
+      : this.add.image(0, 0, texture).setOrigin(0.5, 1).setScale(EXPLORATION_CHARACTER_SCALE);
     const hitTarget = this.add.rectangle(0, -100, 96, 210, 0xffffff, 0.001).setInteractive({ useHandCursor: true });
     root.add([shadow, body, hitTarget]);
     this.npcRoots.set(placement.id, root);
@@ -402,16 +417,20 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private createReenactmentActors(): void {
-    const actor = (texture: string) => {
+    const actor = (character: 'miles' | 'officer', texture: string) => {
       const shadow = this.add.ellipse(0, 0, 80, 19, 0x000000, 0.58);
-      const body = this.add.image(0, 0, texture).setOrigin(0.5, 1).setScale(EXPLORATION_CHARACTER_SCALE);
+      const body = this.textures.exists(LEVEL_ONE_CHARACTER_ATLAS_KEY)
+        ? this.add.image(0, 0, LEVEL_ONE_CHARACTER_ATLAS_KEY, levelOneCharacterFrame(character, 'neutral')).setOrigin(0.5, 1).setScale(EXPLORATION_CHARACTER_SCALE)
+        : this.add.image(0, 0, texture).setOrigin(0.5, 1).setScale(EXPLORATION_CHARACTER_SCALE);
       const root = this.add.container(0, 0, [shadow, body]).setVisible(false);
       return { root, body };
     };
-    const miles = actor('exploration-miles');
+    const miles = actor('miles', 'exploration-miles');
     this.reenactmentActor = miles.root;
     this.reenactmentActorBody = miles.body;
-    this.reenactmentOfficer = actor('exploration-officer').root;
+    const officer = actor('officer', 'exploration-officer');
+    this.reenactmentOfficer = officer.root;
+    this.reenactmentOfficerBody = officer.body;
   }
 
   private createReenactmentHud(): void {
@@ -468,6 +487,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.player.gameObject().setVisible(false);
     document.querySelector<HTMLElement>('#mobile-controls')?.setAttribute('aria-hidden', 'true');
     this.setNpcAtAlteredLoopMark('npc.miles', 'windows');
+    this.setNpcPose('npc.miles', 'neutral');
     this.moveNpcToMark('npc.vera', 'desk');
     this.drawAlteredLoopRoute();
     this.alteredLoopRoute.setVisible(false);
@@ -490,27 +510,33 @@ export class ExplorationScene extends Phaser.Scene {
     if (!miles) return;
 
     if (phase.id === 'reset') {
+      this.setNpcPose('npc.miles', 'neutral');
       this.setNpcAtAlteredLoopMark('npc.miles', 'windows');
       if (!qaPose) this.cameras.main.fadeOut(180, 0, 0, 0);
     } else if (phase.id === 'establish') {
       if (!qaPose) this.cameras.main.fadeIn(220, 0, 0, 0);
       this.setReenactmentCamera(this.room('lounge'), 23, 6, 0.78);
     } else if (phase.id === 'anticipate') {
+      this.setNpcPose('npc.miles', 'suspicious');
       this.alteredLoopRoute.setVisible(true);
       this.alteredLoopDoorLabel.setVisible(true);
       miles.setAngle(-2);
     } else if (phase.id === 'transit-1') {
+      this.setNpcPose('npc.miles', 'suspicious');
       this.alteredLoopRoute.setVisible(true);
       this.alteredLoopDoorLabel.setVisible(true);
       this.cameras.main.startFollow(miles, true, 0.045, 0.045);
       this.slideNpcForAlteredLoop('npc.miles', 'center-aisle', phase.durationMs);
     } else if (phase.id === 'transit-2') {
+      this.setNpcPose('npc.miles', 'suspicious');
       this.slideNpcForAlteredLoop('npc.miles', 'office-door', phase.durationMs);
     } else if (phase.id === 'arrived') {
+      this.setNpcPose('npc.miles', 'alarmed');
       this.setNpcAtAlteredLoopMark('npc.miles', 'office-door');
       this.alteredLoopRoute.setVisible(false);
       this.alteredLoopDoorLabel.setVisible(true);
     } else if (phase.recordsObservation) {
+      this.setNpcPose('npc.miles', 'alarmed');
       this.caseState.record('guided-altered-loop', [
         'observation.miles-office-check',
         'timeline.miles-office-deviation',
@@ -618,6 +644,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.alteredLoopRoute.setVisible(false);
     this.alteredLoopDoorLabel.setVisible(false);
     this.alteredLoopHud.hide();
+    this.setNpcPose('npc.miles', 'neutral');
     document.querySelector<HTMLElement>('#mobile-controls')?.removeAttribute('aria-hidden');
     this.player.gameObject().setVisible(true);
     this.activateRoom('lounge');
@@ -722,6 +749,8 @@ export class ExplorationScene extends Phaser.Scene {
     beatDurationMs: number,
   ): void {
     const room = this.room(roomId);
+    this.setReenactmentPose('miles', 'neutral');
+    this.setReenactmentPose('officer', 'neutral');
     this.activateRoom(room.id);
     const place = (target: Phaser.GameObjects.Container, x: number, y: number) => {
       const point = levelPoint(this.level, this.levelGeometry, room, x, y);
@@ -735,11 +764,13 @@ export class ExplorationScene extends Phaser.Scene {
     }
     this.reenactmentActor.setVisible(true);
     if (action === 'miles-window-alibi') {
+      this.setReenactmentPose('miles', 'neutral');
       place(this.reenactmentActor, 23, 4);
       this.setReenactmentCamera(room, 23, 6, 0.8);
       return;
     }
     if (action === 'key-ledger') {
+      this.setReenactmentPose('miles', 'speaking');
       place(this.reenactmentActor, 18, 6);
       this.setReenactmentCamera(room, 12, 6, 0.72);
       this.slideReenactmentActor(
@@ -749,20 +780,25 @@ export class ExplorationScene extends Phaser.Scene {
       return;
     }
     if (action === 'room-317-door') {
+      this.setReenactmentPose('miles', 'suspicious');
       place(this.reenactmentActor, 3, 5);
       this.setReenactmentCamera(room, 3, 4, 0.9);
       return;
     }
     if (action === 'office-deviation') {
+      this.setReenactmentPose('miles', 'suspicious');
       place(this.reenactmentActor, 23, 4);
       this.setReenactmentCamera(room, 23, 6, 0.72);
       this.cameras.main.startFollow(this.reenactmentActor, true, 0.045, 0.045);
       this.slideReenactmentActor(
         levelPoint(this.level, this.levelGeometry, room, 2, 15),
         Math.min(6_200, beatDurationMs - 1_200),
+        'alarmed',
       );
       return;
     }
+    this.setReenactmentPose('miles', 'alarmed');
+    this.setReenactmentPose('officer', 'alarmed');
     place(this.reenactmentActor, 14, 14);
     place(this.reenactmentOfficer, 17, 14);
     this.reenactmentOfficer.setVisible(true).setAlpha(0.84);
@@ -785,14 +821,16 @@ export class ExplorationScene extends Phaser.Scene {
     const point = levelPoint(this.level, this.levelGeometry, room, destination.x, destination.y);
     this.reenactmentActor.setPosition(point.x, point.y).setDepth(100 + point.y);
     if (beat.stageAction === 'office-deviation') {
+      this.setReenactmentPose('miles', 'alarmed');
       this.cameras.main.stopFollow();
       this.cameras.main.centerOn(point.x, point.y);
     }
   }
 
-  private slideReenactmentActor(destination: { x: number; y: number }, duration: number): void {
+  private slideReenactmentActor(destination: { x: number; y: number }, duration: number, finalPose?: LevelOneCharacterPose): void {
     if (this.reducedMotion) {
       this.reenactmentActor.setPosition(destination.x, destination.y).setDepth(100 + destination.y);
+      if (finalPose) this.setReenactmentPose('miles', finalPose);
       return;
     }
     const direction = Math.sign(destination.x - this.reenactmentActor.x) || 1;
@@ -809,6 +847,7 @@ export class ExplorationScene extends Phaser.Scene {
       onComplete: () => {
         this.reenactmentActor.setAngle(0);
         this.reenactmentActorBody.setY(0);
+        if (finalPose) this.setReenactmentPose('miles', finalPose);
       },
     });
   }
@@ -993,9 +1032,16 @@ export class ExplorationScene extends Phaser.Scene {
     if (this.finaleTransitionPending || this.dialogue?.isOpen()) return;
     const variant = this.interactionFor(id);
     if (!variant) return;
-    if (id.startsWith('clue.')) this.audio.playSfx(AUDIO_KEYS.sfx.inspect, { volume: 0.75, throttleMs: 250 });
+    if (id.startsWith('clue.')) {
+      this.audio.playSfx(AUDIO_KEYS.sfx.inspect, { volume: 0.75, throttleMs: 250 });
+      this.setPlayerPose('speaking');
+    } else {
+      this.setNpcPose(id, variant.requiresAll?.length ? 'suspicious' : 'speaking');
+    }
     this.lastInteraction = `opened-${id}`;
     this.dialogue.open(variant.script, (reason) => {
+      this.setPlayerPose('neutral');
+      if (id.startsWith('npc.')) this.setNpcPose(id, 'neutral');
       if (reason === 'completed') {
         const added = applyLevelOneInteractionClose(this.caseState, variant, reason);
         this.lastInteraction = added.length ? `unlocked-${added.at(-1)}` : `completed-${variant.script.id}`;
@@ -1004,6 +1050,25 @@ export class ExplorationScene extends Phaser.Scene {
         this.lastInteraction = `dismissed-${variant.script.id}`;
       }
     });
+  }
+
+  private setNpcPose(id: string, pose: LevelOneCharacterPose): void {
+    if (!this.textures.exists(LEVEL_ONE_CHARACTER_ATLAS_KEY)) return;
+    const character = id.startsWith('npc.') ? id.slice(4) : id;
+    if (character !== 'vera' && character !== 'miles' && character !== 'officer') return;
+    this.npcBodies.get(id)?.setFrame(levelOneCharacterFrame(character, pose));
+  }
+
+  private setPlayerPose(pose: LevelOneCharacterPose): void {
+    if (this.textures.exists(LEVEL_ONE_CHARACTER_ATLAS_KEY)) {
+      this.player.setFrame(levelOneCharacterFrame('detective', pose));
+    }
+  }
+
+  private setReenactmentPose(character: 'miles' | 'officer', pose: LevelOneCharacterPose): void {
+    if (!this.textures.exists(LEVEL_ONE_CHARACTER_ATLAS_KEY)) return;
+    const body = character === 'miles' ? this.reenactmentActorBody : this.reenactmentOfficerBody;
+    body.setFrame(levelOneCharacterFrame(character, pose));
   }
 
   private interactionFor(id: string): LevelOneInteractionVariant | undefined {
@@ -1354,6 +1419,7 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private createTextures(): void {
+    if (this.textures.exists(LEVEL_ONE_CHARACTER_ATLAS_KEY)) return;
     this.createPersonTexture('exploration-detective', 0x111318, 0xd9cfb6, true);
     this.createPersonTexture('exploration-vera', 0x20232b, 0x8f2432, true);
     this.createPersonTexture('exploration-miles', 0x27231f, 0xc7a85b, false);
@@ -1404,6 +1470,11 @@ export class ExplorationScene extends Phaser.Scene {
     canvas.dataset.propAtlasLoaded = this.textures.exists(LEVEL_ONE_PROP_ATLAS_KEY).toString();
     canvas.dataset.propAtlasFrameCount = LEVEL_ONE_PROP_FRAMES.length.toString();
     canvas.dataset.propAtlasDecodedBytes = LEVEL_ONE_PROP_ATLAS_DECODED_BYTES.toString();
+    canvas.dataset.characterAtlasLoaded = this.textures.exists(LEVEL_ONE_CHARACTER_ATLAS_KEY).toString();
+    canvas.dataset.characterAtlasFrameCount = (LEVEL_ONE_CHARACTER_FRAMES.length + LEVEL_ONE_CHARACTER_PORTRAITS.length).toString();
+    canvas.dataset.characterAtlasDecodedBytes = LEVEL_ONE_CHARACTER_ATLAS_DECODED_BYTES.toString();
+    canvas.dataset.playerCharacterFrame = this.player.frameName();
+    canvas.dataset.npcCharacterFrames = JSON.stringify([...this.npcBodies.entries()].map(([id, body]) => ({ id, frame: body.frame.name })));
     canvas.dataset.roomTextureLoaded = this.textures.exists(LEVEL_ONE_ROOM_TEXTURE_KEY).toString();
     canvas.dataset.roomTextureFrameCount = Object.keys(LEVEL_ONE_ROOM_TEXTURE_FRAMES).length.toString();
     canvas.dataset.roomTextureDecodedBytes = LEVEL_ONE_ROOM_TEXTURE_DECODED_BYTES.toString();
