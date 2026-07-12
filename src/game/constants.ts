@@ -7,5 +7,6 @@ export const SCENE_KEYS = {
   title: 'title',
   sandbox: 'sandbox',
   exploration: 'exploration',
+  caseClosed: 'case-closed',
   investigation: 'investigation',
 } as const;

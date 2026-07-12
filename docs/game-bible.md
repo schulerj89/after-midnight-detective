@@ -242,7 +242,11 @@ After a correct accusation, Level 1 presents a short, skippable detective
 reconstruction using the same room stages and cutout movement. It visualizes only
 the evidence-supported chain, labels recorded information, testimony,
 observation, and inference explicitly, and never invents an unproven murder act.
-The solved board remains available afterward with a replay control.
+Ordinary exploration HUD and controls are absent during this presentation. The
+reconstruction then cuts to a separate `CASE CLOSED` arrest tableau showing Miles
+behind foreground bars with restrained press-camera flashes. This curtain call
+adds no new evidence or truth claims; it confirms consequence, supports reduced
+motion, and returns to the solved board with its replay control.
 
 ## Technical implications
 

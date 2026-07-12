@@ -77,6 +77,7 @@ export class ExplorationScene extends Phaser.Scene {
   private promptText!: Phaser.GameObjects.Text;
   private locationText!: Phaser.GameObjects.Text;
   private caseText!: Phaser.GameObjects.Text;
+  private readonly explorationHudObjects: Array<Phaser.GameObjects.GameObject & { setVisible(visible: boolean): unknown }> = [];
   private removeMobileMove?: () => void;
   private removeMobileControl?: () => void;
   private lastInteraction = 'exploration-ready';
@@ -122,6 +123,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.createReenactmentHud();
     this.createAlteredLoopPresentation();
     this.createInput();
+    this.game.events.on('case-closed:return', this.returnFromCaseClosed, this);
     this.applyQaPose();
     this.publishDebugSnapshot({ x: 0, y: 0 });
   }
@@ -146,15 +148,15 @@ export class ExplorationScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
     this.wasd = { up: this.input.keyboard.addKey('W'), down: this.input.keyboard.addKey('S'), left: this.input.keyboard.addKey('A'), right: this.input.keyboard.addKey('D') };
     this.input.keyboard.on('keydown-E', () => {
-      if (this.isAlteredLoopRestageActive()) return;
+      if (this.isAlteredLoopRestageActive() || this.isReenactmentActive()) return;
       if (this.transitionState === 'idle') this.activateNearest();
     });
     this.input.keyboard.on('keydown-N', () => {
-      if (this.isAlteredLoopRestageActive()) return;
+      if (this.isAlteredLoopRestageActive() || this.isReenactmentActive()) return;
       if (!this.dialogue.isOpen() && this.transitionState === 'idle') this.caseBoard.toggle();
     });
     this.input.keyboard.on('keydown-T', () => {
-      if (this.isAlteredLoopRestageActive()) return;
+      if (this.isAlteredLoopRestageActive() || this.isReenactmentActive()) return;
       if (!this.dialogue.isOpen() && this.transitionState === 'idle') this.caseBoard.open('timeline');
     });
     this.input.keyboard.on('keydown-SPACE', () => {
@@ -179,6 +181,7 @@ export class ExplorationScene extends Phaser.Scene {
       this.caseBoard.destroy();
       this.reenactmentHud.destroy();
       this.alteredLoopHud.destroy();
+      this.game.events.off('case-closed:return', this.returnFromCaseClosed, this);
       document.querySelector<HTMLElement>('#mobile-controls')?.removeAttribute('aria-hidden');
     });
   }
@@ -283,7 +286,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.npcRoots.set(placement.id, root);
     this.npcBodies.set(placement.id, body);
     hitTarget.on('pointerdown', () => {
-      if (!this.isAlteredLoopRestageActive() && this.currentRoomId === room.id && this.transitionState === 'idle') this.openDialogue(placement.id);
+      if (!this.isAlteredLoopRestageActive() && !this.isReenactmentActive() && this.currentRoomId === room.id && this.transitionState === 'idle') this.openDialogue(placement.id);
     });
     this.trackRoomObject(room.id, root);
     this.interactables.push({ id: placement.id, roomId: room.id, x: point.x, y: point.y, range: 175, activate: () => this.openDialogue(placement.id) });
@@ -297,7 +300,7 @@ export class ExplorationScene extends Phaser.Scene {
     const marker = this.add.rectangle(0, -7, 42, 30, clueColor, 1).setRotation(-0.14).setStrokeStyle(2, 0xd9cfb6, 0.62).setInteractive({ useHandCursor: true });
     clue.add([halo, marker]);
     marker.on('pointerdown', () => {
-      if (!this.isAlteredLoopRestageActive() && this.currentRoomId === room.id && this.transitionState === 'idle') this.openDialogue(placement.id);
+      if (!this.isAlteredLoopRestageActive() && !this.isReenactmentActive() && this.currentRoomId === room.id && this.transitionState === 'idle') this.openDialogue(placement.id);
     });
     this.trackRoomObject(room.id, clue);
     this.interactables.push({ id: placement.id, roomId: room.id, x: point.x, y: point.y, range: 145, activate: () => this.openDialogue(placement.id) });
@@ -310,9 +313,10 @@ export class ExplorationScene extends Phaser.Scene {
     hud.fillStyle(0x090a0d, 0.86).fillRoundedRect(844, 20, 414, 70, 5);
     hud.lineStyle(2, 0x817967, 0.8).strokeRoundedRect(844, 20, 414, 70, 5);
     this.locationText = this.add.text(42, 36, 'AFTER MIDNIGHT // HOTEL MARLOWE', { color: '#d9cfb6', fontFamily: FONT, fontSize: '12px' }).setScrollFactor(0).setDepth(9001);
-    this.add.text(42, 61, 'MOVE: WASD / ARROWS  //  CASE: N / B', { color: '#817967', fontFamily: FONT, fontSize: '9px' }).setScrollFactor(0).setDepth(9001);
+    const helpText = this.add.text(42, 61, 'MOVE: WASD / ARROWS  //  CASE: N / B', { color: '#817967', fontFamily: FONT, fontSize: '9px' }).setScrollFactor(0).setDepth(9001);
     this.caseText = this.add.text(864, 34, '', { color: '#c7a85b', fontFamily: FONT, fontSize: '9px', lineSpacing: 8 }).setScrollFactor(0).setDepth(9001);
     this.promptText = this.add.text(GAME_WIDTH / 2, 452, '', { color: '#c7a85b', backgroundColor: '#090a0ddd', fontFamily: FONT, fontSize: '12px', padding: { x: 14, y: 9 } }).setOrigin(0.5).setScrollFactor(0).setDepth(9001);
+    this.explorationHudObjects.push(hud, this.locationText, helpText, this.caseText, this.promptText);
     this.updateCaseHud();
     this.setMobileLabels('ACT', 'BACK');
   }
@@ -565,6 +569,7 @@ export class ExplorationScene extends Phaser.Scene {
     const beat = this.reenactment.start(beatId);
     if (!beat) return;
     this.caseBoard.close();
+    this.setExplorationHudVisible(false);
     document.querySelector<HTMLElement>('#mobile-controls')?.setAttribute('aria-hidden', 'true');
     this.player.gameObject().setVisible(false);
     this.reenactmentActor.setVisible(true);
@@ -602,12 +607,28 @@ export class ExplorationScene extends Phaser.Scene {
     this.reenactmentActor.setVisible(false);
     this.reenactmentOfficer.setVisible(false);
     this.reenactmentHud.hide();
+    this.lastInteraction = `reenactment-${reason}`;
+    this.scene.launch(SCENE_KEYS.caseClosed, {
+      solved: this.caseState.has('outcome.level-one-solved'),
+      knowledgeCount: this.caseState.snapshot().flags.length,
+    });
+    this.scene.pause(SCENE_KEYS.exploration);
+  }
+
+  private returnFromCaseClosed(): void {
+    this.scene.resume(SCENE_KEYS.exploration);
     document.querySelector<HTMLElement>('#mobile-controls')?.removeAttribute('aria-hidden');
     this.player.gameObject().setVisible(true);
+    this.setExplorationHudVisible(true);
     this.activateRoom('lounge');
     this.setCameraForRoom(this.room('lounge'));
     this.caseBoard.open('accuse');
-    this.lastInteraction = `reenactment-${reason}`;
+    this.lastInteraction = 'case-closed-returned';
+    this.updateCaseHud();
+  }
+
+  private setExplorationHudVisible(visible: boolean): void {
+    this.explorationHudObjects.forEach((object) => object.setVisible(visible));
   }
 
   private stageReenactmentBeat(beat: LevelOneReenactmentBeat): void {
@@ -860,7 +881,7 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private activateNearest(): void {
-    if (this.transitionState !== 'idle' || this.isAlteredLoopRestageActive()) return;
+    if (this.transitionState !== 'idle' || this.isAlteredLoopRestageActive() || this.isReenactmentActive()) return;
     const nearest = this.nearestInteractable();
     if (nearest) nearest.activate();
     else this.lastInteraction = 'nothing-in-range';

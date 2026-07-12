@@ -22,7 +22,13 @@ export class PreloadScene extends Phaser.Scene {
       delay: 250,
       onComplete: () => {
         const scene = new URLSearchParams(window.location.search).get('scene');
-        this.scene.start(scene === 'blocking' ? SCENE_KEYS.sandbox : SCENE_KEYS.exploration);
+        this.scene.start(
+          scene === 'blocking'
+            ? SCENE_KEYS.sandbox
+            : scene === SCENE_KEYS.caseClosed
+              ? SCENE_KEYS.caseClosed
+              : SCENE_KEYS.exploration,
+        );
       },
     });
   }

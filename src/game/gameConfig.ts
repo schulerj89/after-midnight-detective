@@ -5,6 +5,7 @@ import { PreloadScene } from './scenes/PreloadScene';
 import { ExplorationScene } from './scenes/ExplorationScene';
 import { SandboxScene } from './scenes/SandboxScene';
 import { TitleScene } from './scenes/TitleScene';
+import { CaseClosedScene } from './scenes/CaseClosedScene';
 
 export const gameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -12,7 +13,7 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
   width: GAME_WIDTH,
   height: GAME_HEIGHT,
   backgroundColor: '#090a0d',
-  scene: [BootScene, PreloadScene, ExplorationScene, SandboxScene, TitleScene],
+  scene: [BootScene, PreloadScene, ExplorationScene, CaseClosedScene, SandboxScene, TitleScene],
   scale: {
     mode: Phaser.Scale.EXPAND,
     autoCenter: Phaser.Scale.CENTER_BOTH,
