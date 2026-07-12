@@ -14,14 +14,16 @@ retained solved case.
 - `case-closed-arrest-desktop.png` — 1280x720 settled arrest tableau.
 - `case-closed-arrest-mobile.png` — 844x390 settled arrest tableau with a 184x50
   CSS-pixel return target inside the safe area.
+- `case-closed-arrest-wide-mobile.png` — 1280x512 extra-wide landscape capture;
+  the charcoal stage fills the viewport and the jail spans 768 CSS pixels.
 - `case-closed-flash-mobile.png` — deterministic press-flash frame.
 - `case-closed-reduced-motion-mobile.png` — stable tableau with zero flash events.
 
 ## Automated results
 
-- 70 Vitest tests pass, including solved-state gating and zero-knowledge-mutation
-  checks for the finale.
-- All four layout manifests pass containment, 48-pixel minimum target,
+- 73 Vitest tests pass, including solved-state gating, zero-knowledge-mutation,
+  and standard/extra-wide responsive layout checks for the finale.
+- All five layout manifests pass containment, 48-pixel minimum target,
   forbidden-overlap, and pixel-activity checks.
 - Production typecheck and build pass.
 
@@ -36,11 +38,16 @@ retained solved case.
   and `lastInteraction=case-closed-returned`.
 - Mobile controls reported `aria-hidden=true` and computed opacity `0` during the
   finale.
+- At 1280x512 the Phaser viewport measured 1800 logical pixels, the stage center
+  was 900, the jail width was capped at 1080, and both the settled prisoner and
+  spotlight reported x=900 with a 0.0 alignment delta. During the entrance, both
+  reported x=672.5 with the same 0.0 delta.
 
 ## Human visual review
 
-The central full-body silhouette reads behind the foreground bars at desktop and
-phone scale. Red title, yellow custody label, cream evidence payoff, and the
+The central full-body silhouette reads behind the foreground bars at desktop,
+standard phone, and extra-wide phone scale. The backdrop now fills every tested
+landscape width without exposing a narrow fixed stage. Red title, yellow custody label, cream evidence payoff, and the
 large bordered return action establish a clear hierarchy. The flash preserves
 the bars and silhouette instead of bleaching them away. Negative space at the
 landscape edges feels intentional and does not reserve space for controls.

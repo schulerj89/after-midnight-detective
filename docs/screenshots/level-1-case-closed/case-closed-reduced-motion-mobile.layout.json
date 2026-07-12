@@ -3,13 +3,13 @@
   "screenshot": { "name": "case-closed-reduced-motion-mobile", "file": "case-closed-reduced-motion-mobile.png", "pose": "case-closed-arrest&reducedMotion=1" },
   "viewport": { "deviceScaleFactor": 1, "width": 844, "height": 390 },
   "elements": [
-    { "id": "jail-cell", "role": "stage", "x": 262, "y": 68, "width": 320, "height": 240 },
+    { "id": "jail-cell", "role": "stage", "x": 160, "y": 68, "width": 524, "height": 240 },
     { "id": "prisoner", "role": "subject", "x": 384, "y": 156, "width": 76, "height": 141 },
     { "id": "return-to-case", "role": "touch-control", "x": 330, "y": 331, "width": 184, "height": 50 }
   ],
   "containmentZones": [
     { "id": "safe-area", "x": 8, "y": 8, "width": 828, "height": 374, "contains": ["jail-cell", "prisoner", "return-to-case"] },
-    { "id": "cell-frame", "x": 262, "y": 68, "width": 320, "height": 240, "contains": ["prisoner"] }
+    { "id": "cell-frame", "x": 160, "y": 68, "width": 524, "height": 240, "contains": ["prisoner"] }
   ],
   "forbiddenOverlaps": [],
   "alignmentPairs": [],

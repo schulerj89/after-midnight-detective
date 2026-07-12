@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "case-closed-arrest-wide-mobile", "file": "case-closed-arrest-wide-mobile.png", "pose": "case-closed-arrest" },
+  "viewport": { "deviceScaleFactor": 1, "width": 1280, "height": 512 },
+  "elements": [
+    { "id": "stage-backdrop", "role": "stage", "x": 0, "y": 0, "width": 1280, "height": 512 },
+    { "id": "ending-title", "role": "text", "x": 506, "y": 34, "width": 268, "height": 22 },
+    { "id": "custody-label", "role": "text", "x": 503, "y": 69, "width": 274, "height": 13 },
+    { "id": "jail-cell", "role": "stage", "x": 256, "y": 89, "width": 768, "height": 315 },
+    { "id": "prisoner", "role": "subject", "x": 590, "y": 199, "width": 100, "height": 190 },
+    { "id": "ending-copy", "role": "text", "x": 529, "y": 400, "width": 225, "height": 31 },
+    { "id": "return-to-case", "role": "touch-control", "x": 519, "y": 435, "width": 242, "height": 66 }
+  ],
+  "containmentZones": [
+    { "id": "safe-area", "x": 8, "y": 8, "width": 1264, "height": 496, "contains": ["ending-title", "custody-label", "jail-cell", "prisoner", "ending-copy", "return-to-case"] },
+    { "id": "cell-frame", "x": 256, "y": 89, "width": 768, "height": 315, "contains": ["prisoner"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "ending-title", "b": "jail-cell" },
+    { "a": "ending-copy", "b": "return-to-case" }
+  ],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "wide-prisoner", "x": 590, "y": 199, "width": 100, "height": 190, "minLuminance": 8, "maxLuminance": 150, "minVariance": 20, "maxVariance": 9000 },
+    { "id": "centered-spotlight", "x": 505, "y": 0, "width": 270, "height": 393, "minLuminance": 8, "maxLuminance": 110, "minVariance": 8, "maxVariance": 9000 }
+  ]
+}

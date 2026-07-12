@@ -57,3 +57,9 @@ Validation completed: desktop, 844x390 mobile, flash, and reduced-motion capture
 were inspected. All four geometry manifests pass, including the 184x50 mobile
 return target and safe-area containment. The first pass exposed title/rail crowding
 and a three-pixel safe-area violation; both were corrected before acceptance.
+
+Responsive correction: a 1280x512 phone capture exposed the original fixed-width
+stage. The scene now derives its center and background width from the live Phaser
+viewport, scales the jail to 62% with a 1080-unit cap, and binds the spotlight x
+position to the prisoner throughout the entrance. Five manifests now pass; the
+extra-wide settled and moving samples both report a 0.0 light/actor alignment delta.

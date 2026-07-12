@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_HEIGHT, GAME_WIDTH, SCENE_KEYS } from '../constants';
 import { CaseClosedFinale } from '../features/case/CaseClosedFinale';
+import { resolveCaseClosedLayout } from '../features/case/CaseClosedLayout';
 
 const FONT = '"Press Start 2P", monospace';
 
@@ -8,11 +9,15 @@ export class CaseClosedScene extends Phaser.Scene {
   private finale = new CaseClosedFinale(true, 0);
   private prisoner!: Phaser.GameObjects.Container;
   private bars!: Phaser.GameObjects.Container;
+  private spotlight!: Phaser.GameObjects.Graphics;
   private flash!: Phaser.GameObjects.Rectangle;
   private returnButton!: Phaser.GameObjects.Container;
   private reducedMotion = false;
   private qaPose = 'none';
   private flashCount = 0;
+  private stageWidth = GAME_WIDTH;
+  private stageCenterX = GAME_WIDTH / 2;
+  private cellWidth = 590;
 
   constructor() {
     super(SCENE_KEYS.caseClosed);
@@ -24,6 +29,10 @@ export class CaseClosedScene extends Phaser.Scene {
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches || query.get('reducedMotion') === '1';
     const solved = data?.solved ?? (this.qaPose.startsWith('case-closed') || query.get('scene') === SCENE_KEYS.caseClosed);
     this.finale = new CaseClosedFinale(solved, data?.knowledgeCount ?? 0);
+    const layout = resolveCaseClosedLayout(this.scale.width);
+    this.stageWidth = layout.stageWidth;
+    this.stageCenterX = layout.stageCenterX;
+    this.cellWidth = layout.cellWidth;
 
     this.cameras.main.setBackgroundColor('#090a0d');
     this.createStage();
@@ -31,7 +40,7 @@ export class CaseClosedScene extends Phaser.Scene {
     document.querySelector<HTMLElement>('#mobile-controls')?.setAttribute('aria-hidden', 'true');
 
     if (this.finale.snapshot().status === 'locked') {
-      this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'CASE OUTCOME REQUIRED', { color: '#8f2432', fontFamily: FONT, fontSize: '18px' }).setOrigin(0.5);
+      this.add.text(this.stageCenterX, GAME_HEIGHT / 2, 'CASE OUTCOME REQUIRED', { color: '#8f2432', fontFamily: FONT, fontSize: '18px' }).setOrigin(0.5);
       this.returnButton.setVisible(false);
     } else if (this.qaPose !== 'none' || this.reducedMotion) {
       this.settleTableau(this.qaPose === 'case-closed-flash');
@@ -53,35 +62,49 @@ export class CaseClosedScene extends Phaser.Scene {
   }
 
   private createStage(): void {
-    this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x090a0d, 1).setOrigin(0).setDepth(-10);
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, 760, GAME_HEIGHT, 0x17191f, 1).setDepth(-8);
-    this.add.triangle(GAME_WIDTH / 2, 80, -280, 520, 280, 520, 0, 0, 0xd9cfb6, 0.08).setDepth(-7);
+    this.add.rectangle(0, 0, this.stageWidth, GAME_HEIGHT, 0x090a0d, 1).setOrigin(0).setDepth(-10);
+    this.add.rectangle(this.stageCenterX, GAME_HEIGHT / 2, this.stageWidth, GAME_HEIGHT, 0x17191f, 1).setDepth(-8);
+    this.add.rectangle(this.stageCenterX, 525, this.stageWidth, 390, 0x111318, 0.78).setDepth(-7.5);
+    const entranceX = resolveCaseClosedLayout(this.stageWidth).entranceX;
+    this.spotlight = this.createSpotlight(entranceX).setDepth(-7);
 
-    this.add.text(GAME_WIDTH / 2, 64, 'CASE CLOSED', {
+    this.add.text(this.stageCenterX, 64, 'CASE CLOSED', {
       color: '#8f2432', fontFamily: FONT, fontSize: '28px', letterSpacing: 6,
     }).setOrigin(0.5).setDepth(60);
-    this.add.text(GAME_WIDTH / 2, 108, 'MILES PIKE // IN CUSTODY', {
+    this.add.text(this.stageCenterX, 108, 'MILES PIKE // IN CUSTODY', {
       color: '#c7a85b', fontFamily: FONT, fontSize: '14px', letterSpacing: 2,
     }).setOrigin(0.5).setDepth(60);
 
-    this.prisoner = this.createPrisoner(GAME_WIDTH / 2 - 180, 540).setDepth(20);
-    this.bars = this.createBars().setPosition(GAME_WIDTH / 2, -GAME_HEIGHT).setDepth(40);
+    this.prisoner = this.createPrisoner(entranceX, 540).setDepth(20);
+    this.bars = this.createBars(this.cellWidth).setPosition(this.stageCenterX, -GAME_HEIGHT).setDepth(40);
 
-    this.add.text(GAME_WIDTH / 2, 568, 'THE KEY BROKE THE ALIBI.', {
+    this.add.text(this.stageCenterX, 568, 'THE KEY BROKE THE ALIBI.', {
       color: '#d9cfb6', fontFamily: FONT, fontSize: '13px',
     }).setOrigin(0.5).setDepth(60);
-    this.add.text(GAME_WIDTH / 2, 598, 'THE BARS CLOSE THE ACT.', {
+    this.add.text(this.stageCenterX, 598, 'THE BARS CLOSE THE ACT.', {
       color: '#817967', fontFamily: FONT, fontSize: '10px',
     }).setOrigin(0.5).setDepth(60);
 
     const buttonPlate = this.add.rectangle(0, 0, 340, 92, 0x090a0d, 0.94).setStrokeStyle(3, 0xd9cfb6, 0.62);
     const buttonText = this.add.text(0, 0, 'RETURN TO CASE', { color: '#d9cfb6', fontFamily: FONT, fontSize: '14px' }).setOrigin(0.5);
-    this.returnButton = this.add.container(GAME_WIDTH / 2, 658, [buttonPlate, buttonText]).setDepth(70).setSize(340, 92).setInteractive({ useHandCursor: true });
+    this.returnButton = this.add.container(this.stageCenterX, 658, [buttonPlate, buttonText]).setDepth(70).setSize(340, 92).setInteractive({ useHandCursor: true });
     this.returnButton.on('pointerdown', () => this.returnToCase());
     this.returnButton.on('pointerover', () => buttonPlate.setStrokeStyle(2, 0xc7a85b, 1));
     this.returnButton.on('pointerout', () => buttonPlate.setStrokeStyle(2, 0xd9cfb6, 0.62));
 
-    this.flash = this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0xfff7df, 1).setOrigin(0).setAlpha(0).setDepth(100);
+    this.flash = this.add.rectangle(0, 0, this.stageWidth, GAME_HEIGHT, 0xfff7df, 1).setOrigin(0).setAlpha(0).setDepth(100);
+  }
+
+  private createSpotlight(x: number): Phaser.GameObjects.Graphics {
+    const light = this.add.graphics({ x, y: 0 });
+    light.fillStyle(0xd9cfb6, 0.09);
+    light.fillPoints([
+      new Phaser.Math.Vector2(-52, 0),
+      new Phaser.Math.Vector2(52, 0),
+      new Phaser.Math.Vector2(190, 552),
+      new Phaser.Math.Vector2(-190, 552),
+    ], true);
+    return light;
   }
 
   private createPrisoner(x: number, y: number): Phaser.GameObjects.Container {
@@ -96,13 +119,15 @@ export class CaseClosedScene extends Phaser.Scene {
     return this.add.container(x, y, [shadow, body]);
   }
 
-  private createBars(): Phaser.GameObjects.Container {
+  private createBars(width: number): Phaser.GameObjects.Container {
     const pieces: Phaser.GameObjects.Rectangle[] = [];
-    for (let x = -270; x <= 270; x += 90) {
+    const halfWidth = width / 2;
+    const gap = Phaser.Math.Clamp(width / 10, 82, 108);
+    for (let x = -halfWidth + 18; x <= halfWidth - 18; x += gap) {
       pieces.push(this.add.rectangle(x, 345, 24, 410, 0x090a0d, 1).setStrokeStyle(2, 0x817967, 0.72));
     }
-    pieces.push(this.add.rectangle(0, 140, 590, 30, 0x090a0d, 1).setStrokeStyle(3, 0xc7a85b, 0.34));
-    pieces.push(this.add.rectangle(0, 550, 590, 34, 0x090a0d, 1).setStrokeStyle(3, 0x817967, 0.55));
+    pieces.push(this.add.rectangle(0, 140, width, 30, 0x090a0d, 1).setStrokeStyle(3, 0xc7a85b, 0.34));
+    pieces.push(this.add.rectangle(0, 550, width, 34, 0x090a0d, 1).setStrokeStyle(3, 0x817967, 0.55));
     return this.add.container(0, 0, pieces);
   }
 
@@ -110,10 +135,11 @@ export class CaseClosedScene extends Phaser.Scene {
     this.cameras.main.fadeIn(260, 0, 0, 0);
     this.tweens.add({
       targets: this.prisoner,
-      x: GAME_WIDTH / 2,
+      x: this.stageCenterX,
       angle: 2,
       duration: 900,
       ease: 'Sine.easeInOut',
+      onUpdate: () => this.spotlight.setX(this.prisoner.x),
       onComplete: () => this.prisoner.setAngle(0),
     });
     this.tweens.add({ targets: this.prisoner, y: 534, duration: 210, yoyo: true, repeat: 1, ease: 'Sine.easeInOut' });
@@ -139,8 +165,9 @@ export class CaseClosedScene extends Phaser.Scene {
 
   private settleTableau(showFlash: boolean): void {
     this.tweens.killAll();
-    this.prisoner.setPosition(GAME_WIDTH / 2, 540).setAngle(0);
-    this.bars.setPosition(GAME_WIDTH / 2, 0);
+    this.prisoner.setPosition(this.stageCenterX, 540).setAngle(0);
+    this.spotlight.setX(this.prisoner.x);
+    this.bars.setPosition(this.stageCenterX, 0);
     this.flash.setAlpha(showFlash ? 0.34 : 0);
     this.flashCount = showFlash ? 1 : 0;
     this.finale.settle();
@@ -165,5 +192,10 @@ export class CaseClosedScene extends Phaser.Scene {
     canvas.dataset.caseClosedFlashCount = this.flashCount.toString();
     canvas.dataset.caseClosedBarsSettled = (this.bars?.y === 0).toString();
     canvas.dataset.caseClosedPrisonerX = this.prisoner?.x.toFixed(1) ?? 'none';
+    canvas.dataset.caseClosedViewportWidth = this.stageWidth.toFixed(1);
+    canvas.dataset.caseClosedStageCenterX = this.stageCenterX.toFixed(1);
+    canvas.dataset.caseClosedCellWidth = this.cellWidth.toFixed(1);
+    canvas.dataset.caseClosedSpotlightX = this.spotlight?.x.toFixed(1) ?? 'none';
+    canvas.dataset.caseClosedSpotlightDelta = this.spotlight && this.prisoner ? Math.abs(this.spotlight.x - this.prisoner.x).toFixed(1) : 'none';
   }
 }
