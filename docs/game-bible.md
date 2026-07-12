@@ -148,6 +148,9 @@ a general decoration color.
 - Present connected interiors as isolated room stages. A doorway cuts briefly to
   black before revealing the destination; neighboring rooms do not remain visible
   beyond the active set.
+- Dress each room stage with a low-contrast material texture instead of visible
+  construction-grid cells. Surface art must remain subordinate to actors, clues,
+  dialogue, and collision-authored props.
 - Favor strong silhouettes, pools of light, negative space, and graphic shadow
   shapes over realistic rendering.
 - Present characters as full-body transparent cutouts with a consistent camera
@@ -207,6 +210,9 @@ music, ambience, dialogue, and SFX buses.
 - In landscape mobile, expand the scene to the full available viewport and layer
   the translucent joystick and action buttons over the lower corners. Controls
   must not reserve black side gutters or reduce the visible play area.
+- Pull the exploration camera back modestly on short landscape phones, center
+  compact rooms within the black theatrical surround, and anchor the location,
+  audio, and case-note HUD zones to left, center, and right safe areas.
 - Normal play opens on a pixel-noir title card with large `START CASE` and
   `SETTINGS` choices. Settings remains compact and audio-focused: music mute,
   music volume, and SFX volume, with choices persisted between sessions.

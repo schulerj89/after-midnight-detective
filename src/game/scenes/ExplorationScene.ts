@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { resolveLevelOneInteraction, type LevelOneInteractionVariant } from '../../content/cases/levelOneCaseContent';
 import levelOneSource from '../../content/levels/level-1.lvl.txt?raw';
 import { EXPLORATION_CHARACTER_SCALE, ExplorationPlayer } from '../actors/ExplorationPlayer';
-import { GAME_WIDTH, SCENE_KEYS } from '../constants';
+import { GAME_HEIGHT, GAME_WIDTH, SCENE_KEYS } from '../constants';
 import type { DialogueScript } from '../features/dialogue/DialogueModel';
 import { LevelOneCaseState } from '../features/case/LevelOneCaseState';
 import { applyLevelOneInteractionClose } from '../features/case/LevelOneInteractionController';
@@ -40,6 +40,12 @@ import {
   LEVEL_ONE_PROP_ATLAS_KEY,
   LEVEL_ONE_PROP_FRAMES,
 } from '../../content/assets/levelOnePropAtlas';
+import {
+  LEVEL_ONE_ROOM_TEXTURE_DECODED_BYTES,
+  LEVEL_ONE_ROOM_TEXTURE_FRAMES,
+  LEVEL_ONE_ROOM_TEXTURE_KEY,
+  levelOneRoomTextureFrame,
+} from '../../content/assets/levelOneRoomTextures';
 import { AUDIO_ASSETS, AUDIO_KEYS, getAudioManager, type AudioManager } from '../systems/audio/AudioManager';
 
 const FONT = '"Press Start 2P", monospace';
@@ -100,6 +106,13 @@ export class ExplorationScene extends Phaser.Scene {
   private lastReenactmentBeat = 'none';
   private lastAlteredLoopPhase = 'none';
   private alteredLoopQaFrozen = false;
+  private mobileLandscape = false;
+  private explorationCameraZoom = 1;
+  private presentationWidth = GAME_WIDTH;
+  private hudLayout = {
+    leftPanel: { x: 22, y: 20, width: 430, height: 80 },
+    rightPanel: { x: 828, y: 20, width: 430, height: 80 },
+  };
   private readonly reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches || new URLSearchParams(window.location.search).get('reducedMotion') === '1';
 
   constructor() {
@@ -112,6 +125,11 @@ export class ExplorationScene extends Phaser.Scene {
       throw new Error(parsed.errors.map((error) => `Line ${error.line}: ${error.message}`).join('\n'));
     }
     this.level = parsed.level;
+    this.mobileLandscape = window.innerWidth > window.innerHeight
+      && window.innerWidth <= 1_400
+      && window.innerHeight <= 600;
+    this.explorationCameraZoom = this.mobileLandscape ? 0.88 : 1;
+    this.presentationWidth = Math.max(GAME_WIDTH, this.scale.width);
     this.audio = getAudioManager(this.sound);
     this.audio.requestMusic(AUDIO_KEYS.music.levelOne, { loop: true, volume: 0.72 });
     this.levelGeometry = buildLevelGeometry(this.level);
@@ -231,24 +249,42 @@ export class ExplorationScene extends Phaser.Scene {
     this.add.rectangle(0, 0, this.levelGeometry.worldWidth * 2, this.levelGeometry.worldHeight * 2, 0x090a0d, 1).setOrigin(0).setDepth(-10);
 
     this.level.rooms.forEach((room, roomIndex) => {
-      const floor = this.trackRoomObject(room.id, this.add.graphics().setDepth(0));
+      const bounds = this.roomBounds(room);
+      const shade = roomIndex % 2 === 0 ? 0x17191f : 0x151820;
+      this.trackRoomObject(
+        room.id,
+        this.add.rectangle(bounds.x, bounds.y, bounds.width, bounds.height, shade, 1).setOrigin(0).setDepth(-1),
+      );
+      const textureFrame = levelOneRoomTextureFrame(room.id);
+      if (textureFrame && this.textures.exists(LEVEL_ONE_ROOM_TEXTURE_KEY)) {
+        this.trackRoomObject(
+          room.id,
+          this.add.tileSprite(
+            bounds.x,
+            bounds.y,
+            bounds.width,
+            bounds.height,
+            LEVEL_ONE_ROOM_TEXTURE_KEY,
+            textureFrame,
+          ).setOrigin(0).setAlpha(0.5).setDepth(0),
+        );
+      }
       room.map.forEach((row, localY) => row.forEach((tile, localX) => {
         const x = this.levelGeometry.offsetX + (room.originX + localX) * this.level.tileSize;
         const y = this.levelGeometry.offsetY + (room.originY + localY) * this.level.tileSize;
-        if (tile !== '#') {
-          const shade = roomIndex % 2 === 0 ? 0x17191f : 0x151820;
-          floor.fillStyle(shade, 1).fillRect(x, y, this.level.tileSize, this.level.tileSize);
-          floor.lineStyle(1, 0x252832, 0.58).strokeRect(x, y, this.level.tileSize, this.level.tileSize);
-          if (tile === '+') {
-            floor.fillStyle(0xc7a85b, 0.24).fillRect(x, y, this.level.tileSize, this.level.tileSize);
-          }
-        } else {
+        if (tile === '#') {
           const wall = this.add
             .rectangle(x, y, this.level.tileSize, this.level.tileSize, 0x0c0e13, 1)
             .setOrigin(0)
-            .setStrokeStyle(2, 0x2b2d35, 0.8)
             .setDepth(100 + y + this.level.tileSize);
           this.trackRoomObject(room.id, wall);
+        } else if (tile === '+') {
+          this.trackRoomObject(
+            room.id,
+            this.add.rectangle(x, y, this.level.tileSize, this.level.tileSize, 0xc7a85b, 0.18)
+              .setOrigin(0)
+              .setDepth(1),
+          );
         }
       }));
 
@@ -327,15 +363,23 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private createHud(): void {
+    const margin = 22;
+    const panelWidth = 430;
+    const panelHeight = 80;
+    const rightX = this.presentationWidth - margin - panelWidth;
+    this.hudLayout = {
+      leftPanel: { x: margin, y: 20, width: panelWidth, height: panelHeight },
+      rightPanel: { x: rightX, y: 20, width: panelWidth, height: panelHeight },
+    };
     const hud = this.add.graphics().setScrollFactor(0).setDepth(9000);
-    hud.fillStyle(0x090a0d, 0.86).fillRoundedRect(22, 20, 430, 70, 5);
-    hud.lineStyle(2, 0x817967, 0.8).strokeRoundedRect(22, 20, 430, 70, 5);
-    hud.fillStyle(0x090a0d, 0.86).fillRoundedRect(844, 20, 414, 70, 5);
-    hud.lineStyle(2, 0x817967, 0.8).strokeRoundedRect(844, 20, 414, 70, 5);
-    this.locationText = this.add.text(42, 36, 'AFTER MIDNIGHT // HOTEL MARLOWE', { color: '#d9cfb6', fontFamily: FONT, fontSize: '12px' }).setScrollFactor(0).setDepth(9001);
-    const helpText = this.add.text(42, 61, 'MOVE: WASD / ARROWS  //  CASE: N / B', { color: '#817967', fontFamily: FONT, fontSize: '9px' }).setScrollFactor(0).setDepth(9001);
-    this.caseText = this.add.text(864, 34, '', { color: '#c7a85b', fontFamily: FONT, fontSize: '9px', lineSpacing: 8 }).setScrollFactor(0).setDepth(9001);
-    this.promptText = this.add.text(GAME_WIDTH / 2, 452, '', { color: '#c7a85b', backgroundColor: '#090a0ddd', fontFamily: FONT, fontSize: '12px', padding: { x: 14, y: 9 } }).setOrigin(0.5).setScrollFactor(0).setDepth(9001);
+    hud.fillStyle(0x090a0d, 0.86).fillRoundedRect(margin, 20, panelWidth, panelHeight, 5);
+    hud.lineStyle(2, 0x817967, 0.8).strokeRoundedRect(margin, 20, panelWidth, panelHeight, 5);
+    hud.fillStyle(0x090a0d, 0.86).fillRoundedRect(rightX, 20, panelWidth, panelHeight, 5);
+    hud.lineStyle(2, 0x817967, 0.8).strokeRoundedRect(rightX, 20, panelWidth, panelHeight, 5);
+    this.locationText = this.add.text(margin + 20, 34, 'AFTER MIDNIGHT // HOTEL MARLOWE', { color: '#d9cfb6', fontFamily: FONT, fontSize: '12px' }).setScrollFactor(0).setDepth(9001);
+    const helpText = this.add.text(margin + 20, 66, 'MOVE: WASD / ARROWS  //  CASE: N / B', { color: '#817967', fontFamily: FONT, fontSize: '9px' }).setScrollFactor(0).setDepth(9001);
+    this.caseText = this.add.text(rightX + 20, 32, '', { color: '#c7a85b', fontFamily: FONT, fontSize: '9px', lineSpacing: 10 }).setScrollFactor(0).setDepth(9001);
+    this.promptText = this.add.text(this.presentationWidth / 2, 452, '', { color: '#c7a85b', backgroundColor: '#090a0ddd', fontFamily: FONT, fontSize: '12px', padding: { x: 14, y: 9 } }).setOrigin(0.5).setScrollFactor(0).setDepth(9001);
     this.explorationHudObjects.push(hud, this.locationText, helpText, this.caseText, this.promptText);
     this.updateCaseHud();
     this.setMobileLabels('ACT', 'BACK');
@@ -1039,13 +1083,20 @@ export class ExplorationScene extends Phaser.Scene {
   private setCameraForRoom(room: LevelRoom): void {
     const bounds = this.roomBounds(room);
     const verticalStagePadding = room.id === 'lounge' ? 220 : 0;
+    const paddedHeight = bounds.height + verticalStagePadding * 2;
+    const minimumWorldWidth = this.presentationWidth / this.explorationCameraZoom;
+    const minimumWorldHeight = GAME_HEIGHT / this.explorationCameraZoom;
+    const cameraBoundsWidth = Math.max(bounds.width, minimumWorldWidth);
+    const cameraBoundsHeight = Math.max(paddedHeight, minimumWorldHeight);
+    const cameraBoundsX = bounds.x + (bounds.width - cameraBoundsWidth) / 2;
+    const cameraBoundsY = bounds.y - verticalStagePadding + (paddedHeight - cameraBoundsHeight) / 2;
     this.cameras.main.stopFollow();
-    this.cameras.main.setZoom(1);
+    this.cameras.main.setZoom(this.explorationCameraZoom);
     this.cameras.main.setBounds(
-      bounds.x,
-      bounds.y - verticalStagePadding,
-      bounds.width,
-      bounds.height + verticalStagePadding * 2,
+      cameraBoundsX,
+      cameraBoundsY,
+      cameraBoundsWidth,
+      cameraBoundsHeight,
     );
     if (this.player) {
       this.cameras.main.centerOn(this.player.position().x, this.player.position().y);
@@ -1323,6 +1374,7 @@ export class ExplorationScene extends Phaser.Scene {
   private publishDebugSnapshot(vector: MovementVector): void {
     const position = this.player.position();
     const camera = this.cameras.main.worldView;
+    const activeRoom = this.room(this.currentRoomId);
     const canvas = this.game.canvas;
     canvas.dataset.explorationReady = 'true';
     canvas.dataset.sandboxScene = SCENE_KEYS.exploration;
@@ -1332,6 +1384,15 @@ export class ExplorationScene extends Phaser.Scene {
     canvas.dataset.propAtlasLoaded = this.textures.exists(LEVEL_ONE_PROP_ATLAS_KEY).toString();
     canvas.dataset.propAtlasFrameCount = LEVEL_ONE_PROP_FRAMES.length.toString();
     canvas.dataset.propAtlasDecodedBytes = LEVEL_ONE_PROP_ATLAS_DECODED_BYTES.toString();
+    canvas.dataset.roomTextureLoaded = this.textures.exists(LEVEL_ONE_ROOM_TEXTURE_KEY).toString();
+    canvas.dataset.roomTextureFrameCount = Object.keys(LEVEL_ONE_ROOM_TEXTURE_FRAMES).length.toString();
+    canvas.dataset.roomTextureDecodedBytes = LEVEL_ONE_ROOM_TEXTURE_DECODED_BYTES.toString();
+    canvas.dataset.roomTextureFrame = levelOneRoomTextureFrame(activeRoom.id) ?? 'none';
+    canvas.dataset.activeRoomBounds = JSON.stringify(this.roomBounds(activeRoom));
+    canvas.dataset.mobileLandscape = this.mobileLandscape.toString();
+    canvas.dataset.explorationCameraTargetZoom = this.explorationCameraZoom.toFixed(2);
+    canvas.dataset.presentationWidth = this.presentationWidth.toFixed(1);
+    canvas.dataset.hudLayout = JSON.stringify(this.hudLayout);
     canvas.dataset.textureCount = this.textures.getTextureKeys().length.toString();
     canvas.dataset.actualFps = this.game.loop.actualFps.toFixed(1);
     canvas.dataset.activeRoomCount = [...this.roomObjects.values()].filter((objects) => objects.some((object) => object.active)).length.toString();
@@ -1342,7 +1403,6 @@ export class ExplorationScene extends Phaser.Scene {
     canvas.dataset.lastTransitionLinkId = this.lastTransition?.linkId ?? 'none';
     canvas.dataset.lastTransitionFromRoom = this.lastTransition?.fromRoomId ?? 'none';
     canvas.dataset.lastTransitionToRoom = this.lastTransition?.toRoomId ?? 'none';
-    const activeRoom = this.room(this.currentRoomId);
     canvas.dataset.activePropLayout = JSON.stringify(activeRoom.placements
       .filter((placement) => placement.kind !== 'actor')
       .map((placement) => buildPropRenderPlan(this.level, this.levelGeometry, activeRoom, placement))

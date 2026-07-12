@@ -6,6 +6,11 @@ import {
   LEVEL_ONE_PROP_ATLAS_JSON,
   LEVEL_ONE_PROP_ATLAS_KEY,
 } from '../../content/assets/levelOnePropAtlas';
+import {
+  LEVEL_ONE_ROOM_TEXTURE_IMAGE,
+  LEVEL_ONE_ROOM_TEXTURE_JSON,
+  LEVEL_ONE_ROOM_TEXTURE_KEY,
+} from '../../content/assets/levelOneRoomTextures';
 
 export class PreloadScene extends Phaser.Scene {
   private loadingText!: Phaser.GameObjects.Text;
@@ -27,6 +32,7 @@ export class PreloadScene extends Phaser.Scene {
     });
     AUDIO_ASSETS.forEach((asset) => this.load.audio(asset.key, asset.path));
     this.load.atlas(LEVEL_ONE_PROP_ATLAS_KEY, LEVEL_ONE_PROP_ATLAS_IMAGE, LEVEL_ONE_PROP_ATLAS_JSON);
+    this.load.atlas(LEVEL_ONE_ROOM_TEXTURE_KEY, LEVEL_ONE_ROOM_TEXTURE_IMAGE, LEVEL_ONE_ROOM_TEXTURE_JSON);
   }
 
   create(): void {

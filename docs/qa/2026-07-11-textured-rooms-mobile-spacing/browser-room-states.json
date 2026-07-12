@@ -1,0 +1,198 @@
+[
+  {
+    "activeRooms": 1,
+    "audioRect": {
+      "bottom": 56,
+      "height": 48,
+      "left": 373,
+      "right": 471,
+      "top": 8,
+      "width": 98,
+      "x": 373,
+      "y": 8
+    },
+    "canvasRect": {
+      "bottom": 390,
+      "height": 390,
+      "left": 0,
+      "right": 844,
+      "top": 0,
+      "width": 844,
+      "x": 0,
+      "y": 0
+    },
+    "fps": 58.5,
+    "frame": "lounge",
+    "hud": {
+      "leftPanel": {
+        "height": 80,
+        "width": 430,
+        "x": 22,
+        "y": 20
+      },
+      "rightPanel": {
+        "height": 80,
+        "width": 430,
+        "x": 1106.1538461538462,
+        "y": 20
+      }
+    },
+    "loaded": "true",
+    "presentationWidth": 1558.2,
+    "roomBounds": {
+      "height": 2160,
+      "width": 2160,
+      "x": 810,
+      "y": 666
+    },
+    "roomId": "lounge",
+    "zoom": 0.88
+  },
+  {
+    "activeRooms": 1,
+    "audioRect": {
+      "bottom": 56,
+      "height": 48,
+      "left": 373,
+      "right": 471,
+      "top": 8,
+      "width": 98,
+      "x": 373,
+      "y": 8
+    },
+    "canvasRect": {
+      "bottom": 390,
+      "height": 390,
+      "left": 0,
+      "right": 844,
+      "top": 0,
+      "width": 844,
+      "x": 0,
+      "y": 0
+    },
+    "fps": 58.5,
+    "frame": "kitchen",
+    "hud": {
+      "leftPanel": {
+        "height": 80,
+        "width": 430,
+        "x": 22,
+        "y": 20
+      },
+      "rightPanel": {
+        "height": 80,
+        "width": 430,
+        "x": 1106.1538461538462,
+        "y": 20
+      }
+    },
+    "loaded": "true",
+    "presentationWidth": 1558.2,
+    "roomBounds": {
+      "height": 720,
+      "width": 864,
+      "x": 2970,
+      "y": 1386
+    },
+    "roomId": "kitchen",
+    "zoom": 0.88
+  },
+  {
+    "activeRooms": 1,
+    "audioRect": {
+      "bottom": 56,
+      "height": 48,
+      "left": 373,
+      "right": 471,
+      "top": 8,
+      "width": 98,
+      "x": 373,
+      "y": 8
+    },
+    "canvasRect": {
+      "bottom": 390,
+      "height": 390,
+      "left": 0,
+      "right": 844,
+      "top": 0,
+      "width": 844,
+      "x": 0,
+      "y": 0
+    },
+    "fps": 58.5,
+    "frame": "bedroom",
+    "hud": {
+      "leftPanel": {
+        "height": 80,
+        "width": 430,
+        "x": 22,
+        "y": 20
+      },
+      "rightPanel": {
+        "height": 80,
+        "width": 430,
+        "x": 1106.1538461538462,
+        "y": 20
+      }
+    },
+    "loaded": "true",
+    "presentationWidth": 1558.2,
+    "roomBounds": {
+      "height": 576,
+      "width": 576,
+      "x": 1602,
+      "y": 90
+    },
+    "roomId": "bedroom",
+    "zoom": 0.88
+  },
+  {
+    "activeRooms": 1,
+    "audioRect": {
+      "bottom": 56,
+      "height": 48,
+      "left": 373,
+      "right": 471,
+      "top": 8,
+      "width": 98,
+      "x": 373,
+      "y": 8
+    },
+    "canvasRect": {
+      "bottom": 390,
+      "height": 390,
+      "left": 0,
+      "right": 844,
+      "top": 0,
+      "width": 844,
+      "x": 0,
+      "y": 0
+    },
+    "fps": 58.5,
+    "frame": "office",
+    "hud": {
+      "leftPanel": {
+        "height": 80,
+        "width": 430,
+        "x": 22,
+        "y": 20
+      },
+      "rightPanel": {
+        "height": 80,
+        "width": 430,
+        "x": 1106.1538461538462,
+        "y": 20
+      }
+    },
+    "loaded": "true",
+    "presentationWidth": 1558.2,
+    "roomBounds": {
+      "height": 576,
+      "width": 720,
+      "x": 90,
+      "y": 1530
+    },
+    "roomId": "office",
+    "zoom": 0.88
+  }
+]

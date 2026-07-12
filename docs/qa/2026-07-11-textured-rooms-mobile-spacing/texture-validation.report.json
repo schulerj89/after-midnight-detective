@@ -1,0 +1,32 @@
+{
+  "status": "pass",
+  "size": [
+    1024,
+    1024
+  ],
+  "frameCount": 4,
+  "decodedBytes": 4194304,
+  "metrics": {
+    "lounge": {
+      "meanLuminance": 20.41,
+      "luminanceStdDev": 6.26,
+      "maxEdgeSeamDelta": 2.51
+    },
+    "kitchen": {
+      "meanLuminance": 23.1,
+      "luminanceStdDev": 7.56,
+      "maxEdgeSeamDelta": 2.41
+    },
+    "bedroom": {
+      "meanLuminance": 23.06,
+      "luminanceStdDev": 4.6,
+      "maxEdgeSeamDelta": 2.9
+    },
+    "office": {
+      "meanLuminance": 22.91,
+      "luminanceStdDev": 4.85,
+      "maxEdgeSeamDelta": 2.42
+    }
+  },
+  "failures": []
+}

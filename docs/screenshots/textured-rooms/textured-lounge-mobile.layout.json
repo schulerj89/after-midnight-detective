@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "screenshot": { "name": "textured-lounge-mobile", "file": "textured-lounge-mobile.png", "pose": "level-room-lounge" },
+  "viewport": { "width": 844, "height": 390, "deviceScaleFactor": 1 },
+  "elements": [
+    { "id": "left-hud", "role": "hud-panel", "x": 11.92, "y": 10.83, "width": 232.92, "height": 43.33 },
+    { "id": "audio-control", "role": "touch-control", "x": 373, "y": 8, "width": 98, "height": 48, "minWidth": 48, "minHeight": 48 },
+    { "id": "right-hud", "role": "hud-panel", "x": 599.08, "y": 10.83, "width": 232.92, "height": 43.33 },
+    { "id": "joystick", "role": "touch-control", "x": 16, "y": 262, "width": 112, "height": 112, "minWidth": 48, "minHeight": 48 },
+    { "id": "button-b", "role": "touch-control", "x": 690, "y": 278, "width": 62, "height": 62, "minWidth": 48, "minHeight": 48 },
+    { "id": "button-a", "role": "touch-control", "x": 766, "y": 296, "width": 62, "height": 62, "minWidth": 48, "minHeight": 48 }
+  ],
+  "containmentZones": [
+    { "id": "safe-area", "x": 8, "y": 8, "width": 828, "height": 374, "contains": ["left-hud", "audio-control", "right-hud", "joystick", "button-b", "button-a"] }
+  ],
+  "forbiddenOverlaps": [
+    { "a": "left-hud", "b": "audio-control" },
+    { "a": "audio-control", "b": "right-hud" },
+    { "a": "left-hud", "b": "joystick" },
+    { "a": "right-hud", "b": "button-a" }
+  ],
+  "alignmentPairs": [],
+  "expectedPixelActivity": [
+    { "id": "lounge-carpet", "x": 280, "y": 110, "width": 280, "height": 180, "minVariance": 5, "maxVariance": 10000 }
+  ]
+}

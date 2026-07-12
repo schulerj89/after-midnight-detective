@@ -29,7 +29,7 @@ body {
 #audio-control {
   position: fixed;
   top: max(12px, calc(env(safe-area-inset-top) + 6px));
-  left: 43%;
+  left: 50%;
   z-index: 16;
   display: flex;
   min-width: 108px;

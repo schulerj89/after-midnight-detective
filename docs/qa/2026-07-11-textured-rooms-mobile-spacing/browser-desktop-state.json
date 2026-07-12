@@ -1,0 +1,43 @@
+{
+  "audioRect": {
+    "bottom": 60,
+    "height": 48,
+    "left": 586,
+    "right": 694,
+    "top": 12,
+    "width": 108,
+    "x": 586,
+    "y": 12
+  },
+  "canvasRect": {
+    "bottom": 720,
+    "height": 720,
+    "left": 0,
+    "right": 1280,
+    "top": 0,
+    "width": 1280,
+    "x": 0,
+    "y": 0
+  },
+  "fps": 58.5,
+  "frame": "lounge",
+  "hud": {
+    "leftPanel": {
+      "height": 80,
+      "width": 430,
+      "x": 22,
+      "y": 20
+    },
+    "rightPanel": {
+      "height": 80,
+      "width": 430,
+      "x": 828,
+      "y": 20
+    }
+  },
+  "loaded": "true",
+  "mobile": "false",
+  "presentationWidth": 1280,
+  "roomId": "lounge",
+  "zoom": 1
+}
