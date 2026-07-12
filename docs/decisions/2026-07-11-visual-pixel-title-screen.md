@@ -93,6 +93,9 @@ geometry analysis with zero failures. At 844x390 each interactive row is
 270.83x52 CSS pixels. Browser checks prove pointer Settings, mute, both volume
 cycles, Back, keyboard navigation, and Start-to-lounge behavior. Original and
 annotated grid review found no title/settings overlap or unsafe placement.
+The later landscape-centering correction reports a `0.00` center delta on both
+desktop and representative mobile viewports while keeping both controls inside
+the safe area.
 
 ## Follow-up
 

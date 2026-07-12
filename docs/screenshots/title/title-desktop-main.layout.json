@@ -3,14 +3,19 @@
   "screenshot": { "name": "title-desktop-main", "file": "title-desktop-main.png", "pose": "title-main" },
   "viewport": { "width": 1280, "height": 720, "deviceScaleFactor": 1 },
   "elements": [
-    { "id": "start", "role": "touch-control", "x": 390, "y": 390, "width": 500, "height": 96, "minWidth": 48, "minHeight": 48 },
-    { "id": "settings", "role": "touch-control", "x": 390, "y": 508, "width": 500, "height": 96, "minWidth": 48, "minHeight": 48 }
+    { "id": "title-block", "role": "title-text", "x": 245, "y": 291.75, "width": 790, "height": 136.5 },
+    { "id": "viewport-center-target", "role": "alignment-target", "x": 245, "y": 291.75, "width": 790, "height": 136.5 },
+    { "id": "start", "role": "touch-control", "x": 390, "y": 487, "width": 500, "height": 96, "minWidth": 48, "minHeight": 48 },
+    { "id": "settings", "role": "touch-control", "x": 390, "y": 602, "width": 500, "height": 96, "minWidth": 48, "minHeight": 48 }
   ],
   "containmentZones": [
-    { "id": "safe-area", "x": 16, "y": 16, "width": 1248, "height": 688, "contains": ["start", "settings"] }
+    { "id": "safe-area", "x": 16, "y": 16, "width": 1248, "height": 688, "contains": ["title-block", "start", "settings"] }
   ],
   "forbiddenOverlaps": [{ "a": "start", "b": "settings" }],
-  "alignmentPairs": [{ "a": "start", "b": "settings", "axis": "centerX", "tolerance": 1 }],
+  "alignmentPairs": [
+    { "a": "title-block", "b": "viewport-center-target", "axis": "centerX", "tolerance": 0.5 },
+    { "a": "title-block", "b": "viewport-center-target", "axis": "centerY", "tolerance": 0.5 },
+    { "a": "start", "b": "settings", "axis": "centerX", "tolerance": 1 }
+  ],
   "expectedPixelActivity": []
 }
-

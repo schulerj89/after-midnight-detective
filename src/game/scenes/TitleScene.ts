@@ -20,6 +20,7 @@ export class TitleScene extends Phaser.Scene {
   private mainPanel!: Phaser.GameObjects.Container;
   private settingsPanel!: Phaser.GameObjects.Container;
   private brandPanel!: Phaser.GameObjects.Container;
+  private titleLines: Phaser.GameObjects.Text[] = [];
   private audio!: AudioManager;
   private stageWidth = GAME_WIDTH;
   private starting = false;
@@ -62,27 +63,26 @@ export class TitleScene extends Phaser.Scene {
     graphics.lineStyle(2, 0xc7a85b, 0.2).lineBetween(0, 642, this.stageWidth, 642);
 
     this.brandPanel = this.add.container(0, 0);
-    this.brandPanel.add(this.add.text(this.stageWidth / 2, 92, 'HOTEL MARLOWE // 12:08 A.M.', {
+    this.brandPanel.add(this.add.text(this.stageWidth / 2, 241.25, 'HOTEL MARLOWE // 12:08 A.M.', {
       color: '#817967', fontFamily: FONT, fontSize: '11px', letterSpacing: 3,
     }).setOrigin(0.5));
-    this.brandPanel.add(this.add.text(this.stageWidth / 2, 170, 'AFTER MIDNIGHT,', {
+    const firstLine = this.add.text(this.stageWidth / 2, 316.25, 'AFTER MIDNIGHT,', {
       color: '#d9cfb6', fontFamily: FONT, fontSize: '48px', letterSpacing: 5,
-    }).setOrigin(0.5));
-    this.brandPanel.add(this.add.text(this.stageWidth / 2, 246, 'DETECTIVE', {
+    }).setOrigin(0.5);
+    const secondLine = this.add.text(this.stageWidth / 2, 396.25, 'DETECTIVE', {
       color: '#8f2432', fontFamily: FONT, fontSize: '62px', letterSpacing: 7,
-    }).setOrigin(0.5));
-    this.brandPanel.add(this.add.text(this.stageWidth / 2, 314, 'THE NIGHT REMEMBERS WHERE EVERYONE STOOD.', {
+    }).setOrigin(0.5);
+    this.titleLines = [firstLine, secondLine];
+    this.brandPanel.add(this.titleLines);
+    this.brandPanel.add(this.add.text(this.stageWidth / 2, 456.25, 'THE NIGHT REMEMBERS WHERE EVERYONE STOOD.', {
       color: '#b9ad91', fontFamily: FONT, fontSize: '10px', letterSpacing: 1,
-    }).setOrigin(0.5));
-    this.brandPanel.add(this.add.text(this.stageWidth / 2, 680, 'WASD / ARROWS  //  ENTER / TAP', {
-      color: '#57564f', fontFamily: FONT, fontSize: '8px', letterSpacing: 1,
     }).setOrigin(0.5));
   }
 
   private createMainPanel(): void {
     this.mainPanel = this.add.container(0, 0);
-    this.createControl(this.mainPanel, 'start', 438, 'START CASE');
-    this.createControl(this.mainPanel, 'settings', 556, 'SETTINGS');
+    this.createControl(this.mainPanel, 'start', 535, 'START CASE');
+    this.createControl(this.mainPanel, 'settings', 650, 'SETTINGS');
   }
 
   private createSettingsPanel(): void {
@@ -235,6 +235,17 @@ export class TitleScene extends Phaser.Scene {
     canvas.dataset.titleMusicLevel = this.audio.getLevel('music').toFixed(2);
     canvas.dataset.titleSfxLevel = this.audio.getLevel('sfx').toFixed(2);
     canvas.dataset.titleStageWidth = String(this.stageWidth);
+    if (this.titleLines.length === 2) {
+      const [first, second] = this.titleLines.map((line) => line.getBounds());
+      const left = Math.min(first.left, second.left);
+      const top = Math.min(first.top, second.top);
+      const right = Math.max(first.right, second.right);
+      const bottom = Math.max(first.bottom, second.bottom);
+      const titleBlock = { x: left, y: top, width: right - left, height: bottom - top };
+      canvas.dataset.titleBlock = JSON.stringify(titleBlock);
+      canvas.dataset.titleCenterDeltaX = (left + titleBlock.width / 2 - this.stageWidth / 2).toFixed(2);
+      canvas.dataset.titleCenterDeltaY = (top + titleBlock.height / 2 - GAME_HEIGHT / 2).toFixed(2);
+    }
     canvas.dataset.titleLayout = JSON.stringify(this.controls
       .filter((control) => active.has(control.action))
       .map((control) => ({ id: control.action, role: 'touch-control', ...control.logicalBounds })));

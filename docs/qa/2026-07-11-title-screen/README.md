@@ -18,6 +18,8 @@ Each PNG has a companion runtime-derived layout manifest. Analyzer reports and
 ## Automated results
 
 - All title controls remain inside their declared safe area.
+- The two-line title block reports `0.00` horizontal and vertical center delta
+  at both 1280x720 desktop and 844x390 landscape mobile.
 - Every mobile control renders 270.83x52 CSS pixels, exceeding the 48x48
   minimum.
 - Button columns align within one pixel and adjacent controls do not overlap.
@@ -36,7 +38,8 @@ Each PNG has a companion runtime-derived layout manifest. Analyzer reports and
 
 ## Human visual review
 
-The cream/red title reads first, followed by the active dim-yellow plate. Rain
+The cream/red title now straddles the exact landscape viewport midpoint and
+reads first, followed by the active dim-yellow plate. Rain
 and hard shadow planes establish noir atmosphere without obscuring copy. The
 mobile settings screen uses the full landscape width, keeps four evenly spaced
 single-tap rows, and avoids title-copy overlap.
@@ -46,4 +49,3 @@ single-tap rows, and avoids title-copy overlap.
 Canvas controls use explicit keyboard selection and visible focus rather than
 native HTML button semantics. Screenshot geometry can prove target size and
 placement, but not subjective comfort for every device or font rasterizer.
-
